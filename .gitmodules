@@ -1,0 +1,3 @@
+[submodule "3rd-party/ospf-cpp-base"]
+	path = 3rd-party/ospf-cpp-base
+	url = https://github.com/fuookami/ospf-cpp-base.git
