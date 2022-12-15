@@ -1,3 +1,6 @@
 [submodule "3rd-party/ospf-cpp-base"]
 	path = 3rd-party/ospf-cpp-base
 	url = https://github.com/fuookami/ospf-cpp-base.git
+[submodule "3rd-party/magic_enum"]
+	path = 3rd-party/magic_enum
+	url = https://github.com/Neargye/magic_enum.git

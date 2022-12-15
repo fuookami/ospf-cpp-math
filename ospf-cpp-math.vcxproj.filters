@@ -21,5 +21,16 @@
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
+      <Filter>src\ospf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concept\bounded.hpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
