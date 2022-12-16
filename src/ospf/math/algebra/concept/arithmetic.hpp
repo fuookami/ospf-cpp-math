@@ -2,6 +2,7 @@
 
 #include <ospf/basic_definition.hpp>
 #include <ospf/literal_constant.hpp>
+#include <ospf/concepts.hpp>
 #include <ospf/math/ospf_math_api.hpp>
 #include <concepts>
 #include <compare>
@@ -18,15 +19,19 @@ namespace ospf
 					{ static_cast<T>(0) } -> std::same_as<T>;
 					{ static_cast<T>(1) } -> std::same_as<T>;
 				}
-		struct ArithmeticTrait {};
+		struct ArithmeticTrait
+		{
+			static const T zero;
+			static const T one;
+		};
 
 		template<typename T>
 		concept Arithmetic = std::copyable<T> 
 			&& (std::three_way_comparable<T> || std::totally_ordered<T>)
 			&& requires
 			{
-				{ ArithmeticTrait<T>::zero } -> std::same_as<T>;
-				{ ArithmeticTrait<T>::one } -> std::same_as<T>;
+				{ ArithmeticTrait<T>::zero } -> DecaySameAs<T>;
+				{ ArithmeticTrait<T>::one } -> DecaySameAs<T>;
 			};
 
 		template<>
@@ -142,17 +147,17 @@ namespace ospf
 		};
 
 		template<u64 bits>
-		struct ArithmeticTrait<uintx<bits>>
+		struct ArithmeticTrait<intx<bits>>
 		{
-			static constexpr const uintx<bits> zero = uintx<bints>{ 0_u64 };
-			static constexpr const uintx<bits> one = uintx<bints>{ 1_u64 };
+			static constexpr const intx<bits> zero = intx<bits>{ 0_i64 };
+			static constexpr const intx<bits> one = intx<bits>{ 1_i64 };
 		};
 
 		template<u64 bits>
-		struct ArithmeticTrait<intx<bits>>
+		struct ArithmeticTrait<uintx<bits>>
 		{
-			static constexpr const intx<bits> zero = intx<bints>{ 0_i64 };
-			static constexpr const intx<bits> one = intx<bints>{ 1_i64 };
+			static constexpr const uintx<bits> zero = uintx<bits>{ 0_u64 };
+			static constexpr const uintx<bits> one = uintx<bits>{ 1_u64 };
 		};
 
 		template<>
@@ -205,7 +210,7 @@ namespace ospf
 		};
 
 		template<>
-		struct ArithmeticTrait<dec50>
+		struct ArithmeticTrait<dec100>
 		{
 			OSPF_MATH_API static const dec100 zero;
 			OSPF_MATH_API static const dec100 one;

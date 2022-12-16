@@ -16,20 +16,47 @@
     <Filter Include="src\ospf\math\algebra\concept">
       <UniqueIdentifier>{29ed3657-f542-4ec4-8982-152611a1e614}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\functional">
+      <UniqueIdentifier>{3a039acd-e334-4ea9-8882-82c79cd71f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\combinatorics">
+      <UniqueIdentifier>{e39144cf-065c-43f1-8606-fe8857e46e64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\geometry">
+      <UniqueIdentifier>{154b7904-31d1-4b9f-90c6-08e38eeb2078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\operator">
+      <UniqueIdentifier>{27c2aa96-0f02-44a2-abf9-29555eeba4e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\ordinary">
+      <UniqueIdentifier>{492ae55c-1511-4502-9ab5-8df253f20be1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\rational">
+      <UniqueIdentifier>{61296e49-c80e-4ccb-81d8-786aa32998d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\scale">
+      <UniqueIdentifier>{275d9e06-fbe7-4c72-802a-7db980096ec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\value_range">
+      <UniqueIdentifier>{740f3624-4be8-4fac-b3fd-d589f0eacf88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
     </ClInclude>
-    <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
-      <Filter>src\ospf</Filter>
-    </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\concept\bounded.hpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
+      <Filter>src\ospf\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
     </ClCompile>
   </ItemGroup>
