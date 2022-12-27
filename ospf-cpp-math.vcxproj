@@ -141,6 +141,8 @@
   <ItemGroup>
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\bounded.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\concept\precision.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp" />
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp" />
   </ItemGroup>
   <ItemGroup>

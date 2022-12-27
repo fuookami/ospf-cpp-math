@@ -2,6 +2,7 @@
 
 #include <ospf/basic_definition.hpp>
 #include <ospf/literal_constant.hpp>
+#include <ospf/concepts.hpp>
 #include <ospf/math/ospf_math_api.hpp>
 #include <optional>
 

@@ -40,6 +40,9 @@
     <Filter Include="src\ospf\math\algebra\value_range">
       <UniqueIdentifier>{740f3624-4be8-4fac-b3fd-d589f0eacf88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\algebra\operator\comparison">
+      <UniqueIdentifier>{34f45e38-2ccd-4b32-b49d-c727e05c1582}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp">
@@ -50,6 +53,12 @@
     </ClInclude>
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
       <Filter>src\ospf\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concept\precision.hpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
