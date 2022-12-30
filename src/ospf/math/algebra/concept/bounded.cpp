@@ -1,6 +1,6 @@
 #include "bounded.hpp"
 
-namespace ospf::math
+namespace ospf::math::algebra
 {
     const std::optional<bigint> BoundedTrait<bigint>::maximum = std::nullopt;
     const std::optional<bigint> BoundedTrait<bigint>::minimum = std::nullopt;

@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)3rd-party\ospf-cpp-base\src;$(SolutionDir)src;$(BOOST_HOME)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)3rd-party\ospf-cpp-base\src;$(SolutionDir)3rd-party\magic_enum\include;$(SolutionDir)src;$(BOOST_HOME)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)3rd-party\ospf-cpp-base\src;$(SolutionDir)src;$(BOOST_HOME)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)3rd-party\ospf-cpp-base\src;$(SolutionDir)3rd-party\magic_enum\include;$(SolutionDir)src;$(BOOST_HOME)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -142,12 +142,16 @@
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\bounded.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\precision.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\concept\scalar.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\concept\signed.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\concept\variant.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp" />
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp" />
     <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp" />
+    <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

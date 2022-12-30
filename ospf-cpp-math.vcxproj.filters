@@ -60,12 +60,24 @@
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp">
       <Filter>src\ospf\math\algebra\operator\comparison</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concept\scalar.hpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concept\signed.hpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concept\variant.hpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
     </ClCompile>
     <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
     </ClCompile>
   </ItemGroup>

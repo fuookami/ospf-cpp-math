@@ -1,6 +1,6 @@
 #include "arithmetic.hpp"
 
-namespace ospf::math
+namespace ospf::math::algebra
 {
     const bigint ArithmeticTrait<bigint>::zero = bigint{ 0_i64 };
     const bigint ArithmeticTrait<bigint>::one = bigint{ 1_i64 };
