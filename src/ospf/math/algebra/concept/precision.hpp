@@ -4,6 +4,7 @@
 #include <ospf/literal_constant.hpp>
 #include <ospf/concepts.hpp>
 #include <ospf/math/ospf_math_api.hpp>
+#include <ospf/math/algebra/concept/arithmetic.hpp>
 #include <optional>
 
 namespace ospf
@@ -21,12 +22,38 @@ namespace ospf
             };
 
             template<typename T>
-            concept WithPrecision = requires
+            concept WithPrecision = Arithmetic<T> 
+                && requires
+                {
+                    { PrecisionTrait<T>::epsilon } -> DecaySameAs<T>;
+                    { PrecisionTrait<T>::decimal_digits } -> DecaySameAs<std::optional<usize>>;
+                    { PrecisionTrait<T>::positive_minimum } -> DecaySameAs<T>;
+                };
+
+            template<typename T>
+            inline static constexpr const bool precision(void) noexcept
             {
-                { PrecisionTrait<T>::epsilon } -> DecaySameAs<T>;
-                { PrecisionTrait<T>::decimal_digits } -> DecaySameAs<std::optional<usize>>;
-                { PrecisionTrait<T>::positive_minimum } -> DecaySameAs<T>;
+                return PrecisionTrait<T>::positive_minimum == ArithmeticTrait<T>::zero;
+            }
+
+            template<WithPrecision T>
+            struct IsPrecise
+            {
+                static constexpr const bool value = false;
             };
+
+            template<WithPrecision T>
+                requires requires { { PrecisionTrait<T>::positive_minimum == ArithmeticTrait<T>::zero } -> std::same_as<std::true_type>; }
+            struct IsPrecise
+            {
+                static constexpr const bool value = true;
+            };
+
+            template<typename T>
+            concept Precise = WithPrecision<T> && IsPrecise<T>::value;
+
+            template<typename T>
+            concept Imprecise = WithPrecision<T> && !IsPrecise<T>::value;
 
             template<>
             struct PrecisionTrait<i8>

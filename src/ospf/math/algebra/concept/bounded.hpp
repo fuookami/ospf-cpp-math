@@ -4,6 +4,7 @@
 #include <ospf/literal_constant.hpp>
 #include <ospf/concepts.hpp>
 #include <ospf/math/ospf_math_api.hpp>
+#include <ospf/math/algebra/concept/arithmetic.hpp>
 #include <optional>
 
 namespace ospf
@@ -21,12 +22,13 @@ namespace ospf
             };
 
             template<typename T>
-            concept Bounded = requires
-            {
-                { BoundedTrait<T>::maximum } -> DecaySameAs<std::optional<T>>;
-                { BoundedTrait<T>::minimum } -> DecaySameAs<std::optional<T>>;
-                { BoundedTrait<T>::positive_minimum } -> DecaySameAs<T>;
-            };
+            concept Bounded = Arithmetic<T> 
+                && requires
+                {
+                    { BoundedTrait<T>::maximum } -> DecaySameAs<std::optional<T>>;
+                    { BoundedTrait<T>::minimum } -> DecaySameAs<std::optional<T>>;
+                    { BoundedTrait<T>::positive_minimum } -> DecaySameAs<T>;
+                };
 
             template<>
             struct BoundedTrait<i8>
