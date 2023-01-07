@@ -33,7 +33,7 @@ namespace ospf
                     public:
                         inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
                         {
-                            return (lhs - rhs) != ArithmeticTrait<ValueType>::zero;
+                            return lhs != rhs;
                         }
                     };
 
@@ -114,9 +114,9 @@ namespace ospf
                 template<Invariant T>
                 class Unequal
                 {
-                    using PreciseImpl = unequal::UnequalPreciseImpl;
-                    using SignedImpreciseImpl = unequal::UnequalSignedImpreciseImpl;
-                    using UnsignedImpreciseImpl = unequal::UnequalUnsignedImpreciseImpl;
+                    using PreciseImpl = unequal::UnequalPreciseImpl<T>;
+                    using SignedImpreciseImpl = unequal::UnequalSignedImpreciseImpl<T>;
+                    using UnsignedImpreciseImpl = unequal::UnequalUnsignedImpreciseImpl<T>;
                     using Impl = std::variant<PreciseImpl, SignedImpreciseImpl, UnsignedImpreciseImpl>;
 
                 public:
@@ -178,6 +178,13 @@ namespace ospf
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
+                    constexpr Unequal(const Unequal& ano) = default;
+                    constexpr Unequal(Unequal&& ano) noexcept = default;
+                    constexpr Unequal& operator=(const Unequal& rhs) = default;
+                    constexpr Unequal& operator=(Unequal&& rhs) noexcept = default;
+                    constexpr ~Unequal(void) noexcept = default;
+
+                public:
                     inline constexpr const bool operator()(CLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (CopyFaster<ValueType>)
@@ -202,7 +209,7 @@ namespace ospf
 
                 template<Invariant T>
                     requires Precise<T>
-                class Unequal
+                class Unequal<T>
                     : public unequal::UnequalPreciseImpl<T>
                 {
                     using Impl = unequal::UnequalPreciseImpl<T>;
@@ -224,7 +231,7 @@ namespace ospf
 
                 template<Invariant T>
                     requires Imprecise<T> && Signed<T> && Abs<T>
-                class Unequal
+                class Unequal<T>
                     : public unequal::UnequalSignedImpreciseImpl<T>
                 {
                     using Impl = unequal::UnequalSignedImpreciseImpl<T>;
@@ -251,7 +258,7 @@ namespace ospf
 
                 template<Invariant T>
                     requires Imprecise<T> && Unsigned<T>
-                class Unequal
+                class Unequal<T>
                     : public unequal::UnequalUnsignedImpreciseImpl<T>
                 {
                     using Impl = unequal::UnequalUnsignedImpreciseImpl<T>;

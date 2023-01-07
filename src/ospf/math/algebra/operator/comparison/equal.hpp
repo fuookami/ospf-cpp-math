@@ -33,7 +33,7 @@ namespace ospf
                     public:
                         inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
                         {
-                            return (lhs - rhs) == ArithmeticTrait<ValueType>::zero;
+                            return lhs == rhs;
                         }
                     };
 
@@ -116,7 +116,7 @@ namespace ospf
                 {
                     using PreciseImpl = equal::EqualPreciseImpl<T>;
                     using SignedImpreciseImpl = equal::EqualSignedImpreciseImpl<T>;
-                    using UnsignedImpreciseImpl = equal::EqualUnsignedImpreciseImpl;
+                    using UnsignedImpreciseImpl = equal::EqualUnsignedImpreciseImpl<T>;
                     using Impl = std::variant<PreciseImpl, SignedImpreciseImpl, UnsignedImpreciseImpl>;
 
                 public:
@@ -178,6 +178,13 @@ namespace ospf
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
+                    constexpr Equal(const Equal& ano) = default;
+                    constexpr Equal(Equal&& ano) noexcept = default;
+                    constexpr Equal& operator=(const Equal& rhs) = default;
+                    constexpr Equal& operator=(Equal&& rhs) noexcept = default;
+                    constexpr ~Equal(void) noexcept = default;
+
+                public:
                     inline constexpr const bool operator()(CLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (CopyFaster<ValueType>)
@@ -202,7 +209,7 @@ namespace ospf
 
                 template<Invariant T>
                     requires Precise<T>
-                class Equal
+                class Equal<T>
                     : public equal::EqualPreciseImpl<T>
                 {
                     using Impl = equal::EqualPreciseImpl<T>;

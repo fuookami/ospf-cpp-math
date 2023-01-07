@@ -195,7 +195,7 @@ namespace ospf
 
                 template<Invariant T>
                     requires Precise<T>
-                class Zero
+                class Zero<T>
                     : public zero::ZeroPreciseImpl<T>
                 {
                     using Impl = zero::ZeroPreciseImpl<T>;
