@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ospf\math\algebra\concept.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\bounded.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\precision.hpp" />
@@ -146,15 +147,26 @@
     <ClInclude Include="src\ospf\math\algebra\concept\scalar.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\signed.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\variant.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\equal.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\greater.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\greater_equal.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\in.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\less.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\less_equal.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\unequal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\value_range.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\value_range\bound.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\value_range\interval.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\value_range\value_range.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\value_range\value_wrapper.hpp" />
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp" />
     <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp" />
     <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp" />
-    <ClCompile Include="src\ospf\math\algebra\operator\comparison\zero.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -31,7 +31,7 @@ namespace ospf
                         constexpr ~EqualPreciseImpl(void) noexcept = default;
 
                     public:
-                        inline constexpr const bool operator()(const CLRefType<ValueType> lhs, const CLRefType<ValueType> rhs) const noexcept
+                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
                         {
                             return (lhs - rhs) == ArithmeticTrait<ValueType>::zero;
                         }
@@ -45,7 +45,7 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr EqualSignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<T>::decimal_precision)
+                        constexpr EqualSignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                             : _precision(std::abs(precision)) {}
 
                         template<typename = void>
@@ -78,7 +78,7 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr EqualUnsignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<T>::decimal_precision)
+                        constexpr EqualUnsignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                             : _precision(precision) {}
 
                         template<typename = void>
@@ -164,12 +164,12 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires WithoutPrecision<ValueType>
-                    constexpr Equal(CLRefType<ValueType> precision = ArithmeticTrait<T>::zero)
+                    constexpr Equal(CLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires WithPrecision<ValueType>
-                    constexpr Equal(CLRefType<ValueType> precision = PrecisionTrait<T>::decimal_precision)
+                    constexpr Equal(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
@@ -233,7 +233,7 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Equal(CLRefType<ValueType> precision = PrecisionTrait<T>::decimal_precision)
+                    constexpr Equal(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : Impl(precision) {}
 
                     template<typename = void>
@@ -260,7 +260,7 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Equal(CLRefType<ValueType> precision = PrecisionTrait<T>::decimal_precision)
+                    constexpr Equal(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : Impl(precision) {}
 
                     template<typename = void>

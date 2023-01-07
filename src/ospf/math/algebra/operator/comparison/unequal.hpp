@@ -14,56 +14,56 @@ namespace ospf
         {
             inline namespace comparison_operator
             {
-                namespace zero
+                namespace unequal
                 {
                     template<Invariant T>
-                    class ZeroPreciseImpl
+                    class UnequalPreciseImpl
                     {
                     public:
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr ZeroPreciseImpl(void) = default;
-                        constexpr ZeroPreciseImpl(const ZeroPreciseImpl& ano) = default;
-                        constexpr ZeroPreciseImpl(ZeroPreciseImpl&& ano) noexcept = default;
-                        constexpr ZeroPreciseImpl& operator=(const ZeroPreciseImpl& rhs) = default;
-                        constexpr ZeroPreciseImpl& operator=(ZeroPreciseImpl&& rhs) noexcept = default;
-                        constexpr ~ZeroPreciseImpl(void) noexcept = default;
+                        constexpr UnequalPreciseImpl(void) = default;
+                        constexpr UnequalPreciseImpl(const UnequalPreciseImpl& ano) = default;
+                        constexpr UnequalPreciseImpl(UnequalPreciseImpl&& ano) noexcept = default;
+                        constexpr UnequalPreciseImpl& operator=(const UnequalPreciseImpl& rhs) = default;
+                        constexpr UnequalPreciseImpl& operator=(UnequalPreciseImpl&& rhs) noexcept = default;
+                        constexpr ~UnequalPreciseImpl(void) noexcept = default;
 
                     public:
-                        inline constexpr const bool operator()(CLRefType<ValueType> value) const noexcept
+                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
                         {
-                            return value == ArithmeticTrait<ValueType>::zero;
+                            return (lhs - rhs) != ArithmeticTrait<ValueType>::zero;
                         }
                     };
 
                     template<Invariant T>
                         requires WithPrecision<T> && Abs<T>
-                    class ZeroSignedImpreciseImpl
+                    class UnequalSignedImpreciseImpl
                     {
                     public:
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr ZeroSignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                        constexpr UnequalSignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                             : _precision(std::abs(precision)) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        ZeroSignedImpreciseImpl(RRefType<ValueType> precision)
+                        UnequalSignedImpreciseImpl(RRefType<ValueType> precision)
                             : _precision(std::abs(move<ValueType>(precision))) {}
 
                     public:
-                        constexpr ZeroSignedImpreciseImpl(const ZeroSignedImpreciseImpl& ano) = default;
-                        constexpr ZeroSignedImpreciseImpl(ZeroSignedImpreciseImpl&& ano) noexcept = default;
-                        constexpr ZeroSignedImpreciseImpl& operator=(const ZeroSignedImpreciseImpl& rhs) = default;
-                        constexpr ZeroSignedImpreciseImpl& operator=(ZeroSignedImpreciseImpl&& rhs) noexcept = default;
-                        constexpr ~ZeroSignedImpreciseImpl(void) noexcept = default;
+                        constexpr UnequalSignedImpreciseImpl(const UnequalSignedImpreciseImpl& ano) = default;
+                        constexpr UnequalSignedImpreciseImpl(UnequalSignedImpreciseImpl&& ano) noexcept = default;
+                        constexpr UnequalSignedImpreciseImpl& operator=(const UnequalSignedImpreciseImpl& rhs) = default;
+                        constexpr UnequalSignedImpreciseImpl& operator=(UnequalSignedImpreciseImpl&& rhs) noexcept = default;
+                        constexpr ~UnequalSignedImpreciseImpl(void) = default;
 
                     public:
-                        inline constexpr const bool operator()(CLRefType<ValueType> value) const noexcept
+                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
                         {
-                            return std::abs(value) <= _precision;
+                            return std::abs(lhs - rhs) > _precision;
                         }
 
                     private:
@@ -72,31 +72,38 @@ namespace ospf
 
                     template<Invariant T>
                         requires WithPrecision<T>
-                    class ZeroUnsignedImpreciseImpl
+                    class UnequalUnsignedImpreciseImpl
                     {
                     public:
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr ZeroUnsignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
-                            : _precision(precision) {}
+                        constexpr UnequalUnsignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                            : _precision(std::abs(precision)) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        ZeroUnsignedImpreciseImpl(RRefType<ValueType> precision)
-                            : _precision(move<ValueType>(precision)) {}
+                        UnequalUnsignedImpreciseImpl(RRefType<ValueType> precision)
+                            : _precision(std::abs(move<ValueType>(precision))) {}
 
                     public:
-                        constexpr ZeroUnsignedImpreciseImpl(const ZeroUnsignedImpreciseImpl& ano) = default;
-                        constexpr ZeroUnsignedImpreciseImpl(ZeroUnsignedImpreciseImpl&& ano) noexcept = default;
-                        constexpr ZeroUnsignedImpreciseImpl& operator=(const ZeroUnsignedImpreciseImpl& rhs) = default;
-                        constexpr ZeroUnsignedImpreciseImpl& operator=(ZeroUnsignedImpreciseImpl&& rhs) noexcept = default;
-                        constexpr ~ZeroUnsignedImpreciseImpl(void) noexcept = default;
+                        constexpr UnequalUnsignedImpreciseImpl(const UnequalUnsignedImpreciseImpl& ano) = default;
+                        constexpr UnequalUnsignedImpreciseImpl(UnequalUnsignedImpreciseImpl&& ano) noexcept = default;
+                        constexpr UnequalUnsignedImpreciseImpl& operator=(const UnequalUnsignedImpreciseImpl& rhs) = default;
+                        constexpr UnequalUnsignedImpreciseImpl& operator=(UnequalUnsignedImpreciseImpl&& rhs) noexcept = default;
+                        constexpr ~UnequalUnsignedImpreciseImpl(void) = default;
 
                     public:
-                        inline constexpr const bool operator()(CLRefType<ValueType> value) const noexcept
+                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
                         {
-                            return value <= _precision;
+                            if (lhs < rhs)
+                            {
+                                return (rhs - lhs) > _precision;
+                            }
+                            else
+                            {
+                                return (lhs - rhs) > _precision;
+                            }
                         }
 
                     private:
@@ -105,11 +112,11 @@ namespace ospf
                 };
 
                 template<Invariant T>
-                class Zero
+                class Unequal
                 {
-                    using PreciseImpl = zero::ZeroPreciseImpl<T>;
-                    using SignedImpreciseImpl = zero::ZeroSignedImpreciseImpl<T>;
-                    using UnsignedImpreciseImpl = zero::ZeroUnsignedImpreciseImpl<T>;
+                    using PreciseImpl = unequal::UnequalPreciseImpl;
+                    using SignedImpreciseImpl = unequal::UnequalSignedImpreciseImpl;
+                    using UnsignedImpreciseImpl = unequal::UnequalUnsignedImpreciseImpl;
                     using Impl = std::variant<PreciseImpl, SignedImpreciseImpl, UnsignedImpreciseImpl>;
 
                 public:
@@ -157,17 +164,17 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires WithoutPrecision<ValueType>
-                    constexpr Zero(CLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
+                    constexpr Unequal(CLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires WithPrecision<ValueType>
-                    constexpr Zero(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Unequal(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Zero(RRefType<ValueType> precision)
+                    Unequal(RRefType<ValueType> precision)
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
@@ -195,78 +202,78 @@ namespace ospf
 
                 template<Invariant T>
                     requires Precise<T>
-                class Zero
-                    : public zero::ZeroPreciseImpl<T>
+                class Unequal
+                    : public unequal::UnequalPreciseImpl<T>
                 {
-                    using Impl = zero::ZeroPreciseImpl<T>;
+                    using Impl = unequal::UnequalPreciseImpl<T>;
 
                 public:
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Zero(void) = default;
-                    constexpr Zero(CLRefType<ValueType> _) = default;
+                    constexpr Unequal(void) = default;
+                    constexpr Unequal(CLRefType<ValueType> _) = default;
 
                 public:
-                    constexpr Zero(const Zero& ano) = default;
-                    constexpr Zero(Zero&& ano) noexcept = default;
-                    constexpr Zero& operator=(const Zero& rhs) = default;
-                    constexpr Zero& operator=(Zero&& rhs) noexcept = default;
-                    constexpr ~Zero(void) noexcept = default;
+                    constexpr Unequal(const Unequal& ano) = default;
+                    constexpr Unequal(Unequal&& ano) noexcept = default;
+                    constexpr Unequal& operator=(const Unequal& rhs) = default;
+                    constexpr Unequal& operator=(Unequal&& rhs) noexcept = default;
+                    constexpr ~Unequal(void) noexcept = default;
                 };
-                
+
                 template<Invariant T>
                     requires Imprecise<T> && Signed<T> && Abs<T>
-                class Zero<T>
-                    : public zero::ZeroSignedImpreciseImpl<T>
+                class Unequal
+                    : public unequal::UnequalSignedImpreciseImpl<T>
                 {
-                    using Impl = zero::ZeroSignedImpreciseImpl<T>;
+                    using Impl = unequal::UnequalSignedImpreciseImpl<T>;
 
                 public:
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Zero(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Unequal(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Zero(RRefType<ValueType> precision)
+                    Unequal(RRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
-                    constexpr Zero(const Zero& ano) = default;
-                    constexpr Zero(Zero&& ano) noexcept = default;
-                    constexpr Zero& operator=(const Zero& rhs) = default;
-                    constexpr Zero& operator=(Zero&& rhs) noexcept = default;
-                    constexpr ~Zero(void) noexcept = default;
+                    constexpr Unequal(const Unequal& ano) = default;
+                    constexpr Unequal(Unequal&& ano) noexcept = default;
+                    constexpr Unequal& operator=(const Unequal& rhs) = default;
+                    constexpr Unequal& operator=(Unequal&& rhs) noexcept = default;
+                    constexpr ~Unequal(void) noexcept = default;
                 };
 
                 template<Invariant T>
                     requires Imprecise<T> && Unsigned<T>
-                class Zero<T>
-                    : public zero::ZeroUnsignedImpreciseImpl<T>
+                class Unequal
+                    : public unequal::UnequalUnsignedImpreciseImpl<T>
                 {
-                    using Impl = zero::ZeroUnsignedImpreciseImpl<T>;
+                    using Impl = unequal::UnequalUnsignedImpreciseImpl<T>;
 
                 public:
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Zero(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Unequal(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Zero(RRefType<ValueType> precision)
+                    Unequal(RRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
-                    constexpr Zero(const Zero& ano) = default;
-                    constexpr Zero(Zero&& ano) noexcept = default;
-                    constexpr Zero& operator=(const Zero& rhs) = default;
-                    constexpr Zero& operator=(Zero&& rhs) noexcept = default;
-                    constexpr ~Zero(void) noexcept = default;
+                    constexpr Unequal(const Unequal& ano) = default;
+                    constexpr Unequal(Unequal&& ano) noexcept = default;
+                    constexpr Unequal& operator=(const Unequal& rhs) = default;
+                    constexpr Unequal& operator=(Unequal&& rhs) noexcept = default;
+                    constexpr ~Unequal(void) noexcept = default;
                 };
 
                 // todo: extern commom class template specialization
