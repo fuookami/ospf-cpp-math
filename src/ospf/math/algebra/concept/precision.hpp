@@ -31,29 +31,27 @@ namespace ospf
                 };
 
             template<typename T>
-            inline static constexpr const bool precision(void) noexcept
+            concept WithoutPrecision = Arithmetic<T> && !WithPrecision<T>;
+
+            template<typename T>
+            inline static constexpr const bool precise(void) noexcept
             {
                 return PrecisionTrait<T>::positive_minimum == ArithmeticTrait<T>::zero;
             }
 
-            template<WithPrecision T>
-            struct IsPrecise
-            {
-                static constexpr const bool value = false;
-            };
-
-            template<WithPrecision T>
-                requires requires { { PrecisionTrait<T>::positive_minimum == ArithmeticTrait<T>::zero } -> std::same_as<std::true_type>; }
-            struct IsPrecise
-            {
-                static constexpr const bool value = true;
-            };
+            template<typename T>
+            concept Precise = WithPrecision<T> 
+                && requires 
+                { 
+                    { PrecisionTrait<T>::positive_minimum == ArithmeticTrait<T>::zero } -> std::same_as<std::true_type>; 
+                };
 
             template<typename T>
-            concept Precise = WithPrecision<T> && IsPrecise<T>::value;
-
-            template<typename T>
-            concept Imprecise = WithPrecision<T> && !IsPrecise<T>::value;
+            concept Imprecise = WithPrecision<T> 
+                && requires 
+                {
+                    { PrecisionTrait<T>::positive_minimum != ArithmeticTrait<T>::zero } -> std::same_as<std::true_type>;
+                };
 
             template<>
             struct PrecisionTrait<i8>

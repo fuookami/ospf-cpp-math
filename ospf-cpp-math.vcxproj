@@ -154,6 +154,7 @@
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp" />
     <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp" />
     <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp" />
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\zero.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -69,6 +69,12 @@
     <ClInclude Include="src\ospf\math\algebra\concept\variant.hpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concept\real_number.hpp">
+      <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison\equal.hpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp">
@@ -79,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp">
       <Filter>src\ospf\math\algebra\concept</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\zero.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

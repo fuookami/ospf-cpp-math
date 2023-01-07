@@ -19,6 +19,8 @@ namespace ospf
 
             template<typename T>
             concept Invariant = Arithmetic<T> && !IsVariant<T>::value;
+
+            // todo
         };
     };
 };
