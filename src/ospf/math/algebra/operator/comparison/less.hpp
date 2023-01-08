@@ -84,7 +84,7 @@ namespace ospf
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
                         LessUnsignedImpreciseImpl(RRefType<ValueType> precision)
-                            : _precision(precision) {}
+                            : _precision(move<ValueType>(precision)) {}
 
                     public:
                         constexpr LessUnsignedImpreciseImpl(const LessUnsignedImpreciseImpl& ano) = default;
