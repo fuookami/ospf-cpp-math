@@ -114,6 +114,12 @@
     <ClInclude Include="src\ospf\math\algebra\value_range.hpp">
       <Filter>src\ospf\math\algebra</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\functional\predicate.hpp">
+      <Filter>src\ospf\math\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\functional\operator.hpp">
+      <Filter>src\ospf\math\functional</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp">

@@ -15,12 +15,12 @@ namespace ospf
         {
             template<typename T>
                 requires std::copyable<T>
-            && (std::three_way_comparable<T> || std::totally_ordered<T>)
-                && requires
-            {
-                { static_cast<T>(0) } -> std::same_as<T>;
-                { static_cast<T>(1) } -> std::same_as<T>;
-            }
+                    && (std::three_way_comparable<T> || std::totally_ordered<T>)
+                    && requires
+                        {
+                            { static_cast<T>(0) } -> std::same_as<T>;
+                            { static_cast<T>(1) } -> std::same_as<T>;
+                        }
             struct ArithmeticTrait
             {
                 static const T zero;
@@ -31,10 +31,10 @@ namespace ospf
             concept Arithmetic = std::copyable<T>
                 && (std::three_way_comparable<T> || std::totally_ordered<T>)
                 && requires
-            {
-                { ArithmeticTrait<T>::zero } -> DecaySameAs<T>;
-                { ArithmeticTrait<T>::one } -> DecaySameAs<T>;
-            };
+                    {
+                        { ArithmeticTrait<T>::zero } -> DecaySameAs<T>;
+                        { ArithmeticTrait<T>::one } -> DecaySameAs<T>;
+                    };
 
             template<>
             struct ArithmeticTrait<i8>

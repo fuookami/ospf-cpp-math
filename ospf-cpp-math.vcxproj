@@ -147,6 +147,8 @@
     <ClInclude Include="src\ospf\math\algebra\concept\scalar.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\signed.hpp" />
     <ClInclude Include="src\ospf\math\algebra\concept\variant.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\functional\operator.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\functional\predicate.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\equal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\greater.hpp" />

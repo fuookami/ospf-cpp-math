@@ -31,7 +31,7 @@ namespace ospf
                         constexpr ~GreaterPreciseImpl(void) noexcept = default;
 
                     public:
-                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
+                        inline constexpr const bool operator()(ArgCLRefType<ValueType> lhs, ArgCLRefType<ValueType> rhs) const noexcept
                         {
                             return lhs > rhs;
                         }
@@ -45,12 +45,12 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr GreaterSignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                        constexpr GreaterSignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                             : _precision(precision) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType>&& std::movable<ValueType>
-                        GreaterSignedImpreciseImpl(RRefType<ValueType> precision)
+                        GreaterSignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(precision) {}
 
                     public:
@@ -61,7 +61,7 @@ namespace ospf
                         constexpr ~GreaterSignedImpreciseImpl(void) noexcept = default;
 
                     public:
-                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
+                        inline constexpr const bool operator()(ArgCLRefType<ValueType> lhs, ArgCLRefType<ValueType> rhs) const noexcept
                         {
                             return (lhs - rhs) > _precision;
                         }
@@ -78,12 +78,12 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr GreaterUnsignedImpreciseImpl(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                        constexpr GreaterUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                             : _precision(precision) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType>&& std::movable<ValueType>
-                        GreaterUnsignedImpreciseImpl(RRefType<ValueType> precision)
+                        GreaterUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(move<ValueType>(precision)) {}
 
                     public:
@@ -94,7 +94,7 @@ namespace ospf
                         constexpr ~GreaterUnsignedImpreciseImpl(void) noexcept = default;
 
                     public:
-                        inline constexpr const bool operator()(CLRefType<ValueType> lhs, CLRefType<ValueType> rhs) const noexcept
+                        inline constexpr const bool operator()(ArgCLRefType<ValueType> lhs, ArgCLRefType<ValueType> rhs) const noexcept
                         {
                             if (lhs < rhs)
                             {
@@ -123,7 +123,7 @@ namespace ospf
                     using ValueType = OriginType<T>;
 
                 private:
-                    static constexpr Impl impl(CLRefType<ValueType> precision) noexcept
+                    static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
                         if (precise<ValueType>())
                         {
@@ -142,7 +142,7 @@ namespace ospf
                         }
                     }
 
-                    static Impl impl(RRefType<ValueType> precision) noexcept
+                    static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
                         if (precise<ValueType>())
                         {
@@ -164,17 +164,17 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires WithoutPrecision<ValueType>
-                    constexpr Greater(CLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
+                    constexpr Greater(ArgCLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires WithPrecision<ValueType>
-                    constexpr Greater(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Greater(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType>&& std::movable<ValueType>
-                    Greater(RRefType<ValueType> precision)
+                    Greater(ArgRRefType<ValueType> precision)
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
@@ -185,7 +185,7 @@ namespace ospf
                     constexpr ~Greater(void) noexcept = default;
 
                 public:
-                    inline constexpr const bool operator()(CLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator()(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (CopyFaster<ValueType>)
                         {
@@ -219,7 +219,7 @@ namespace ospf
 
                 public:
                     constexpr Greater(void) = default;
-                    constexpr Greater(CLRefType<ValueType> _) = default;
+                    constexpr Greater(ArgCLRefType<ValueType> _) = default;
 
                 public:
                     constexpr Greater(const Greater& ano) = default;
@@ -240,12 +240,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Greater(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Greater(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType>&& std::movable<ValueType>
-                    Greater(RRefType<ValueType> precision)
+                    Greater(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
@@ -267,12 +267,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Greater(CLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Greater(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType>&& std::movable<ValueType>
-                    Greater(RRefType<ValueType> precision)
+                    Greater(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
