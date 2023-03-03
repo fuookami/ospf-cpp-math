@@ -121,15 +121,4 @@
       <Filter>src\ospf\math\functional</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClCompile>
-  </ItemGroup>
 </Project>

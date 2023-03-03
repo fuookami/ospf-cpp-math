@@ -38,7 +38,7 @@ namespace ospf
                     };
 
                     template<Invariant T>
-                        requires WithPrecision<T>&& Abs<T>
+                        requires WithPrecision<T> && Abs<T>
                     class GreaterSignedImpreciseImpl
                     {
                     public:
@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if (precise<ValueType>())
+                        if constexpr (Precise<ValueType>())
                         {
                             return PreciseImpl{ precision };
                         }
@@ -144,7 +144,7 @@ namespace ospf
 
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if (precise<ValueType>())
+                        if constexpr (Precise<ValueType>())
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -230,7 +230,7 @@ namespace ospf
                 };
 
                 template<Invariant T>
-                    requires Imprecise<T>&& Signed<T>&& Abs<T>
+                    requires Imprecise<T> && Signed<T> && Abs<T>
                 class Greater<T>
                     : public greater::GreaterSignedImpreciseImpl<T>
                 {
@@ -257,7 +257,7 @@ namespace ospf
                 };
 
                 template<Invariant T>
-                    requires Imprecise<T>&& Unsigned<T>
+                    requires Imprecise<T> && Unsigned<T>
                 class Greater<T>
                     : public greater::GreaterUnsignedImpreciseImpl<T>
                 {
@@ -271,7 +271,7 @@ namespace ospf
                         : Impl(precision) {}
 
                     template<typename = void>
-                        requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     Greater(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 

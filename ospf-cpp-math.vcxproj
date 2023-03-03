@@ -165,11 +165,6 @@
     <ClInclude Include="src\ospf\math\algebra\value_range\value_wrapper.hpp" />
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\ospf\math\algebra\concept\arithmetic.cpp" />
-    <ClCompile Include="src\ospf\math\algebra\concept\bounded.cpp" />
-    <ClCompile Include="src\ospf\math\algebra\concept\precision.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

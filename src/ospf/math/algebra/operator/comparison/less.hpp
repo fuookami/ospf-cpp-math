@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if (precise<ValueType>())
+                        if constexpr (Precise<ValueType>())
                         {
                             return PreciseImpl{ precision };
                         }
@@ -144,7 +144,7 @@ namespace ospf
 
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if (precise<ValueType>())
+                        if constexpr (Precise<ValueType>())
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -173,7 +173,7 @@ namespace ospf
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
-                        requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     Less(ArgRRefType<ValueType> precision)
                         : _impl(impl(move<ValueType>(precision))) {}
 
@@ -244,7 +244,7 @@ namespace ospf
                         : Impl(precision) {}
 
                     template<typename = void>
-                        requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     Less(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
@@ -271,7 +271,7 @@ namespace ospf
                         : Impl(precision) {}
 
                     template<typename = void>
-                        requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     Less(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
