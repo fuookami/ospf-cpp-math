@@ -345,7 +345,7 @@ namespace ospf
                 }
             };
 
-            template<u64 bits>
+            template<usize bits>
             struct PrecisionTrait<intx<bits>>
             {
                 inline static constexpr const intx<bits>& epsilon(void) noexcept
@@ -366,7 +366,7 @@ namespace ospf
                 }
             };
 
-            template<u64 bits>
+            template<usize bits>
             struct PrecisionTrait<uintx<bits>>
             {
                 inline static constexpr const uintx<bits>& epsilon(void) noexcept
@@ -545,7 +545,7 @@ namespace ospf
                 }
             };
 
-            template<u64 digits>
+            template<usize digits>
             struct PrecisionTrait<dec<digits>>
             {
                 inline static const dec<digits>& epsilon(void) noexcept

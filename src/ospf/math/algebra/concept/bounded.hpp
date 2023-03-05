@@ -331,7 +331,7 @@ namespace ospf
                 }
             };
 
-            template<u64 bits>
+            template<usize bits>
             struct BoundedTrait<intx<bits>>
             {
                 inline static constexpr const std::optional<Ref<intx<bits>>> maximum(void) noexcept
@@ -353,7 +353,7 @@ namespace ospf
                 }
             };
 
-            template<u64 bits>
+            template<usize bits>
             struct BoundedTrait<uintx<bits>>
             {
                 inline static constexpr const std::optional<Ref<uintx<bits>>> maximum(void) noexcept
@@ -534,7 +534,7 @@ namespace ospf
                 }
             };
 
-            template<u64 digits>
+            template<usize digits>
             struct BoundedTrait<dec<digits>>
             {
                 inline static constexpr const std::optional<Ref<dec<digits>>> maximum(void) noexcept

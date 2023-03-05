@@ -34,17 +34,17 @@ namespace ospf
                     };
 
             template<>
-            struct ArithmeticTrait<i8>
-            {
-                inline static constexpr const i8 zero(void) noexcept { return 0_i8; }
-                inline static constexpr const i8 one(void) noexcept { return 1_i8; }
-            };
-
-            template<>
             struct ArithmeticTrait<u8>
             {
                 inline static constexpr const u8 zero(void) noexcept { return 0_u8; }
                 inline static constexpr const u8 one(void) noexcept { return 1_u8; }
+            };
+
+            template<>
+            struct ArithmeticTrait<i8>
+            {
+                inline static constexpr const i8 zero(void) noexcept { return 0_i8; }
+                inline static constexpr const i8 one(void) noexcept { return 1_i8; }
             };
 
             template<>
@@ -65,7 +65,7 @@ namespace ospf
             struct ArithmeticTrait<i32>
             {
                 inline static constexpr const i32 zero(void) noexcept { return 0_i32; }
-                inline static constexpr const u32 one(void) noexcept { return 1_i32; }
+                inline static constexpr const i32 one(void) noexcept { return 1_i32; }
             };
 
             template<>
@@ -145,7 +145,7 @@ namespace ospf
                 inline static constexpr const u1024 one(void) noexcept { return u1024{ 1_u64 }; }
             };
 
-            template<u64 bits>
+            template<usize bits>
             struct ArithmeticTrait<intx<bits>>
             {
                 inline static constexpr const intx<bits>& zero(void) noexcept
@@ -161,7 +161,7 @@ namespace ospf
                 }
             };
 
-            template<u64 bits>
+            template<usize bits>
             struct ArithmeticTrait<uintx<bits>>
             {
                 inline static constexpr const uintx<bits>& zero(void) noexcept
@@ -295,7 +295,7 @@ namespace ospf
                 }
             };
 
-            template<u64 digits>
+            template<usize digits>
             struct ArithmeticTrait<dec<digits>>
             {
                 inline static const dec<digits>& zero(void) noexcept
