@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ospf/concepts/base.hpp>
-#include <ospf/math/algebra/functional/operator.hpp>
+#include <ospf/math/functional/operator.hpp>
 #include <compare>
 
 namespace ospf

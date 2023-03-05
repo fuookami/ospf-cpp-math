@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ospf/math/algebra/concept/arithmetic.hpp>
+#include <ospf/math/algebra/concepts/arithmetic.hpp>
 #include <ospf/string/hasher.hpp>
 
 namespace ospf

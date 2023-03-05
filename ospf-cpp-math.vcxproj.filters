@@ -13,9 +13,6 @@
     <Filter Include="src\ospf\math\algebra">
       <UniqueIdentifier>{c80bc4c8-5e2d-41e0-8418-1a8e1603f5a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\ospf\math\algebra\concept">
-      <UniqueIdentifier>{29ed3657-f542-4ec4-8982-152611a1e614}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\ospf\math\functional">
       <UniqueIdentifier>{3a039acd-e334-4ea9-8882-82c79cd71f9b}</UniqueIdentifier>
     </Filter>
@@ -46,34 +43,16 @@
     <Filter Include="src\ospf\math\algebra\operator\arithmetic">
       <UniqueIdentifier>{5bae3216-2b41-421b-ac1d-41ec9ed0373f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\algebra\concepts">
+      <UniqueIdentifier>{29ed3657-f542-4ec4-8982-152611a1e614}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept\bounded.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClInclude>
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
       <Filter>src\ospf\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept\precision.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp">
       <Filter>src\ospf\math\algebra\operator\comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept\scalar.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept\signed.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept\variant.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept\real_number.hpp">
-      <Filter>src\ospf\math\algebra\concept</Filter>
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\equal.hpp">
       <Filter>src\ospf\math\algebra\operator\comparison</Filter>
@@ -96,7 +75,7 @@
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\in.hpp">
       <Filter>src\ospf\math\algebra\operator\comparison</Filter>
     </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\concept.hpp">
+    <ClInclude Include="src\ospf\math\algebra\concepts.hpp">
       <Filter>src\ospf\math\algebra</Filter>
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\operator.hpp">
@@ -117,12 +96,6 @@
     <ClInclude Include="src\ospf\math\algebra\value_range.hpp">
       <Filter>src\ospf\math\algebra</Filter>
     </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\functional\predicate.hpp">
-      <Filter>src\ospf\math\functional</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\functional\operator.hpp">
-      <Filter>src\ospf\math\functional</Filter>
-    </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\operator\comparison.hpp">
       <Filter>src\ospf\math\algebra\operator</Filter>
     </ClInclude>
@@ -131,6 +104,39 @@
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\abs.hpp">
       <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\functional\operator.hpp">
+      <Filter>src\ospf\math\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\functional\predicate.hpp">
+      <Filter>src\ospf\math\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra.hpp">
+      <Filter>src\ospf\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\funtional.hpp">
+      <Filter>src\ospf\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\arithmetic.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\bounded.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\precision.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\real_number.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\scalar.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\signed.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\variant.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <ospf/math/algebra/concept/variant.hpp>
-#include <ospf/math/algebra/concept/precision.hpp>
-#include <ospf/math/algebra/concept/signed.hpp>
+#include <ospf/math/algebra/concepts/variant.hpp>
+#include <ospf/math/algebra/concepts/precision.hpp>
+#include <ospf/math/algebra/concepts/signed.hpp>
 #include <ospf/math/algebra/operator/arithmetic/abs.hpp>
 #include <ospf/functional/either.hpp>
 

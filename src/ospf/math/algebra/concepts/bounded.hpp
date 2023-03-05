@@ -4,7 +4,7 @@
 #include <ospf/concepts/base.hpp>
 #include <ospf/literal_constant.hpp>
 #include <ospf/math/ospf_math_api.hpp>
-#include <ospf/math/algebra/concept/arithmetic.hpp>
+#include <ospf/math/algebra/concepts/arithmetic.hpp>
 #include <ospf/memory/reference.hpp>
 #include <optional>
 

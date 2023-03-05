@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ospf/math/algebra/concept/scalar.hpp>
+#include <ospf/math/algebra/concepts/scalar.hpp>
 
 namespace ospf
 {
