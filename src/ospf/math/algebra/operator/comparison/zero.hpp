@@ -118,7 +118,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -135,9 +135,11 @@ namespace ospf
                         }
                     }
 
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -205,7 +207,7 @@ namespace ospf
 
                 public:
                     constexpr Zero(void) = default;
-                    constexpr Zero(ArgCLRefType<ValueType> _) = default;
+                    constexpr Zero(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr Zero(const Zero& ano) = default;
@@ -269,7 +271,31 @@ namespace ospf
                     constexpr ~Zero(void) noexcept = default;
                 };
 
-                // todo: extern commom class template specialization
+                extern template class Zero<i8>;
+                extern template class Zero<u8>;
+                extern template class Zero<i16>;
+                extern template class Zero<u16>;
+                extern template class Zero<i32>;
+                extern template class Zero<u32>;
+                extern template class Zero<i64>;
+                extern template class Zero<u64>;
+                extern template class Zero<i128>;
+                extern template class Zero<u128>;
+                extern template class Zero<i256>;
+                extern template class Zero<u256>;
+                extern template class Zero<i512>;
+                extern template class Zero<u512>;
+                extern template class Zero<i1024>;
+                extern template class Zero<u1024>;
+                extern template class Zero<bigint>;
+
+                extern template class Zero<f32>;
+                extern template class Zero<f64>;
+                extern template class Zero<f128>;
+                extern template class Zero<f256>;
+                extern template class Zero<f512>;
+                extern template class Zero<dec50>;
+                extern template class Zero<dec100>;
             };
         };
     };

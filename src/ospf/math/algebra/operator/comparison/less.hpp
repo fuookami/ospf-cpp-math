@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -142,9 +142,11 @@ namespace ospf
                         }
                     }
 
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -219,7 +221,7 @@ namespace ospf
 
                 public:
                     constexpr Less(void) = default;
-                    constexpr Less(ArgCLRefType<ValueType> _) = default;
+                    constexpr Less(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr Less(const Less& ano) = default;
@@ -283,7 +285,31 @@ namespace ospf
                     constexpr ~Less(void) noexcept = default;
                 };
 
-                // todo: extern commom class template specialization
+                extern template class Less<i8>;
+                extern template class Less<u8>;
+                extern template class Less<i16>;
+                extern template class Less<u16>;
+                extern template class Less<i32>;
+                extern template class Less<u32>;
+                extern template class Less<i64>;
+                extern template class Less<u64>;
+                extern template class Less<i128>;
+                extern template class Less<u128>;
+                extern template class Less<i256>;
+                extern template class Less<u256>;
+                extern template class Less<i512>;
+                extern template class Less<u512>;
+                extern template class Less<i1024>;
+                extern template class Less<u1024>;
+                extern template class Less<bigint>;
+
+                extern template class Less<f32>;
+                extern template class Less<f64>;
+                extern template class Less<f128>;
+                extern template class Less<f256>;
+                extern template class Less<f512>;
+                extern template class Less<dec50>;
+                extern template class Less<dec100>;
             };
         };
     };

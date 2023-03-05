@@ -23,20 +23,21 @@ namespace ospf
                 {
                     { PrecisionTrait<T>::epsilon() } -> DecaySameAs<T>;
                     { PrecisionTrait<T>::decimal_digits() } -> DecaySameAs<std::optional<usize>>;
-                    { PrecisionTrait<T>::positive_minimum() } -> DecaySameAs<T>;
+                    { PrecisionTrait<T>::decimal_precision() } -> DecaySameAs<T>;
                 };
 
             template<typename T>
             concept WithoutPrecision = Arithmetic<T> && !WithPrecision<T>;
 
             template<WithPrecision T>
-            inline static constexpr const bool precise(void) noexcept
-            {
-                return PrecisionTrait<T>::positive_minimum == ArithmeticTrait<T>::zero;
-            }
+            static constexpr const bool is_precise = IsPrecise<T>::value;
 
             template<typename T>
-            concept Precise = WithPrecision<T> && precise<T>();
+            concept Precise = WithPrecision<T> 
+                && requires
+                {
+                    PrecisionTrait<T>::decimal_precision() == ArithmeticTrait<T>::zero();
+                };
 
             template<typename T>
             concept Imprecise = WithPrecision<T> && !Precise<T>;
@@ -430,36 +431,36 @@ namespace ospf
             template<>
             struct PrecisionTrait<f64>
             {
-                inline static constexpr const f32 epsilon(void) noexcept
+                inline static constexpr const f64 epsilon(void) noexcept
                 {
                     return std::numeric_limits<f32>::denorm_min();
                 }
 
                 inline static constexpr const std::optional<usize> decimal_digits(void) noexcept
                 {
-                    return static_cast<usize>(std::numeric_limits<f32>::digits10);
+                    return static_cast<usize>(std::numeric_limits<f64>::digits10);
                 }
 
-                inline static constexpr const f32 decimal_precision(void) noexcept
+                inline static constexpr const f64 decimal_precision(void) noexcept
                 {
-                    return std::numeric_limits<f32>::epsilon();
+                    return std::numeric_limits<f64>::epsilon();
                 }
             };
 
             template<>
             struct PrecisionTrait<f128>
             {
-                inline static constexpr const f128 epsilon(void) noexcept
+                inline static const f128 epsilon(void) noexcept
                 {
                     return std::numeric_limits<f128>::denorm_min();
                 }
 
-                inline static constexpr const std::optional<usize> decimal_digits(void) noexcept
+                inline static const std::optional<usize> decimal_digits(void) noexcept
                 {
                     return static_cast<usize>(std::numeric_limits<f128>::digits10);
                 }
 
-                inline static constexpr const f128 decimal_precision(void) noexcept
+                inline static const f128 decimal_precision(void) noexcept
                 {
                     return std::numeric_limits<f128>::epsilon();
                 }
@@ -468,17 +469,17 @@ namespace ospf
             template<>
             struct PrecisionTrait<f256>
             {
-                inline static constexpr const f256 epsilon(void) noexcept
+                inline static const f256 epsilon(void) noexcept
                 {
                     return std::numeric_limits<f256>::denorm_min();
                 }
 
-                inline static constexpr const std::optional<usize> decimal_digits(void) noexcept
+                inline static const std::optional<usize> decimal_digits(void) noexcept
                 {
                     return static_cast<usize>(std::numeric_limits<f256>::digits10);
                 }
 
-                inline static constexpr const f256 decimal_precision(void) noexcept
+                inline static const f256 decimal_precision(void) noexcept
                 {
                     return std::numeric_limits<f256>::epsilon();
                 }
@@ -487,17 +488,17 @@ namespace ospf
             template<>
             struct PrecisionTrait<f512>
             {
-                inline static constexpr const f512 epsilon(void) noexcept
+                inline static const f512 epsilon(void) noexcept
                 {
                     return std::numeric_limits<f512>::denorm_min();
                 }
 
-                inline static constexpr const std::optional<usize> decimal_digits(void) noexcept
+                inline static const std::optional<usize> decimal_digits(void) noexcept
                 {
                     return static_cast<usize>(std::numeric_limits<f512>::digits10);
                 }
 
-                inline static constexpr const f512 decimal_precision(void) noexcept
+                inline static const f512 decimal_precision(void) noexcept
                 {
                     return std::numeric_limits<f512>::epsilon();
                 }
@@ -506,7 +507,7 @@ namespace ospf
             template<>
             struct PrecisionTrait<dec50>
             {
-                inline static constexpr const dec50& epsilon(void) noexcept
+                inline static const dec50& epsilon(void) noexcept
                 {
                     static const dec50 value{ std::numeric_limits<dec50>::denorm_min() };
                     return value;
@@ -517,7 +518,7 @@ namespace ospf
                     return static_cast<usize>(std::numeric_limits<dec50>::digits10);
                 }
 
-                inline static constexpr const dec50& decimal_precision(void) noexcept
+                inline static const dec50& decimal_precision(void) noexcept
                 {
                     static const dec50 value{ std::numeric_limits<dec50>::epsilon() };
                     return value;
@@ -527,7 +528,7 @@ namespace ospf
             template<>
             struct PrecisionTrait<dec100>
             {
-                inline static constexpr const dec100& epsilon(void) noexcept
+                inline static const dec100& epsilon(void) noexcept
                 {
                     static const dec100 value{ std::numeric_limits<dec100>::denorm_min() };
                     return value;
@@ -538,7 +539,7 @@ namespace ospf
                     return static_cast<usize>(std::numeric_limits<dec100>::digits10);
                 }
 
-                inline static constexpr const dec100& decimal_precision(void) noexcept
+                inline static const dec100& decimal_precision(void) noexcept
                 {
                     static const dec100 value{ std::numeric_limits<dec100>::epsilon() };
                     return value;

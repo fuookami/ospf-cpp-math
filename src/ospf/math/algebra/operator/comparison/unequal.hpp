@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -142,9 +142,11 @@ namespace ospf
                         }
                     }
 
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -219,7 +221,7 @@ namespace ospf
 
                 public:
                     constexpr Unequal(void) = default;
-                    constexpr Unequal(ArgCLRefType<ValueType> _) = default;
+                    constexpr Unequal(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr Unequal(const Unequal& ano) = default;
@@ -283,7 +285,31 @@ namespace ospf
                     constexpr ~Unequal(void) noexcept = default;
                 };
 
-                // todo: extern commom class template specialization
+                extern template class Unequal<i8>;
+                extern template class Unequal<u8>;
+                extern template class Unequal<i16>;
+                extern template class Unequal<u16>;
+                extern template class Unequal<i32>;
+                extern template class Unequal<u32>;
+                extern template class Unequal<i64>;
+                extern template class Unequal<u64>;
+                extern template class Unequal<i128>;
+                extern template class Unequal<u128>;
+                extern template class Unequal<i256>;
+                extern template class Unequal<u256>;
+                extern template class Unequal<i512>;
+                extern template class Unequal<u512>;
+                extern template class Unequal<i1024>;
+                extern template class Unequal<u1024>;
+                extern template class Unequal<bigint>;
+
+                extern template class Unequal<f32>;
+                extern template class Unequal<f64>;
+                extern template class Unequal<f128>;
+                extern template class Unequal<f256>;
+                extern template class Unequal<f512>;
+                extern template class Unequal<dec50>;
+                extern template class Unequal<dec100>;
             };
         };
     };

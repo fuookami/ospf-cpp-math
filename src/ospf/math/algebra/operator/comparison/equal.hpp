@@ -4,7 +4,7 @@
 #include <ospf/math/algebra/concept/precision.hpp>
 #include <ospf/math/algebra/concept/signed.hpp>
 #include <ospf/math/algebra/operator/arithmetic/abs.hpp>
-#include <ospf/functional/either.hpp>
+#include <variant>
 
 namespace ospf
 {
@@ -98,7 +98,7 @@ namespace ospf
                         {
                             if (lhs < rhs)
                             {
-                                return (rhs - lhs) <= _precision
+                                return (rhs - lhs) <= _precision;
                             }
                             else
                             {
@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -142,9 +142,11 @@ namespace ospf
                         }
                     }
 
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -219,7 +221,7 @@ namespace ospf
 
                 public:
                     constexpr Equal(void) = default;
-                    constexpr Equal(ArgCLRefType<ValueType> _) = default;
+                    constexpr Equal(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr Equal(const Equal& ano) = default;
@@ -283,7 +285,31 @@ namespace ospf
                     constexpr ~Equal(void) noexcept = default;
                 };
 
-                // todo: extern commom class template specialization
+                extern template class Equal<i8>;
+                extern template class Equal<u8>;
+                extern template class Equal<i16>;
+                extern template class Equal<u16>;
+                extern template class Equal<i32>;
+                extern template class Equal<u32>;
+                extern template class Equal<i64>;
+                extern template class Equal<u64>;
+                extern template class Equal<i128>;
+                extern template class Equal<u128>;
+                extern template class Equal<i256>;
+                extern template class Equal<u256>;
+                extern template class Equal<i512>;
+                extern template class Equal<u512>;
+                extern template class Equal<i1024>;
+                extern template class Equal<u1024>;
+                extern template class Equal<bigint>;
+
+                extern template class Equal<f32>;
+                extern template class Equal<f64>;
+                extern template class Equal<f128>;
+                extern template class Equal<f256>;
+                extern template class Equal<f512>;
+                extern template class Equal<dec50>;
+                extern template class Equal<dec100>;
             };
         };
     };

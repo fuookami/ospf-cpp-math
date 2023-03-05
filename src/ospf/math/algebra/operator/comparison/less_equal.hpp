@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -142,9 +142,11 @@ namespace ospf
                         }
                     }
 
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -219,7 +221,7 @@ namespace ospf
 
                 public:
                     constexpr LessEqual(void) = default;
-                    constexpr LessEqual(ArgCLRefType<ValueType> _) = default;
+                    constexpr LessEqual(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr LessEqual(const LessEqual& ano) = default;
@@ -282,6 +284,32 @@ namespace ospf
                     constexpr LessEqual& operator=(LessEqual&& rhs) noexcept = default;
                     constexpr ~LessEqual(void) noexcept = default;
                 };
+
+                extern template class LessEqual<i8>;
+                extern template class LessEqual<u8>;
+                extern template class LessEqual<i16>;
+                extern template class LessEqual<u16>;
+                extern template class LessEqual<i32>;
+                extern template class LessEqual<u32>;
+                extern template class LessEqual<i64>;
+                extern template class LessEqual<u64>;
+                extern template class LessEqual<i128>;
+                extern template class LessEqual<u128>;
+                extern template class LessEqual<i256>;
+                extern template class LessEqual<u256>;
+                extern template class LessEqual<i512>;
+                extern template class LessEqual<u512>;
+                extern template class LessEqual<i1024>;
+                extern template class LessEqual<u1024>;
+                extern template class LessEqual<bigint>;
+
+                extern template class LessEqual<f32>;
+                extern template class LessEqual<f64>;
+                extern template class LessEqual<f128>;
+                extern template class LessEqual<f256>;
+                extern template class LessEqual<f512>;
+                extern template class LessEqual<dec50>;
+                extern template class LessEqual<dec100>;
             };
         };
     };

@@ -49,7 +49,7 @@ namespace ospf
                             : _precision(precision) {}
 
                         template<typename = void>
-                            requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                            requires ReferenceFaster<ValueType> && std::movable<ValueType>
                         GreaterSignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(precision) {}
 
@@ -82,7 +82,7 @@ namespace ospf
                             : _precision(precision) {}
 
                         template<typename = void>
-                            requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                            requires ReferenceFaster<ValueType> && std::movable<ValueType>
                         GreaterUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(move<ValueType>(precision)) {}
 
@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -141,10 +141,12 @@ namespace ospf
                             }
                         }
                     }
-
+                    
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -219,7 +221,7 @@ namespace ospf
 
                 public:
                     constexpr Greater(void) = default;
-                    constexpr Greater(ArgCLRefType<ValueType> _) = default;
+                    constexpr Greater(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr Greater(const Greater& ano) = default;
@@ -282,6 +284,32 @@ namespace ospf
                     constexpr Greater& operator=(Greater&& rhs) noexcept = default;
                     constexpr ~Greater(void) noexcept = default;
                 };
+
+                extern template class Greater<i8>;
+                extern template class Greater<u8>;
+                extern template class Greater<i16>;
+                extern template class Greater<u16>;
+                extern template class Greater<i32>;
+                extern template class Greater<u32>;
+                extern template class Greater<i64>;
+                extern template class Greater<u64>;
+                extern template class Greater<i128>;
+                extern template class Greater<u128>;
+                extern template class Greater<i256>;
+                extern template class Greater<u256>;
+                extern template class Greater<i512>;
+                extern template class Greater<u512>;
+                extern template class Greater<i1024>;
+                extern template class Greater<u1024>;
+                extern template class Greater<bigint>;
+
+                extern template class Greater<f32>;
+                extern template class Greater<f64>;
+                extern template class Greater<f128>;
+                extern template class Greater<f256>;
+                extern template class Greater<f512>;
+                extern template class Greater<dec50>;
+                extern template class Greater<dec100>;
             };
         };
     };

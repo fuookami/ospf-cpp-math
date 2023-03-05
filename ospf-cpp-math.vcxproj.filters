@@ -43,6 +43,9 @@
     <Filter Include="src\ospf\math\algebra\operator\comparison">
       <UniqueIdentifier>{34f45e38-2ccd-4b32-b49d-c727e05c1582}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\algebra\operator\arithmetic">
+      <UniqueIdentifier>{5bae3216-2b41-421b-ac1d-41ec9ed0373f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\algebra\concept\arithmetic.hpp">
@@ -120,5 +123,37 @@
     <ClInclude Include="src\ospf\math\algebra\functional\operator.hpp">
       <Filter>src\ospf\math\functional</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\comparison.hpp">
+      <Filter>src\ospf\math\algebra\operator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic.hpp">
+      <Filter>src\ospf\math\algebra\operator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\abs.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\equal.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\greater.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\greater_equal.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\less.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\less_equal.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\unequal.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\operator\comparison\zero.cpp">
+      <Filter>src\ospf\math\algebra\operator\comparison</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

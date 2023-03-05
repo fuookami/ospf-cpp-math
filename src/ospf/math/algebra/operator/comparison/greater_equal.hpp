@@ -49,7 +49,7 @@ namespace ospf
                             : _precision(precision) {}
 
                         template<typename = void>
-                            requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                            requires ReferenceFaster<ValueType> && std::movable<ValueType>
                         GreaterEqualSignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(precision) {}
 
@@ -82,7 +82,7 @@ namespace ospf
                             : _precision(precision) {}
 
                         template<typename = void>
-                            requires ReferenceFaster<ValueType>&& std::movable<ValueType>
+                            requires ReferenceFaster<ValueType> && std::movable<ValueType>
                         GreaterEqualUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(move<ValueType>(precision)) {}
 
@@ -125,7 +125,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -142,9 +142,11 @@ namespace ospf
                         }
                     }
 
+                    template<typename = void>
+                        requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>())
+                        if constexpr (Precise<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }
@@ -219,7 +221,7 @@ namespace ospf
 
                 public:
                     constexpr GreaterEqual(void) = default;
-                    constexpr GreaterEqual(ArgCLRefType<ValueType> _) = default;
+                    constexpr GreaterEqual(ArgCLRefType<ValueType> _) {};
 
                 public:
                     constexpr GreaterEqual(const GreaterEqual& ano) = default;
@@ -282,6 +284,32 @@ namespace ospf
                     constexpr GreaterEqual& operator=(GreaterEqual&& rhs) noexcept = default;
                     constexpr ~GreaterEqual(void) noexcept = default;
                 };
+
+                extern template class GreaterEqual<i8>;
+                extern template class GreaterEqual<u8>;
+                extern template class GreaterEqual<i16>;
+                extern template class GreaterEqual<u16>;
+                extern template class GreaterEqual<i32>;
+                extern template class GreaterEqual<u32>;
+                extern template class GreaterEqual<i64>;
+                extern template class GreaterEqual<u64>;
+                extern template class GreaterEqual<i128>;
+                extern template class GreaterEqual<u128>;
+                extern template class GreaterEqual<i256>;
+                extern template class GreaterEqual<u256>;
+                extern template class GreaterEqual<i512>;
+                extern template class GreaterEqual<u512>;
+                extern template class GreaterEqual<i1024>;
+                extern template class GreaterEqual<u1024>;
+                extern template class GreaterEqual<bigint>;
+
+                extern template class GreaterEqual<f32>;
+                extern template class GreaterEqual<f64>;
+                extern template class GreaterEqual<f128>;
+                extern template class GreaterEqual<f256>;
+                extern template class GreaterEqual<f512>;
+                extern template class GreaterEqual<dec50>;
+                extern template class GreaterEqual<dec100>;
             };
         };
     };
