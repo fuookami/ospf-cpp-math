@@ -10,7 +10,7 @@ namespace ospf
 {
     inline namespace math
     {
-        inline namespace value_range
+        inline namespace algebra
         {
             enum class Interval : u8
             {
@@ -51,9 +51,10 @@ namespace ospf
                     return Interval::Close;
                 }
             }
-            
-            namespace interval
+
+            namespace value_range
             {
+
                 template<Interval itv>
                 struct IntervalTrait;
 

@@ -46,6 +46,9 @@
     <Filter Include="src\ospf\math\algebra\concepts">
       <UniqueIdentifier>{29ed3657-f542-4ec4-8982-152611a1e614}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\algebra\numeric_integer">
+      <UniqueIdentifier>{8f05c135-eba0-41e2-971b-ddaa14a4e2ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
@@ -85,9 +88,6 @@
       <Filter>src\ospf\math\algebra\value_range</Filter>
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\value_range\bound.hpp">
-      <Filter>src\ospf\math\algebra\value_range</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ospf\math\algebra\value_range\value_wrapper.hpp">
       <Filter>src\ospf\math\algebra\value_range</Filter>
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\value_range\value_range.hpp">
@@ -137,6 +137,42 @@
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\concepts\variant.hpp">
       <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\value_range\value_wrapper.hpp">
+      <Filter>src\ospf\math\algebra\value_range</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\add.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\sub.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\mul.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\div.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\rem.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\concepts\field.hpp">
+      <Filter>src\ospf\math\algebra\concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\cross.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\numeric_integer.hpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\rational.hpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\scale.hpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\neg.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
