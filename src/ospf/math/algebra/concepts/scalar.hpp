@@ -11,7 +11,7 @@ namespace ospf
     {
         inline namespace algebra
         {
-            template<typename T>
+            template<Arithmetic T>
             struct ScalarTrait;
 
             template<typename T>
