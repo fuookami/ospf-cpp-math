@@ -426,10 +426,61 @@ namespace ospf
                 };
 
                 struct Infinity {};
-                struct NegetivInfinity {};
+                struct NegativeInfinity {};
                 static constexpr const Infinity inf{};
-                static constexpr const NegetivInfinity neg_inf{};
+                static constexpr const NegativeInfinity neg_inf{};
             }; 
         };
+    };
+};
+
+namespace std
+{
+    template<>
+    struct formatter<ospf::Infinity, char>
+        : public formatter<std::string_view, char>
+    {
+        template<typename FormatContext>
+        inline decltype(auto) format(const ospf::Infinity _, FormatContext& fc)
+        {
+            static const formatter<std::string_view, char> _formatter{};
+            return _formatter.format("inf", fc);
+        }
+    };
+
+    template<>
+    struct formatter<ospf::Infinity, ospf::wchar>
+        : public formatter<std::wstring_view, ospf::wchar>
+    {
+        template<typename FormatContext>
+        inline decltype(auto) format(const ospf::Infinity _, FormatContext& fc)
+        {
+            static const formatter<std::wstring_view, ospf::wchar> _formatter{};
+            return _formatter.format(L"inf", fc);
+        }
+    };
+
+    template<>
+    struct formatter<ospf::NegativeInfinity, char>
+        : public formatter<std::string_view, char>
+    {
+        template<typename FormatContext>
+        inline decltype(auto) format(const ospf::NegativeInfinity _, FormatContext& fc)
+        {
+            static const formatter<std::string_view, char> _formatter{};
+            return _formatter.format("-inf", fc);
+        }
+    };
+
+    template<>
+    struct formatter<ospf::NegativeInfinity, ospf::wchar>
+        : public formatter<std::wstring_view, ospf::wchar>
+    {
+        template<typename FormatContext>
+        inline decltype(auto) format(const ospf::NegativeInfinity _, FormatContext& fc)
+        {
+            static const formatter<std::wstring_view, ospf::wchar> _formatter{};
+            return _formatter.format(L"-inf", fc);
+        }
     };
 };
