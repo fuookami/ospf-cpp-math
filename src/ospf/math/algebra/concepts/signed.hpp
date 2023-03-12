@@ -77,6 +77,32 @@ namespace ospf
                 template<> struct SignedTrait<dec50> : public signed_trait::SignedTraitTemplate<dec50> {};
                 template<> struct SignedTrait<dec100> : public signed_trait::SignedTraitTemplate<dec100> {};
                 template<usize digits> struct SignedTrait<dec<digits>> : public signed_trait::SignedTraitTemplate<dec<digits>> {};
+
+                template<Arithmetic T>
+                inline const bool is_positive(const T& value) noexcept
+                {
+                    if constexpr (Signed<T>)
+                    {
+                        return SignedTrait<T>::is_positive(value);
+                    }
+                    else if constexpr (Unsigned<T>)
+                    {
+                        return value > ArithmeticTrait<T>::zero();
+                    }
+                }
+
+                template<Arithmetic T>
+                inline const bool is_negative(const T& value) noexcept
+                {
+                    if constexpr (Signed<T>)
+                    {
+                        return SignedTrait<T>::is_negative(value);
+                    }
+                    else if constexpr (Unsigned<T>)
+                    {
+                        return false;
+                    }
+                }
             };
         };
     };

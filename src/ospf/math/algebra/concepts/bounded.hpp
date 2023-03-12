@@ -177,7 +177,7 @@ namespace ospf
 
                     inline static constexpr const u64 positive_minimum(void) noexcept
                     {
-                        std::numeric_limits<u64>::min();
+                        return std::numeric_limits<u64>::min();
                     }
                 };
 

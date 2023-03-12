@@ -3,6 +3,10 @@
 #include <ospf/concepts/with_default.hpp>
 #include <ospf/exception.hpp>
 #include <ospf/math/algebra/concepts/real_number.hpp>
+#include <ospf/math/algebra/operator/arithmetic/add.hpp>
+#include <ospf/math/algebra/operator/arithmetic/sub.hpp>
+#include <ospf/math/algebra/operator/arithmetic/mul.hpp>
+#include <ospf/math/algebra/operator/arithmetic/div.hpp>
 #include <ospf/type_family.hpp>
 #include <variant>
 
@@ -22,8 +26,8 @@ namespace ospf
                 public:
                     using ValueType = OriginType<T>;
 
-                private:
-                    inline Variant wrap(ArgCLRefType<ValueType> value)
+                public:
+                    inline static Variant wrap(ArgCLRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -53,7 +57,7 @@ namespace ospf
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    inline Variant wrap(ArgRRefType<ValueType> value)
+                    inline static Variant wrap(ArgRRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -114,85 +118,847 @@ namespace ospf
                         return _variant;
                     }
 
+                    // todo: it is not must to return a copy, may be reference
+                    inline RetType<ValueType> unwrap(void) const noexcept
+                    {
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            return std::visit([](const auto& value) -> ValueType
+                                {
+                                    using ValueType = OriginType<decltype(value)>;
+                                    if constexpr (DecaySameAs<ValueType, Infinity>)
+                                    {
+                                        if constexpr (DecaySameAs<decltype(RealNumberTrait<ValueType>::inf()), std::optional<ValueType>>)
+                                        {
+                                            return RealNumberTrait<ValueType>::inf().value_or(*BoundedTrait<ValueType>::maximum());
+                                        }
+                                        else
+                                        {
+                                            return *RealNumberTrait<ValueType>::inf().value_or(*BoundedTrait<ValueType>::maximum());
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ValueType, NegativeInfinity>)
+                                    {
+                                        if constexpr (DecaySameAs<decltype(RealNumberTrait<ValueType>::neg_inf()), std::optional<ValueType>>)
+                                        {
+                                            return RealNumberTrait<ValueType>::neg_inf().value_or(*BoundedTrait<ValueType>::minimum());
+                                        }
+                                        else
+                                        {
+                                            return *RealNumberTrait<ValueType>::neg_inf().value_or(*BoundedTrait<ValueType>::minimum());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return value;
+                                    }
+                                }, _variant);
+                        }
+                        else
+                        {
+                            return std::visit([](const auto& value) -> ValueType
+                                {
+                                    using ValueType = OriginType<decltype(value)>;
+                                    if constexpr (DecaySameAs<ValueType, Infinity>)
+                                    {
+                                        if constexpr (DecaySameAs<decltype(BoundedTrait<ValueType>::maximum()), std::optional<ValueType>>)
+                                        {
+                                            return *BoundedTrait<ValueType>::maximum();
+                                        }
+                                        else
+                                        {
+                                            return **BoundedTrait<ValueType>::maximum();
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ValueType, NegativeInfinity>)
+                                    {
+                                        if constexpr (DecaySameAs<decltype(BoundedTrait<ValueType>::minimum()), std::optional<ValueType>>)
+                                        {
+                                            return *BoundedTrait<ValueType>::minimum();
+                                        }
+                                        else
+                                        {
+                                            return **BoundedTrait<ValueType>::minimum();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return value;
+                                    }
+                                }, _variant);
+                        }
+                    }
+
                 public:
-                    inline ValueWrapper operator+(const ValueWrapper& value) const noexcept
+                    template<typename = void>
+                        requires Neg<ValueType>
+                    inline ValueWrapper operator-(void) noexcept
+                    {
+                        return std::visit([](const auto& this_value) -> ValueWrapper
+                            {
+                                using ThisValueType = OriginType<decltype(this_value)>;
+                                if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                {
+                                    return neg_inf;
+                                }
+                                else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                {
+                                    return inf;
+                                }
+                                else
+                                {
+                                    return -this_value;
+                                }
+                            }, _variant);
+                    }
+
+                public:
+                    template<typename = void>
+                        requires Add<ValueType>
+                    inline ValueWrapper operator+(const ValueWrapper& value) const
                     {
 
                     }
 
-                    inline ValueWrapper& operator+=(const ValueWrapper& value) const noexcept
+                    template<typename = void>
+                        requires AddAssign<ValueType>
+                    inline ValueWrapper& operator+=(const ValueWrapper& value)
                     {
 
                     }
 
-                    inline ValueWrapper operator+(ArgCLRefType<ValueType> value) const noexcept
+                    template<typename = void>
+                        requires Add<ValueType>
+                    inline ValueWrapper operator+(ArgCLRefType<ValueType> value) const
+                    {
+                        if (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range"};
+                            }
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf"};
+                                        }
+                                        return inf;
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between -inf and inf"};
+                                        }
+                                        return neg_inf;
+                                    }
+                                    else
+                                    {
+                                        return this_value + value;
+                                    }
+                                }, _variant);
+                        }
+                        else
+                        {
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        return inf;
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        return neg_inf;
+                                    }
+                                    else
+                                    {
+                                        return this_value + value;
+                                    }
+                                }, _variant);
+                        }
+                    }
+
+                    template<typename = void>
+                        requires AddAssign<ValueType>
+                    inline ValueWrapper& operator+=(ArgCLRefType<ValueType> value)
+                    {
+                        if (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range"};
+                            }
+                            std::visit([this, &value](auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                                        }
+                                    }
+                                    if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                        }
+                                        else if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                        }
+                                        else
+                                        {
+                                            this_value += value;
+                                        }
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                        else
+                        {
+                            std::visit([&value](auto& this_value)
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, ValueType>)
+                                    {
+                                        this_value += value;
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                    }
+
+                    template<typename = void>
+                        requires Sub<ValueType>
+                    inline ValueWrapper operator-(const ValueWrapper& value) const
                     {
 
                     }
 
-                    inline ValueWrapper& operator+=(ArgCLRefType<ValueType> value) const noexcept
+                    template<typename = void>
+                        requires SubAssign<ValueType>
+                    inline ValueWrapper& operator-=(const ValueWrapper& value)
                     {
 
                     }
 
-                    inline ValueWrapper operator-(const ValueWrapper& value) const noexcept
+                    template<typename = void>
+                        requires Sub<ValueType>
+                    inline ValueWrapper operator-(ArgCLRefType<ValueType> value) const
+                    {
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+                            }
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between inf and inf" };
+                                        }
+                                        return inf;
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between -inf and -inf" };
+                                        }
+                                        return neg_inf;
+                                    }
+                                    else
+                                    {
+                                        return this_value - value;
+                                    }
+                                }, _variant);
+                        }
+                        else
+                        {
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        return inf;
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        return neg_inf;
+                                    }
+                                    else
+                                    {
+                                        return this_value - value;
+                                    }
+                                }, _variant);
+                        }
+                    }
+
+                    template<typename = void>
+                        requires SubAssign<ValueType>
+                    inline ValueWrapper& operator-=(ArgCLRefType<ValueType> value)
+                    {
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+                            }
+                            std::visit([this, &value](auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between inf and inf" };
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between -inf and -inf" };
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                        }
+                                        else if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                        }
+                                        else
+                                        {
+                                            this_value -= value;
+                                        }
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                        else
+                        {
+                            std::visit([&value](auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, ValueType>)
+                                    {
+                                        this_value -= value;
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                    }
+
+                    template<typename = void>
+                        requires Mul<ValueType>
+                    inline ValueWrapper operator*(const ValueWrapper& value) const
+                    {
+                    }
+
+                    template<typename = void>
+                        requires MulAssign<ValueType>
+                    inline ValueWrapper& operator*=(const ValueWrapper& value)
                     {
 
                     }
 
-                    inline ValueWrapper& operator-=(const ValueWrapper& value) const noexcept
+                    template<typename = void>
+                        requires Mul<ValueType>
+                    inline ValueWrapper operator*(ArgCLRefType<ValueType> value) const
+                    {
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+                            }
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (is_positive(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (is_positive(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return this_value * value;
+                                    }
+                                }, _variant);
+                        }
+                        else
+                        {
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (is_positive(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (is_positive(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return this_value * value;
+                                    }
+                                }, _variant);
+                        }
+                    }
+
+                    template<typename = void>
+                        requires MulAssign<ValueType>
+                    inline ValueWrapper& operator*=(ArgCLRefType<ValueType> value)
+                    {
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+                            }
+                            std::visit([this, &value](auto& this_value)
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            if (is_positive(this_value))
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                            }
+                                            else if (is_negative(this_value))
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                            }
+                                            else
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                                            }
+                                        }
+                                        else if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            if (is_positive(this_value))
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                            }
+                                            else if (is_negative(this_value))
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                            }
+                                            else
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                                            }
+                                        }
+                                        else
+                                        {
+                                            this_value *= value;
+                                        }
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                        else
+                        {
+                            std::visit([this, &value](auto& this_value)
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf"};
+                                        }
+                                    }
+                                    else
+                                    {
+                                        this_value *= value;
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                    }
+
+                    template<typename = void>
+                        requires Div<ValueType>
+                    inline ValueWrapper operator/(const ValueWrapper& value) const
                     {
 
                     }
 
-                    inline ValueWrapper operator-(ArgCLRefType<ValueType> value) const noexcept
+                    template<typename = void>
+                        requires DivAssign<ValueType>
+                    inline ValueWrapper& operator/=(const ValueWrapper& value)
                     {
 
                     }
 
-                    inline ValueWrapper& operator-=(ArgCLRefType<ValueType> value) const noexcept
+                    template<typename = void>
+                        requires Div<ValueType>
+                    inline ValueWrapper operator/(ArgCLRefType<ValueType> value) const
                     {
-
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+                            }
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                        else if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and -inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                        else if (is_positive(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                        if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and -inf" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                        else if (is_positive(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (value == ArithmeticTrait<ValueType>::zero())
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, std::format("invalid divide between {} and 0", this_value) };
+                                        }
+                                        return this_value / value;
+                                    }
+                                }, _variant);
+                        }
+                        else
+                        {
+                            return std::visit([&value](const auto& this_value) -> ValueWrapper
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (is_positive(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (is_positive(value))
+                                        {
+                                            return neg_inf;
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            return inf;
+                                        }
+                                        else
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (value == ArithmeticTrait<ValueType>::zero())
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, std::format("invalid divide between {} and 0", this_value) };
+                                            return ArithmeticTrait<ValueType>::zero();
+                                        }
+                                        return this_value / value;
+                                    }
+                                }, _variant);
+                        }
                     }
 
-                    inline ValueWrapper operator*(const ValueWrapper& value) const noexcept
+                    template<typename = void>
+                        requires DivAssign<ValueType>
+                    inline ValueWrapper& operator/=(ArgCLRefType<ValueType> value)
                     {
-
+                        if constexpr (RealNumber<ValueType>)
+                        {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+                            }
+                            std::visit([this, &value](auto& this_value)
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and inf" };
+                                        }
+                                        else if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and -inf" };
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (RealNumberTrait<ValueType>::is_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and inf" };
+                                        }
+                                        else if (RealNumberTrait<ValueType>::is_neg_inf(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and -inf" };
+                                        }
+                                        else if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (value == ArithmeticTrait<ValueType>::zero())
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, std::format("invalid divide between {}, and 0", this_value) };
+                                        }
+                                        this_value /= value;
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
+                        else
+                        {
+                            std::visit([this, &value](auto& this_value)
+                                {
+                                    using ThisValueType = OriginType<decltype(this_value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
+                                    {
+                                        if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                                        }
+                                    }
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
+                                    {
+                                        if (is_negative(value))
+                                        {
+                                            this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                        }
+                                        else if (!is_positive(value))
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0"};
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (value == ArithmeticTrait<ValueType>::zero())
+                                        {
+                                            throw OSPFException{ OSPFErrCode::ApplicationError, std::format("invalid divide between {} and 0", this_value) };
+                                        }
+                                        this_value /= value;
+                                    }
+                                }, _variant);
+                            return *this;
+                        }
                     }
 
-                    inline ValueWrapper& operator*=(const ValueWrapper& value) const noexcept
+                public:
+                    template<typename = void>
+                        requires AddAssign<ValueType>
+                    inline ValueWrapper& operator++(void) noexcept
                     {
-
+                        return this->operator+=(ArithmeticTrait<ValueType>::one());
                     }
 
-                    inline ValueWrapper operator*(ArgCLRefType<ValueType> value) const noexcept
+                    template<typename = void>
+                        requires AddAssign<ValueType>
+                    inline ValueWrapper& operator++(int) noexcept
                     {
-
+                        return this->operator+=(ArithmeticTrait<ValueType>::one());
                     }
 
-                    inline ValueWrapper& operator*=(ArgCLRefType<ValueType> value) const noexcept
+                    template<typename = void>
+                        requires SubAssign<ValueType>
+                    inline ValueWrapper& operator--(void) noexcept
                     {
-
+                        return this->operator-=(ArithmeticTrait<ValueType>::one());
                     }
 
-                    inline ValueWrapper operator/(const ValueWrapper& value) const noexcept
+                    template<typename = void>
+                        requires SubAssign<ValueType>
+                    inline ValueWrapper& operator--(int) noexcept
                     {
-
-                    }
-
-                    inline ValueWrapper& operator/=(const ValueWrapper& value) const noexcept
-                    {
-
-                    }
-
-                    inline ValueWrapper operator/(ArgCLRefType<ValueType> value) const noexcept
-                    {
-
-                    }
-
-                    inline ValueWrapper& operator/=(ArgCLRefType<ValueType> value) const noexcept
-                    {
-
+                        return this->operator-=(ArithmeticTrait<ValueType>::one());
                     }
 
                 public:
@@ -240,6 +1006,10 @@ namespace ospf
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return false;
+                            }
                             return std::visit([&value](const auto& this_value)
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -278,6 +1048,10 @@ namespace ospf
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return true;
+                            }
                             return std::visit([&value](const auto& this_value)
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -501,6 +1275,10 @@ namespace ospf
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return false;
+                            }
                             return std::visit([&value](const auto& this_value)
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -543,6 +1321,10 @@ namespace ospf
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return false;
+                            }
                             return std::visit([&value](const auto& this_value)
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -585,6 +1367,10 @@ namespace ospf
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return false;
+                            }
                             return std::visit([&value](const auto& this_value)
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -625,8 +1411,12 @@ namespace ospf
 
                     inline const bool operator>=(ArgCLRefType<ValueType> value) const noexcept
                     {
-                         if constexpr (RealNumber<ValueType>)
+                        if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return false;
+                            }
                             return std::visit([&value](const auto& this_value)
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -731,6 +1521,10 @@ namespace ospf
 
                         if constexpr (RealNumber<ValueType>)
                         {
+                            if (RealNumberTrait<ValueType>::is_nan(value))
+                            {
+                                return std::partial_ordering::unordered;
+                            }
                             return std::visit([&value](const auto& this_value) -> RetType
                                 {
                                     using ThisValueType = OriginType<decltype(this_value)>;
@@ -803,35 +1597,373 @@ namespace ospf
     };
 };
 
-template<typename T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+template<ospf::Arithmetic T>
+    requires ospf::Add<T>
+inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
-
+    if constexpr (ospf::RealNumber<T>)
+    {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+        }
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity>)
+                {
+                    if (ospf::RealNumberTrait<T>::is_neg_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                    }
+                    return ospf::inf;
+                }
+                else if constexpr (ospf::DecaySameAs<RhsValueType, ospf::NegativeInfinity>)
+                {
+                    if (ospf::RealNumberTrait<T>::is_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                    }
+                    return ospf::neg_inf;
+                }
+                else
+                {
+                    return lhs + rhs_value;
+                }
+            }, rhs);
+    }
+    else
+    {
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity>)
+                {
+                    return ospf::inf;
+                }
+                else if constexpr (ospf::DecaySameAs<RhsValueType, ospf::NegativeInfinity>)
+                {
+                    return ospf::neg_inf;
+                }
+                else
+                {
+                    return lhs + rhs_value;
+                }
+            }, rhs);
+    }
 }
 
-template<typename T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+template<ospf::Arithmetic T>
+    requires ospf::Sub<T>
+inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
-
+    if constexpr (ospf::RealNumber<T>)
+    {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+        }
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity>)
+                {
+                    if (ospf::RealNumberTrait<T>::is_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid minus between inf and inf" };
+                    }
+                    return ospf::neg_inf;
+                }
+                else if constexpr (ospf::DecaySameAs<RhsValueType, ospf::NegativeInfinity>)
+                {
+                    if (ospf::RealNumberTrait<T>::is_neg_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid minus between -inf and -inf" };
+                    }
+                    return ospf::inf;
+                }
+                else
+                {
+                    return lhs - rhs_value;
+                }
+            }, rhs)
+    }
+    else
+    {
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity>)
+                {
+                    return ospf::neg_inf;
+                }
+                else if constexpr (ospf::DecaySameAs<RhsValueType, ospf::NegativeInfinity>)
+                {
+                    return ospf::inf;
+                }
+                else
+                {
+                    return lhs - rhs_value;
+                }
+            }, rhs);
+    }
 }
 
-template<typename T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+template<ospf::Arithmetic T>
+    requires ospf::Mul<T>
+inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
-
+    if constexpr (ospf::RealNumber<T>)
+    {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+        }
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using ThisValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<ThisValueType, ospf::Infinity>)
+                {
+                    if (ospf::is_positive(lhs))
+                    {
+                        return ospf::inf;
+                    }
+                    else if (ospf::is_negative(lhs))
+                    {
+                        return ospf::neg_inf;
+                    }
+                    else
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                }
+                else if constexpr (ospf::DecaySameAs<ThisValueType, ospf::NegativeInfinity>)
+                {
+                    if (ospf::is_positive(lhs))
+                    {
+                        return ospf::neg_inf;
+                    }
+                    else if (ospf::is_negative(lhs))
+                    {
+                        return ospf::inf;
+                    }
+                    else
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                }
+                else
+                {
+                    if (ospf::RealNumberTrait<T>::is_inf(lhs))
+                    {
+                        if (ospf::is_positive(rhs_value))
+                        {
+                            return ospf::inf;
+                        }
+                        else if (ospf::is_negative(rhs_value))
+                        {
+                            return ospf::neg_inf;
+                        }
+                        else
+                        {
+                            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                            return ospf::ArithmeticTrait<T>::zero();
+                        }
+                    }
+                    else if (ospf::RealNumberTrait<T>::is_neg_inf(lhs))
+                    {
+                        if (ospf::is_positive(rhs_value))
+                        {
+                            return ospf::neg_inf;
+                        }
+                        else if (ospf::is_negative(rhs_value))
+                        {
+                            return ospf::inf;
+                        }
+                        else
+                        {
+                            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                            return ospf::ArithmeticTrait<T>::zero();
+                        }
+                    }
+                    else
+                    {
+                        return lhs * rhs_value;
+                    }
+                }
+            }, rhs);
+    }
+    else
+    {
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity>)
+                {
+                    if (ospf::is_positive(lhs))
+                    {
+                        return ospf::inf;
+                    }
+                    else if (ospf::is_negative(lhs))
+                    {
+                        return ospf::neg_inf;
+                    }
+                    else
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid multiply between 0 and inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                }
+                else if constexpr (ospf::DecaySameAs<RhsValueType, ospf::NegativeInfinity>)
+                {
+                    if (ospf::is_positive(lhs))
+                    {
+                        return ospf::neg_inf;
+                    }
+                    else if (ospf::is_negative(lhs))
+                    {
+                        return ospf::inf;
+                    }
+                    else
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid multiply between 0 and -inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                }
+                else
+                {
+                    return lhs * rhs_value;
+                }
+            }, rhs);
+    }
 }
 
-template<typename T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+template<ospf::Arithmetic T>
+    requires ospf::Div<T>
+inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
-
+    if constexpr (ospf::RealNumber<T>)
+    {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid argument NaN for value range" };
+        }
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity>)
+                {
+                    if (ospf::RealNumberTrait<T>::is_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid divide between inf and inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                    else if (ospf::RealNumberTrait<T>::is_neg_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid divide between -inf and inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                    else
+                    {
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                }
+                else if constexpr (ospf::DecaySameAs<RhsValueType, ospf::NegativeInfinity>)
+                {
+                    if (ospf::RealNumberTrait<T>::is_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid divide between inf and -inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                    else if (ospf::RealNumberTrait<T>::is_neg_inf(lhs))
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid divide between -inf and -inf" };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                    else
+                    {
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                }
+                else
+                {
+                    if (ospf::RealNumberTrait<T>::is_inf(lhs))
+                    {
+                        if (ospf::is_positive(rhs_value))
+                        {
+                            return ospf::inf;
+                        }
+                        else if (ospf::is_negative(rhs_value))
+                        {
+                            return ospf::neg_inf;
+                        }
+                        else
+                        {
+                            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                            return ospf::ArithmeticTrait<T>::zero();
+                        }
+                    }
+                    else if (ospf::RealNumberTrait<T>::is_neg_inf(lhs))
+                    {
+                        if (ospf::is_positive(rhs_value))
+                        {
+                            return ospf::neg_inf;
+                        }
+                        else if (ospf::is_negative(rhs_value))
+                        {
+                            return ospf::inf;
+                        }
+                        else
+                        {
+                            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                            return ospf::ArithmeticTrait<T>::zero();
+                        }
+                    }
+                    else
+                    {
+                        if (rhs_value == ospf::ArithmeticTrait<T>::zero())
+                        {
+                            throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, std::format("invalid divide between {} and 0", lhs) };
+                            return ospf::ArithmeticTrait<T>::zero();
+                        }
+                        return lhs / rhs_value;
+                    }
+                }
+            }, rhs);
+    }
+    else
+    {
+        return std::visit([&lhs](const auto& rhs_value) -> ospf::value_range::ValueWrapper<T>
+            {
+                using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
+                if constexpr (ospf::DecaySameAs<RhsValueType, ospf::Infinity, ospf::NegativeInfinity>)
+                {
+                    return ospf::ArithmeticTrait<T>::zero();
+                }
+                else
+                {
+                    if (rhs_value == ospf::ArithmeticTrait<T>::zero())
+                    {
+                        throw ospf::OSPFException{ ospf::OSPFErrCode::ApplicationError, std::format("invalid divide between {} and 0", lhs) };
+                        return ospf::ArithmeticTrait<T>::zero();
+                    }
+                    return lhs / rhs_value;
+                }
+            }, rhs);
+    }
 }
 
-template<typename T>
+template<ospf::Arithmetic T>
 inline const bool operator==(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return false;
+        }
         return std::visit([&lhs](const auto& rhs_value)
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
@@ -866,11 +1998,15 @@ inline const bool operator==(const T& lhs, const ospf::value_range::ValueWrapper
     }
 }
 
-template<typename T>
+template<ospf::Arithmetic T>
 inline const bool operator!=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return true;
+        }
         return std::visit([&lhs](const auto& rhs_value)
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
@@ -910,6 +2046,10 @@ inline const bool operator<(const T& lhs, const ospf::value_range::ValueWrapper<
 {
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return false;
+        }
         return std::visit([&lhs](const auto& rhs_value) 
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
@@ -953,6 +2093,10 @@ inline const bool operator<=(const T& lhs, const ospf::value_range::ValueWrapper
 {
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return false;
+        }
         return std::visit([&lhs](const auto& rhs_value) 
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
@@ -996,6 +2140,10 @@ inline const bool operator>(const T& lhs, const ospf::value_range::ValueWrapper<
 {
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return false;
+        }
         return std::visit([&lhs](const auto& rhs_value) 
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
@@ -1039,6 +2187,10 @@ inline const bool operator>=(const T& lhs, const ospf::value_range::ValueWrapper
 {
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return false;
+        }
         return std::visit([&lhs](const auto& rhs_value) 
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
@@ -1084,6 +2236,10 @@ inline const bool operator<=>(const T& lhs, const ospf::value_range::ValueWrappe
 
     if constexpr (ospf::RealNumber<T>)
     {
+        if (ospf::RealNumberTrait<T>::is_nan(lhs))
+        {
+            return std::partial_ordering::unordered;
+        }
         return std::visit([&lhs](const auto& rhs_value) -> RetType
             {
                 using RhsValueType = ospf::OriginType<decltype(rhs_value)>;
