@@ -79,7 +79,7 @@ namespace ospf
                 template<usize digits> struct SignedTrait<dec<digits>> : public signed_trait::SignedTraitTemplate<dec<digits>> {};
 
                 template<Arithmetic T>
-                inline const bool is_positive(const T& value) noexcept
+                inline constexpr const bool is_positive(const T& value) noexcept
                 {
                     if constexpr (Signed<T>)
                     {
@@ -92,7 +92,7 @@ namespace ospf
                 }
 
                 template<Arithmetic T>
-                inline const bool is_negative(const T& value) noexcept
+                inline constexpr const bool is_negative(const T& value) noexcept
                 {
                     if constexpr (Signed<T>)
                     {

@@ -217,14 +217,113 @@ namespace ospf
                         requires Add<ValueType>
                     inline ValueWrapper operator+(const ValueWrapper& value) const
                     {
-
+                        return std::visit([&value](const auto& lhs_value) -> ValueWrapper
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                return inf;
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                return neg_inf;
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    return std::visit([&lhs_value](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                return inf;
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                return neg_inf;
+                                            }
+                                            else
+                                            {
+                                                return lhs_value + rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
                     }
 
                     template<typename = void>
                         requires AddAssign<ValueType>
                     inline ValueWrapper& operator+=(const ValueWrapper& value)
                     {
-
+                        std::visit([this, &value](auto& lhs_value)
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    std::visit([](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    std::visit([](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus between inf and -inf" };
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    std::visit([this, &lhs_value](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                            }
+                                            else
+                                            {
+                                                lhs_value += rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
+                        return *this;
                     }
 
                     template<typename = void>
@@ -346,14 +445,113 @@ namespace ospf
                         requires Sub<ValueType>
                     inline ValueWrapper operator-(const ValueWrapper& value) const
                     {
-
+                        return std::visit([&value](const auto& lhs_value) -> ValueWrapper
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between inf and inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                return inf;
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper 
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between -inf and -inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                return neg_inf;
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    return std::visit([&lhs_value](const auto& rhs_value) -> ValueWrapper 
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                return neg_inf;
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                return inf;
+                                            }
+                                            else
+                                            {
+                                                return lhs_value - rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
                     }
 
                     template<typename = void>
                         requires SubAssign<ValueType>
                     inline ValueWrapper& operator-=(const ValueWrapper& value)
                     {
-
+                        std::visit([this, &value](auto& lhs_value)
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    std::visit([](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between inf and inf" };
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    std::visit([](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus between -inf and -inf" };
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    std::visit([this, &lhs_value](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                            }
+                                            else
+                                            {
+                                                lhs_value -= rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
+                        return *this;
                     }
 
                     template<typename = void>
@@ -475,13 +673,219 @@ namespace ospf
                         requires Mul<ValueType>
                     inline ValueWrapper operator*(const ValueWrapper& value) const
                     {
+                        return std::visit([&value](const auto& lhs_value) -> ValueWrapper
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                return inf;
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                return neg_inf;
+                                            }
+                                            else
+                                            {
+                                                if (is_positive(rhs_value))
+                                                {
+                                                    return inf;
+                                                }
+                                                else if (is_negative(rhs_value))
+                                                {
+                                                    return neg_inf;
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between inf and 0" };
+                                                    return ArithmeticTrait<ValueType>::zero();
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                return neg_inf;
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                return inf;
+                                            }
+                                            else
+                                            {
+                                                if (is_positive(rhs_value))
+                                                {
+                                                    return neg_inf;
+                                                }
+                                                else if (is_negative(rhs_value))
+                                                {
+                                                    return inf;
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between -inf and 0" };
+                                                    return ArithmeticTrait<ValueType>::zero();
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    return std::visit([&lhs_value](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                if (is_positive(lhs_value))
+                                                {
+                                                    return inf;
+                                                }
+                                                else if (is_negative(lhs_value))
+                                                {
+                                                    return neg_inf;
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between inf and 0" };
+                                                    return ArithmeticTrait<ValueType>::zero();
+                                                }
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                if (is_positive(lhs_value))
+                                                {
+                                                    return neg_inf;
+                                                }
+                                                else if (is_negative(lhs_value))
+                                                {
+                                                    return inf;
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between -inf and 0" };
+                                                    return ArithmeticTrait<ValueType>::zero();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                return lhs_value * rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
                     }
 
                     template<typename = void>
                         requires MulAssign<ValueType>
                     inline ValueWrapper& operator*=(const ValueWrapper& value)
                     {
-
+                        std::visit([this, &value](auto& lhs_value)
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    std::visit([this](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                // nothing to do
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                this->_variant = VariantTrait{ std::in_place_index<2_uz>, neg_inf };
+                                            }
+                                            else
+                                            {
+                                                if (is_negative(rhs_value))
+                                                {
+                                                    this->_variant = VariantTrait{ std::in_place_index<2_uz>, neg_inf };
+                                                }
+                                                else if (!is_positive(rhs_value))
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between inf and 0" };
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    std::visit([this](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                // nothing to do
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                this->_variant = VariantTrait{ std::in_place_index<1_uz>, inf };
+                                            }
+                                            else
+                                            {
+                                                if (is_negative(rhs_value))
+                                                {
+                                                    this->_variant = VariantTrait{ std::in_place_index<1_uz>, inf };
+                                                }
+                                                else if (!is_positive(rhs_value))
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between -inf and 0" };
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    std::visit([this, &lhs_value](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                if (is_positive(lhs_value))
+                                                {
+                                                    this->_variant = VariantTrait{ std::in_place_index<1_uz>, inf };
+                                                }
+                                                else if (is_negative(lhs_value))
+                                                {
+                                                    this->_variant = VariantTrait{ std::in_place_index<2_uz>, neg_inf };
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between inf and 0" };
+                                                }
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                if (is_positive(lhs_value))
+                                                {
+                                                    this->_variant = VariantTrait{ std::in_place_index<2_uz>, neg_inf };
+                                                }
+                                                else if (is_negative(lhs_value))
+                                                {
+                                                    this->_variant = VariantTrait{ std::in_place_index<1_uz>, inf };
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid multiply between -inf and 0" };
+                                                }
+                                            }
+                                            else
+                                            {
+                                                lhs_value *= rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
+                        return *this;
                     }
 
                     template<typename = void>
@@ -695,14 +1099,169 @@ namespace ospf
                         requires Div<ValueType>
                     inline ValueWrapper operator/(const ValueWrapper& value) const
                     {
-
+                        return std::visit([&value](const auto& lhs_value) -> ValueWrapper
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and -inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                if (is_positive(rhs_value))
+                                                {
+                                                    return inf;
+                                                }
+                                                else if (is_negative(rhs_value))
+                                                {
+                                                    return neg_inf;
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                                                    return ArithmeticTrait<ValueType>::zero();
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    return std::visit([](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and inf" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                if (is_positive(rhs_value))
+                                                {
+                                                    return neg_inf;
+                                                }
+                                                else if (is_positive(rhs_value))
+                                                {
+                                                    return inf;
+                                                }
+                                                else
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                                                    return ArithmeticTrait<ValueType>::zero();
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    return std::visit([&lhs_value](const auto& rhs_value) -> ValueWrapper
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity, NegativeInfinity>)
+                                            {
+                                                return ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                return lhs_value / rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
                     }
 
                     template<typename = void>
                         requires DivAssign<ValueType>
                     inline ValueWrapper& operator/=(const ValueWrapper& value)
                     {
-
+                        std::visit([this, &value](auto& lhs_value)
+                            {
+                                using LhsValueType = OriginType<decltype(lhs_value)>;
+                                if constexpr (DecaySameAs<LhsValueType, Infinity>)
+                                {
+                                    std::visit([this](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and inf" };
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and -inf" };
+                                            }
+                                            else
+                                            {
+                                                if (is_negative(rhs_value))
+                                                {
+                                                    this->_variant = Variant{ std::in_place_index<2_uz>, neg_inf };
+                                                }
+                                                else if (!is_positive(rhs_value))
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between inf and 0" };
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else if constexpr (DecaySameAs<LhsValueType, NegativeInfinity>)
+                                {
+                                    std::visit([this](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and inf" };
+                                            }
+                                            else if constexpr (DecaySameAs<RhsValueType, NegativeInfinity>)
+                                            {
+                                                throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and -inf" };
+                                            }
+                                            else
+                                            {
+                                                if (is_negative(rhs_value))
+                                                {
+                                                    this->_variant = Variant{ std::in_place_index<1_uz>, inf };
+                                                }
+                                                else if (!is_positive(rhs_value))
+                                                {
+                                                    throw OSPFException{ OSPFErrCode::ApplicationError, "invalid divide between -inf and 0" };
+                                                }
+                                            }
+                                        }, value);
+                                }
+                                else
+                                {
+                                    std::visit([&lhs_value](const auto& rhs_value)
+                                        {
+                                            using RhsValueType = OriginType<decltype(rhs_value)>;
+                                            if constexpr (DecaySameAs<RhsValueType, Infinity, NegativeInfinity>)
+                                            {
+                                                lhs_value = ArithmeticTrait<ValueType>::zero();
+                                            }
+                                            else
+                                            {
+                                                lhs_value /= rhs_value;
+                                            }
+                                        }, value);
+                                }
+                            }, _variant);
+                        return *this;
                     }
 
                     template<typename = void>
