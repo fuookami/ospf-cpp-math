@@ -54,7 +54,6 @@ namespace ospf
 
             namespace value_range
             {
-
                 template<Interval itv>
                 struct IntervalTrait;
 
@@ -131,6 +130,87 @@ namespace ospf
                     inline static Comparer<OriginType<T>> upper_bound_operator(ArgRRefType<T> precision) noexcept
                     {
                         return GreaterEqual<OriginType<T>>{ move<OriginType<T>>(precision) };
+                    }
+                };
+
+                struct DynIntervalTrait
+                {
+                    Interval interval;
+
+                    inline constexpr std::string_view lower_bound_sign(void) noexcept
+                    {
+                        if (interval == Interval::Open)
+                        {
+                            return IntervalTrait<Interval::Open>::lower_bound_sign();
+                        }
+                        else
+                        {
+                            return IntervalTrait<Interval::Close>::upper_bound_sign();
+                        }
+                    }
+
+                    inline constexpr std::string_view upper_bound_sign(void) noexcept
+                    {
+                        if (interval == Interval::Open)
+                        {
+                            return IntervalTrait<Interval::Open>::upper_bound_sign();
+                        }
+                        else
+                        {
+                            return IntervalTrait<Interval::Close>::upper_bound_sign();
+                        }
+                    }
+
+                    template<Invariant T>
+                    inline static Comparer<OriginType<T>> lower_bound_operator(void) noexcept
+                    {
+                        if (interval == Interval::Open)
+                        {
+                            return IntervalTrait<Interval::Open>::lower_bound_operator<T>();
+                        }
+                        else
+                        {
+                            return IntervalTrait<Interval::Close>::lower_bound_operator<T>();
+                        }
+                    }
+
+                    template<Invariant T>
+                    inline static Comparer<OriginType<T>> lower_bound_operator(ArgRRefType<T> precision) noexcept
+                    {
+                        if (interval == Interval::Open)
+                        {
+                            return IntervalTrait<Interval::Open>::lower_bound_operator(move<T>(precision));
+                        }
+                        else
+                        {
+                            return IntervalTrait<Interval::Close>::lower_bound_operator<T>(move<T>(precision));
+                        }
+                    }
+
+                    template<Invariant T>
+                    inline static Comparer<OriginType<T>> upper_bound_operator(void) noexcept
+                    {
+                        if (interval == Interval::Open)
+                        {
+                            return IntervalTrait<Interval::Open>::upper_bound_operator<T>();
+                        }
+                        else
+                        {
+                            return IntervalTrait<Interval::Close>::upper_bound_operator<T>();
+                        }
+                    }
+
+                    template<Invariant T>
+                    inline static Comparer<OriginType<T>> upper_bound_operator(ArgRRefType<T> precision) noexcept
+                    {
+                        if (interval == Interval::Open)
+                        {
+                            return IntervalTrait<Interval::Open>::upper_bound_operator(move<T>(precision));
+                        }
+                        else
+                        {
+                            return IntervalTrait<Interval::Close>::upper_bound_operator<T>(move<T>(precision));
+                        }
                     }
                 };
             };

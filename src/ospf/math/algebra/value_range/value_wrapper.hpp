@@ -27,7 +27,7 @@ namespace ospf
                     using ValueType = OriginType<T>;
 
                 public:
-                    inline static Variant wrap(ArgCLRefType<ValueType> value)
+                    inline static constexpr Variant wrap(ArgCLRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -57,7 +57,7 @@ namespace ospf
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    inline static Variant wrap(ArgRRefType<ValueType> value)
+                    inline static constexpr Variant wrap(ArgRRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -113,13 +113,13 @@ namespace ospf
                     constexpr ~ValueWrapper(void) noexcept = default;
 
                 public:
-                    inline operator const Variant&(void) const noexcept
+                    inline constexpr operator const Variant&(void) const noexcept
                     {
                         return _variant;
                     }
 
                     // todo: it is not must to return a copy, may be reference
-                    inline RetType<ValueType> unwrap(void) const noexcept
+                    inline constexpr RetType<ValueType> unwrap(void) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -192,7 +192,7 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires Neg<ValueType>
-                    inline ValueWrapper operator-(void) noexcept
+                    inline constexpr ValueWrapper operator-(void) noexcept
                     {
                         return std::visit([](const auto& this_value) -> ValueWrapper
                             {
@@ -215,7 +215,7 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires Add<ValueType>
-                    inline ValueWrapper operator+(const ValueWrapper& value) const
+                    inline constexpr ValueWrapper operator+(const ValueWrapper& value) const
                     {
                         return std::visit([&value](const auto& lhs_value) -> ValueWrapper
                             {
@@ -276,7 +276,7 @@ namespace ospf
 
                     template<typename = void>
                         requires AddAssign<ValueType>
-                    inline ValueWrapper& operator+=(const ValueWrapper& value)
+                    inline constexpr ValueWrapper& operator+=(const ValueWrapper& value)
                     {
                         std::visit([this, &value](auto& lhs_value)
                             {
@@ -328,7 +328,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Add<ValueType>
-                    inline ValueWrapper operator+(ArgCLRefType<ValueType> value) const
+                    inline constexpr ValueWrapper operator+(ArgCLRefType<ValueType> value) const
                     {
                         if (RealNumber<ValueType>)
                         {
@@ -384,7 +384,7 @@ namespace ospf
 
                     template<typename = void>
                         requires AddAssign<ValueType>
-                    inline ValueWrapper& operator+=(ArgCLRefType<ValueType> value)
+                    inline constexpr ValueWrapper& operator+=(ArgCLRefType<ValueType> value)
                     {
                         if (RealNumber<ValueType>)
                         {
@@ -443,7 +443,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Sub<ValueType>
-                    inline ValueWrapper operator-(const ValueWrapper& value) const
+                    inline constexpr ValueWrapper operator-(const ValueWrapper& value) const
                     {
                         return std::visit([&value](const auto& lhs_value) -> ValueWrapper
                             {
@@ -504,7 +504,7 @@ namespace ospf
 
                     template<typename = void>
                         requires SubAssign<ValueType>
-                    inline ValueWrapper& operator-=(const ValueWrapper& value)
+                    inline constexpr ValueWrapper& operator-=(const ValueWrapper& value)
                     {
                         std::visit([this, &value](auto& lhs_value)
                             {
@@ -556,7 +556,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Sub<ValueType>
-                    inline ValueWrapper operator-(ArgCLRefType<ValueType> value) const
+                    inline constexpr ValueWrapper operator-(ArgCLRefType<ValueType> value) const
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -612,7 +612,7 @@ namespace ospf
 
                     template<typename = void>
                         requires SubAssign<ValueType>
-                    inline ValueWrapper& operator-=(ArgCLRefType<ValueType> value)
+                    inline constexpr ValueWrapper& operator-=(ArgCLRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -671,7 +671,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Mul<ValueType>
-                    inline ValueWrapper operator*(const ValueWrapper& value) const
+                    inline constexpr ValueWrapper operator*(const ValueWrapper& value) const
                     {
                         return std::visit([&value](const auto& lhs_value) -> ValueWrapper
                             {
@@ -786,7 +786,7 @@ namespace ospf
 
                     template<typename = void>
                         requires MulAssign<ValueType>
-                    inline ValueWrapper& operator*=(const ValueWrapper& value)
+                    inline constexpr ValueWrapper& operator*=(const ValueWrapper& value)
                     {
                         std::visit([this, &value](auto& lhs_value)
                             {
@@ -890,7 +890,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Mul<ValueType>
-                    inline ValueWrapper operator*(ArgCLRefType<ValueType> value) const
+                    inline constexpr ValueWrapper operator*(ArgCLRefType<ValueType> value) const
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -986,7 +986,7 @@ namespace ospf
 
                     template<typename = void>
                         requires MulAssign<ValueType>
-                    inline ValueWrapper& operator*=(ArgCLRefType<ValueType> value)
+                    inline constexpr ValueWrapper& operator*=(ArgCLRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1097,7 +1097,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Div<ValueType>
-                    inline ValueWrapper operator/(const ValueWrapper& value) const
+                    inline constexpr ValueWrapper operator/(const ValueWrapper& value) const
                     {
                         return std::visit([&value](const auto& lhs_value) -> ValueWrapper
                             {
@@ -1188,7 +1188,7 @@ namespace ospf
 
                     template<typename = void>
                         requires DivAssign<ValueType>
-                    inline ValueWrapper& operator/=(const ValueWrapper& value)
+                    inline constexpr ValueWrapper& operator/=(const ValueWrapper& value)
                     {
                         std::visit([this, &value](auto& lhs_value)
                             {
@@ -1266,7 +1266,7 @@ namespace ospf
 
                     template<typename = void>
                         requires Div<ValueType>
-                    inline ValueWrapper operator/(ArgCLRefType<ValueType> value) const
+                    inline constexpr ValueWrapper operator/(ArgCLRefType<ValueType> value) const
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1391,7 +1391,7 @@ namespace ospf
 
                     template<typename = void>
                         requires DivAssign<ValueType>
-                    inline ValueWrapper& operator/=(ArgCLRefType<ValueType> value)
+                    inline constexpr ValueWrapper& operator/=(ArgCLRefType<ValueType> value)
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1494,34 +1494,34 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires AddAssign<ValueType>
-                    inline ValueWrapper& operator++(void) noexcept
+                    inline constexpr ValueWrapper& operator++(void) noexcept
                     {
                         return this->operator+=(ArithmeticTrait<ValueType>::one());
                     }
 
                     template<typename = void>
                         requires AddAssign<ValueType>
-                    inline ValueWrapper& operator++(int) noexcept
+                    inline constexpr ValueWrapper& operator++(int) noexcept
                     {
                         return this->operator+=(ArithmeticTrait<ValueType>::one());
                     }
 
                     template<typename = void>
                         requires SubAssign<ValueType>
-                    inline ValueWrapper& operator--(void) noexcept
+                    inline constexpr ValueWrapper& operator--(void) noexcept
                     {
                         return this->operator-=(ArithmeticTrait<ValueType>::one());
                     }
 
                     template<typename = void>
                         requires SubAssign<ValueType>
-                    inline ValueWrapper& operator--(int) noexcept
+                    inline constexpr ValueWrapper& operator--(int) noexcept
                     {
                         return this->operator-=(ArithmeticTrait<ValueType>::one());
                     }
 
                 public:
-                    inline const bool operator==(const ValueWrapper& value) const noexcept
+                    inline constexpr const bool operator==(const ValueWrapper& value) const noexcept
                     {
                         if (_variant.index() == 0_uz && _variant.index() == value._variant.index())
                         {
@@ -1541,7 +1541,7 @@ namespace ospf
                         }
                     }
 
-                    inline const bool operator!=(const ValueWrapper& value) const noexcept
+                    inline constexpr const bool operator!=(const ValueWrapper& value) const noexcept
                     {
                         if (_variant.index() == 0_uz && _variant.index() == value._variant.index())
                         {
@@ -1561,7 +1561,7 @@ namespace ospf
                         }
                     }
 
-                    inline const bool operator==(ArgCLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator==(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1603,7 +1603,7 @@ namespace ospf
                         }
                     }
 
-                    inline const bool operator!=(ArgCLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator!=(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1646,7 +1646,7 @@ namespace ospf
                     }
 
                 public:
-                    inline const bool operator<(const ValueWrapper& value) const noexcept
+                    inline constexpr const bool operator<(const ValueWrapper& value) const noexcept
                     {
                         return std::visit([&value](const auto& lhs)
                             {
@@ -1692,7 +1692,7 @@ namespace ospf
                             }, _variant);
                     }
 
-                    inline const bool operator<=(const ValueWrapper& value) const noexcept
+                    inline constexpr const bool operator<=(const ValueWrapper& value) const noexcept
                     {
                         return std::visit([&value](const auto& lhs) 
                             {
@@ -1738,7 +1738,7 @@ namespace ospf
                             }, _variant);
                     }
 
-                    inline const bool operator>(const ValueWrapper& value) const noexcept
+                    inline constexpr const bool operator>(const ValueWrapper& value) const noexcept
                     {
                         return std::visit([&value](const auto& lhs) 
                             {
@@ -1784,7 +1784,7 @@ namespace ospf
                             }, _variant);
                     }
 
-                    inline const bool operator>=(const ValueWrapper& value) const noexcept
+                    inline constexpr const bool operator>=(const ValueWrapper& value) const noexcept
                     {
                         return std::visit([&value](const auto& lhs) 
                             {
@@ -1830,7 +1830,7 @@ namespace ospf
                             }, _variant);
                     }
 
-                    inline const bool operator<(ArgCLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator<(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1876,7 +1876,7 @@ namespace ospf
                         }
                     }
 
-                    inline const bool operator<=(ArgCLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator<=(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1922,7 +1922,7 @@ namespace ospf
                         }
                     }
 
-                    inline const bool operator>(ArgCLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator>(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -1968,7 +1968,7 @@ namespace ospf
                         }
                     }
 
-                    inline const bool operator>=(ArgCLRefType<ValueType> value) const noexcept
+                    inline constexpr const bool operator>=(ArgCLRefType<ValueType> value) const noexcept
                     {
                         if constexpr (RealNumber<ValueType>)
                         {
@@ -2015,7 +2015,7 @@ namespace ospf
                     }
 
                 public:
-                    inline std::compare_three_way_result_t<ValueType> operator<=>(const ValueWrapper& value) const noexcept
+                    inline constexpr std::compare_three_way_result_t<ValueType> operator<=>(const ValueWrapper& value) const noexcept
                     {
                         using RetType = std::compare_three_way_result_t<ValueType>;
 
@@ -2074,7 +2074,7 @@ namespace ospf
                             }, _variant);
                     }
 
-                    inline std::compare_three_way_result_t<ValueType> operator<=>(const ValueType& value) const noexcept
+                    inline constexpr std::compare_three_way_result_t<ValueType> operator<=>(const ValueType& value) const noexcept
                     {
                         using RetType = std::compare_three_way_result_t<ValueType>;
 
@@ -2158,7 +2158,7 @@ namespace ospf
 
 template<ospf::Arithmetic T>
     requires ospf::Add<T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
+inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2214,7 +2214,7 @@ inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(const T& lhs,
 
 template<ospf::Arithmetic T>
     requires ospf::Sub<T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
+inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2270,7 +2270,7 @@ inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(const T& lhs,
 
 template<ospf::Arithmetic T>
     requires ospf::Mul<T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
+inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2401,7 +2401,7 @@ inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(const T& lhs,
 
 template<ospf::Arithmetic T>
     requires ospf::Div<T>
-inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
+inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2515,7 +2515,7 @@ inline ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(const T& lhs,
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator==(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator==(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2558,7 +2558,7 @@ inline const bool operator==(const T& lhs, const ospf::value_range::ValueWrapper
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator!=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator!=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2601,7 +2601,7 @@ inline const bool operator!=(const T& lhs, const ospf::value_range::ValueWrapper
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator<(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator<(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2648,7 +2648,7 @@ inline const bool operator<(const T& lhs, const ospf::value_range::ValueWrapper<
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator<=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator<=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2695,7 +2695,7 @@ inline const bool operator<=(const T& lhs, const ospf::value_range::ValueWrapper
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2742,7 +2742,7 @@ inline const bool operator>(const T& lhs, const ospf::value_range::ValueWrapper<
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator>=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator>=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
     {
@@ -2789,7 +2789,7 @@ inline const bool operator>=(const T& lhs, const ospf::value_range::ValueWrapper
 }
 
 template<ospf::Arithmetic T>
-inline const bool operator<=>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+inline constexpr const bool operator<=>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     using RetType = std::compare_three_way_result_t<T>;
 

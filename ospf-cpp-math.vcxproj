@@ -189,6 +189,7 @@
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\less_equal.cpp" />
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\unequal.cpp" />
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\zero.cpp" />
+    <ClCompile Include="src\ospf\math\algebra\value_range\value_range.cpp" />
     <ClCompile Include="src\ospf\math\algebra\value_range\value_wrapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
