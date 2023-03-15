@@ -7,6 +7,12 @@
 #include <ospf/math/algebra/operator/arithmetic/sub.hpp>
 #include <ospf/math/algebra/operator/arithmetic/mul.hpp>
 #include <ospf/math/algebra/operator/arithmetic/div.hpp>
+#include <ospf/math/algebra/operator/comparison/equal.hpp>
+#include <ospf/math/algebra/operator/comparison/unequal.hpp>
+#include <ospf/math/algebra/operator/comparison/less.hpp>
+#include <ospf/math/algebra/operator/comparison/less_equal.hpp>
+#include <ospf/math/algebra/operator/comparison/greater.hpp>
+#include <ospf/math/algebra/operator/comparison/greater_equal.hpp>
 #include <ospf/type_family.hpp>
 #include <variant>
 
@@ -118,6 +124,11 @@ namespace ospf
                         return _variant;
                     }
 
+                    inline constexpr const bool is_inf_or_neg_inf(void) const noexcept
+                    {
+                        return _variant.index() != 0_uz;
+                    }
+
                     // todo: it is not must to return a copy, may be reference
                     inline constexpr RetType<ValueType> unwrap(void) const noexcept
                     {
@@ -187,6 +198,24 @@ namespace ospf
                                     }
                                 }, _variant);
                         }
+                    }
+
+                    template<Arithmetic U>
+                        requires std::convertible_to<ValueType, U>
+                    inline constexpr ValueWrapper<U> to(void) const noexcept
+                    {
+                        return std::visit([](const auto& value) -> ValueWrapper<U>
+                            {
+                                using ValueType = OriginType<decltype(value)>;
+                                if constexpr (DecaySameAs<ValueType, Infinity, NegativeInfinity>)
+                                {
+                                    return value;
+                                }
+                                else
+                                {
+                                    return static_cast<U>(value);
+                                }
+                            }, _variant);
                     }
 
                 public:
@@ -1525,7 +1554,8 @@ namespace ospf
                     {
                         if (_variant.index() == 0_uz && _variant.index() == value._variant.index())
                         {
-                            return std::get<0_uz>(_variant) == std::get<0_uz>(value._variant);
+                            static const Equal<ValueType> eq{};
+                            return eq(std::get<0_uz>(_variant), std::get<0_uz>(value._variant));
                         }
                         else if (_variant.index() == 1_uz && _variant.index() == value._variant.index())
                         {
@@ -1545,7 +1575,8 @@ namespace ospf
                     {
                         if (_variant.index() == 0_uz && _variant.index() == value._variant.index())
                         {
-                            return std::get<0_uz>(_variant) != std::get<0_uz>(value._variant);
+                            static const Unequal<ValueType> neq{};
+                            return neq(std::get<0_uz>(_variant), std::get<0_uz>(value._variant));
                         }
                         else if (_variant.index() == 1_uz && _variant.index() == value._variant.index())
                         {
@@ -1582,7 +1613,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value == value;
+                                        static const Equal<ValueType> eq{};
+                                        return eq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1597,7 +1629,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value == value;
+                                        static const Equal<ValueType> eq{};
+                                        return eq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1624,7 +1657,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value != value;
+                                        static const Unequal<ValueType> neq{};
+                                        return neq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1639,7 +1673,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value != value;
+                                        static const Unequal<ValueType> neq{};
+                                        return neq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1685,7 +1720,8 @@ namespace ospf
                                             }
                                             else
                                             {
-                                                return lhs < rhs;
+                                                static const Less<ValueType> ls{};
+                                                return ls(lhs, rhs);
                                             }
                                         }, value._variant);
                                 }
@@ -1731,7 +1767,8 @@ namespace ospf
                                             }
                                             else
                                             {
-                                                return lhs <= rhs;
+                                                static const LessEqual<ValueType> leq{};
+                                                return leq(lhs, rhs);
                                             }
                                         }, value._variant);
                                 }
@@ -1777,7 +1814,8 @@ namespace ospf
                                             }
                                             else
                                             {
-                                                return lhs > rhs;
+                                                static const Greater<ValueType> gr{};
+                                                return gr(lhs, rhs);
                                             }
                                         }, value._variant);
                                 }
@@ -1823,7 +1861,8 @@ namespace ospf
                                             }
                                             else
                                             {
-                                                return lhs >= rhs;
+                                                static const GreaterEqual<ValueType> geq{};
+                                                return geq(lhs, rhs);
                                             }
                                         }, value._variant);
                                 }
@@ -1851,7 +1890,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value < value;
+                                        static const Less<ValueType> ls{};
+                                        return ls(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1870,7 +1910,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value < value;
+                                        static const Less<ValueType> ls{};
+                                        return ls(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1897,7 +1938,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value <= value;
+                                        static const LessEqual<ValueType> leq{};
+                                        return leq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1916,7 +1958,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value <= value;
+                                        static const LessEqual<ValueType> leq{};
+                                        return leq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1943,7 +1986,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value > value;
+                                        static const Greater<ValueType> gr{};
+                                        return gr(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1962,7 +2006,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value > value;
+                                        static const Greater<ValueType> gr{};
+                                        return gr(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -1989,7 +2034,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value >= value;
+                                        static const GreaterEqual<ValueType> geq{};
+                                        return geq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -2008,7 +2054,8 @@ namespace ospf
                                     }
                                     else
                                     {
-                                        return this_value >= value;
+                                        static const GreaterEqual<ValueType> geq{};
+                                        return geq(this_value, value);
                                     }
                                 }, _variant);
                         }
@@ -2120,6 +2167,12 @@ namespace ospf
                                     }
                                 }, _variant);
                         }
+                    }
+
+                public:
+                    inline void swap(ValueWrapper& ano) noexcept
+                    {
+                        std::swap(_variant, ano._variant);
                     }
 
                 private:
@@ -2536,7 +2589,8 @@ inline constexpr const bool operator==(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs == rhs_value;
+                    static const ospf::Equal<T> eq{};
+                    return eq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2551,7 +2605,8 @@ inline constexpr const bool operator==(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs == rhs_value;
+                    static const ospf::Equal<T> eq{};
+                    return eq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2579,7 +2634,8 @@ inline constexpr const bool operator!=(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs != rhs_value;
+                    static const ospf::Unequal<T> neq{};
+                    return neq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2594,7 +2650,8 @@ inline constexpr const bool operator!=(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs != rhs_value;
+                    static const ospf::Unequal<T> neq{};
+                    return neq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2622,7 +2679,8 @@ inline constexpr const bool operator<(const T& lhs, const ospf::value_range::Val
                 }
                 else
                 {
-                    return lhs < rhs_value;
+                    static const ospf::Less<T> ls{};
+                    return ls(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2641,7 +2699,8 @@ inline constexpr const bool operator<(const T& lhs, const ospf::value_range::Val
                 }
                 else
                 {
-                    return lhs < rhs_value;
+                    static const ospf::Less<T> ls{};
+                    return ls(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2669,7 +2728,8 @@ inline constexpr const bool operator<=(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs <= rhs_value;
+                    static const ospf::LessEqual<T> leq{};
+                    return leq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2688,7 +2748,8 @@ inline constexpr const bool operator<=(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs <= rhs_value;
+                    static const ospf::LessEqual<T> leq{};
+                    return leq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2716,7 +2777,8 @@ inline constexpr const bool operator>(const T& lhs, const ospf::value_range::Val
                 }
                 else
                 {
-                    return lhs > rhs_value;
+                    static const ospf::Greater<T> gr{};
+                    return gr(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2735,7 +2797,8 @@ inline constexpr const bool operator>(const T& lhs, const ospf::value_range::Val
                 }
                 else
                 {
-                    return lhs > rhs_value;
+                    static const ospf::Greater<T> gr{};
+                    return gr(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2763,7 +2826,8 @@ inline constexpr const bool operator>=(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs >= rhs_value;
+                    static const ospf::GreaterEqual<T> geq{};
+                    return geq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2782,7 +2846,8 @@ inline constexpr const bool operator>=(const T& lhs, const ospf::value_range::Va
                 }
                 else
                 {
-                    return lhs >= rhs_value;
+                    static const ospf::GreaterEqual<T> geq{};
+                    return geq(lhs, rhs_value);
                 }
             }, rhs);
     }
@@ -2839,6 +2904,12 @@ inline constexpr const bool operator<=>(const T& lhs, const ospf::value_range::V
 
 namespace std
 {
+    template<ospf::Arithmetic T>
+    inline void swap(ospf::value_range::ValueWrapper<T>& lhs, ospf::value_range::ValueWrapper<T>& rhs) noexcept
+    {
+        lhs.swap(rhs);
+    }
+
     template<ospf::Arithmetic T, ospf::CharType CharT>
     struct formatter<ospf::value_range::ValueWrapper<T>, CharT>
         : public formatter<std::basic_string_view<CharT>, CharT>
