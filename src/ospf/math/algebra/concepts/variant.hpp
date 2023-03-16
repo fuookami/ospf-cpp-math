@@ -2,6 +2,7 @@
 
 #include <ospf/math/algebra/concepts/arithmetic.hpp>
 #include <ospf/string/hasher.hpp>
+#include <optional>
 
 namespace ospf
 {

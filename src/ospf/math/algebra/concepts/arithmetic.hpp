@@ -425,21 +425,8 @@ namespace ospf
                     }
                 };
 
-                struct Infinity 
-                {
-                    inline constexpr const NegativeInfinity operator-(void) noexcept
-                    {
-                        return NegativeInfinity{};
-                    }
-                };
-
-                struct NegativeInfinity 
-                {
-                    inline constexpr const Infinity operator-(void) noexcept
-                    {
-                        return Infinity{};
-                    }
-                };
+                struct Infinity {};
+                struct NegativeInfinity {};
 
                 static constexpr const Infinity inf{};
                 static constexpr const NegativeInfinity neg_inf{};

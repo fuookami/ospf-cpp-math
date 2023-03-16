@@ -25,6 +25,8 @@ namespace ospf
                     }
                 }
 
+                static const auto fuck = abs(dec50{ 1.0 });
+
                 template<typename T>
                 concept Abs = Arithmetic<T>
                     && requires (const T& value) 

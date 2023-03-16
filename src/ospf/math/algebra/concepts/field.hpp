@@ -26,7 +26,7 @@ namespace ospf
                 concept TimesSemiGroup = Arithmetic<T> && Mul<T> && MulAssign<T>;
 
                 template<typename T>
-                concept TimesGroup = TimesSemiGroup<T> && Div<T> && DivAssign<T> && Rem<T> && RemAssign<T>;
+                concept TimesGroup = TimesSemiGroup<T> && Div<T> && DivAssign<T>;
 
                 template<typename T>
                 concept NumberRing = PlusGroup<T> && TimesSemiGroup<T>;

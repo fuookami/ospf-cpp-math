@@ -14,7 +14,7 @@ namespace ospf
                 concept Div = Arithmetic<T>
                     && requires (const T& lhs, const T& rhs)
                     {
-                        { lhs / rhs } -> DecaySameAs<T>;
+                        { lhs / rhs } -> DecaySameAsOrConvertibleTo<T>;
                     };
 
                 template<typename T>

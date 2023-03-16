@@ -21,6 +21,12 @@ namespace ospf
                 template<Arithmetic T, Interval itv>
                 class Bound
                 {
+                    template<Arithmetic, Interval, Interval>
+                    friend class ValueRange;
+
+                    template<Arithmetic>
+                    friend class DynValueRange;
+
                 public:
                     using ValueType = OriginType<T>;
                     using WrapperType = ValueWrapper<ValueType>;
@@ -76,9 +82,9 @@ namespace ospf
                 public:
                     template<Arithmetic U>
                         requires std::convertible_to<ValueType, U>
-                    inline constexpr Bound<U> to(void) const noexcept
+                    inline constexpr Bound<U, itv> to(void) const noexcept
                     {
-                        return Bound{ _side, _value.template to<U>() };
+                        return Bound<U, itv>{ _side, _value.template to<U>() };
                     }
 
                 private:
@@ -140,7 +146,7 @@ namespace ospf
                         requires std::convertible_to<ValueType, U>
                     inline constexpr DynBound<U> to(void) const noexcept
                     {
-                        return DynBound<U>{ _side, _interval, _value.template to<U>()) };
+                        return DynBound<U>{ _side, _interval, _value.template to<U>() };
                     }
 
                 private:

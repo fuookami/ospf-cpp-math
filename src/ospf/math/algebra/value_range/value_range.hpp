@@ -89,9 +89,10 @@ namespace ospf
                         {
                             throw OSPFException{ OSPFErrCode::ApplicationError, "invalid neg for empty value range" };
                         }
-                        return Trait::construct(
+                        return Trait::construct
+                        (
                             LowerBound{ BoundSide::Lower, upper_interval(), -upper_bound().value() },
-                            LowerBound{ BoundSide::Upper, lower_interval(), -lower_bound().value() },
+                            LowerBound{ BoundSide::Upper, lower_interval(), -lower_bound().value() }
                         );
                     }
 
@@ -102,7 +103,8 @@ namespace ospf
                         {
                             throw OSPFException{ OSPFErrCode::ApplicationError, "invalid plus for empty value range" };
                         }
-                        return Trait::construct(
+                        return Trait::construct
+                        (
                             LowerBound{ BoundSide::Lower, lower_interval(), lower_bound().value() + rhs },
                             UpperBound{ BoundSide::Upper, upper_interval(), upper_bound().value() + rhs }
                         );
@@ -125,7 +127,8 @@ namespace ospf
                         {
                             throw OSPFException{ OSPFErrCode::ApplicationError, "invalid minus for empty value range" };
                         }
-                        return Trait::construct(
+                        return Trait::construct
+                        (
                             LowerBound{ BoundSide::Lower, lower_interval(), lower_bound().value() - rhs },
                             UpperBound{ BoundSide::Upper, upper_interval(), upper_bound().value() - rhs }
                         );
@@ -142,6 +145,8 @@ namespace ospf
                         return self();
                     }
 
+                    template<typename = void>
+                        requires SameAs<LowerTrait, UpperTrait>
                     inline constexpr Self operator*(ArgCLRefType<ValueType> rhs)
                     {
                         if (empty())
@@ -150,20 +155,24 @@ namespace ospf
                         }
                         if (is_negative(rhs))
                         {
-                            return Trait::construct(
+                            return Trait::construct
+                            (
                                 LowerBound{ BoundSide::Lower, upper_interval(), upper_bound() * rhs },
                                 UpperBound{ BoundSide::Upper, lower_interval(), lower_bound() * rhs }
                             );
                         }
                         else
                         {
-                            return Trait::construct(
+                            return Trait::construct
+                            (
                                 LowerBound{ BoundSide::Lower, lower_interval(), lower_bound() * rhs },
                                 UpperBound{ BoundSide::Upper, upper_interval(), upper_bound() * rhs }
                             );
                         }
                     }
 
+                    template<typename = void>
+                        requires SameAs<LowerTrait, UpperTrait>
                     inline constexpr Self& operator*=(ArgCLRefType<ValueType> rhs)
                     {
                         if (empty())
@@ -177,10 +186,13 @@ namespace ospf
                         if (is_negative(rhs))
                         {
                             std::swap(lb, ub);
+                            Trait::swap_interval(self());
                         }
                         return self();
                     }
 
+                    template<typename = void>
+                        requires SameAs<LowerTrait, UpperTrait>
                     inline constexpr Self operator/(ArgCLRefType<ValueType> rhs)
                     {
                         if (empty())
@@ -189,20 +201,24 @@ namespace ospf
                         }
                         if (is_negative(rhs))
                         {
-                            return Trait::construct(
+                            return Trait::construct
+                            (
                                 LowerBound{ BoundSide::Lower, upper_interval(), upper_bound() / rhs },
                                 UpperBound{ BoundSide::Upper, lower_interval(), lower_bound() / rhs }
                             );
                         }
                         else
                         {
-                            return Trait::construct(
+                            return Trait::construct
+                            (
                                 LowerBound{ BoundSide::Lower, lower_interval(), lower_bound() / rhs },
                                 UpperBound{ BoundSide::Upper, upper_interval(), upper_bound() / rhs }
                             );
                         }
                     }
 
+                    template<typename = void>
+                        requires SameAs<LowerTrait, UpperTrait>
                     inline constexpr Self& operator/=(ArgCLRefType<ValueType> rhs)
                     {
                         if (empty())
@@ -216,6 +232,7 @@ namespace ospf
                         if (is_negative(rhs))
                         {
                             std::swap(lb, ub);
+                            Trait::swap_interval(self());
                         }
                         return self();
                     }
@@ -227,6 +244,12 @@ namespace ospf
                         {
                             static const auto impl = &Self::OSPF_CRTP_FUNCTION(construct);
                             return (*impl)(move<LowerBound>(lb), move<UpperBound>(ub));
+                        }
+
+                        inline static constexpr void swap_interval(Self& self) noexcept
+                        {
+                            static const auto impl = &Self::OSPF_CRTP_FUNCTION(swap_interval);
+                            return (self.*impl)();
                         }
 
                         inline static constexpr LRefType<LowerBound> lower_bound(Self& self) noexcept
@@ -259,7 +282,7 @@ namespace ospf
                             return (self.*get_impl)();
                         }
 
-                        inline static constexpr const UpperTrait upper_trait(const Self& self) const noexcept
+                        inline static constexpr const UpperTrait upper_trait(const Self& self) noexcept
                         {
                             static const auto get_impl = &Self::OSPF_CRTP_FUNCTION(get_upper_trait);
                             return (self.*get_impl)();
@@ -284,9 +307,6 @@ namespace ospf
                     ValueRange<T, litv, uitv>
                 >
             {
-                template<Arithmetic U, Interval _litv, Interval _uitv>
-                friend class ValueRange<U, _litv, _uitv>;
-
             public:
                 using ValueType = OriginType<T>;
                 using WrapperType = value_range::ValueWrapper<ValueType>;
@@ -342,8 +362,11 @@ namespace ospf
                 {
                     static const Interval lower_interval = interserct_between(litv, _litv);
                     static const Interval upper_interval = interserct_between(uitv, _uitv);
-                    using RetType = ValueRange<ValueType, lower_interval, upper_interval>;
-                    // todo
+                    return ValueRange<ValueType, lower_interval, upper_interval>
+                    {
+                        value_range::Bound<ValueType, lower_interval>{ value_range::BoundSide::Lower, lower_interval, _lb.value() + rhs.lower_bound().value() },
+                        value_range::Bound<ValueType, upper_interval>{ value_range::BoundSide::Upper, upper_interval, _ub.value() + rhs.upper_bound().value() }
+                    };
                 }
 
                 template<Interval _litv, Interval _uitv>
@@ -351,24 +374,44 @@ namespace ospf
                 {
                     static const Interval lower_interval = interserct_between(litv, _uitv);
                     static const Interval upper_interval = interserct_between(uitv, _litv);
-                    using RetType = ValueRange<ValueType, lower_interval, upper_interval>;
-                    // todo
+                    return ValueRange<ValueType, lower_interval, upper_interval>
+                    {
+                        value_range::Bound<ValueType, lower_interval>{ value_range::BoundSide::Lower, lower_interval, _lb.value() - rhs.upper_bound().value() },
+                        value_range::Bound<ValueType, upper_interval>{ value_range::BoundSide::Upper, upper_interval, _ub.value() - rhs.lower_bound().value() }
+                    };
                 }
 
                 inline constexpr DynValueRange<ValueType> operator+(const DynValueRange<ValueType>& rhs)
                 {
-                    // todo
+                    const Interval lower_interval = interserct_between(litv, rhs.lower_interval());
+                    const Interval upper_interval = interserct_between(uitv, rhs.upper_interval());
+                    return DynValueRange<ValueType>
+                    {
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Lower, lower_interval, _lb.value() + rhs.lower_bound().value() },
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Upper, upper_interval, _ub.value() + rhs.upper_bound().value() }
+                    };
                 }
 
                 inline constexpr DynValueRange<ValueType> operator-(const DynValueRange<ValueType>& rhs)
                 {
-                    // todo
+                    const Interval lower_interval = interserct_between(litv, rhs.upper_interval());
+                    const Interval upper_interval = interserct_between(uitv, rhs.lower_interval());
+                    return DynValueRange<ValueType>
+                    {
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Lower, lower_interval, _lb.value() - rhs.upper_bound().value() },
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Upper, upper_interval, _ub.value() - rhs.lower_bound().value() }
+                    };
                 }
 
             OSPF_CRTP_PERMISSION:
                 inline static constexpr ValueRange OSPF_CRTP_FUNCTION(construct)(RRefType<LowerBoundType> lb, RRefType<UpperBoundType> ub) noexcept
                 {
                     return ValueRange{ move<LowerBoundType>(lb), move<UpperBoundType>(ub) };
+                }
+
+                inline constexpr void OSPF_CRTP_FUNCTION(swap_interval)(void) noexcept
+                {
+                    // nothing to do
                 }
 
                 inline constexpr LRefType<LowerBoundType> OSPF_CRTP_FUNCTION(get_lower_bound)(void) noexcept
@@ -415,8 +458,8 @@ namespace ospf
                     DynValueRange<T>
                 >
             {
-                template<Arithmetic U>
-                friend class DynValueRange<U>;
+                template<Arithmetic, Interval, Interval>
+                friend class ValueRange;
 
             public:
                 using ValueType = OriginType<T>;
@@ -429,7 +472,7 @@ namespace ospf
 
             public:
                 constexpr DynValueRange(void)
-                    : _lb(value_range::BoundSide::Lower, neg_inf), _ub(value_range::BoundSide::Upper, inf), _litv(Interval::Close), _uitv(Interval::Close) {}
+                    : _lb(value_range::BoundSide::Lower, Interval::Close, neg_inf), _ub(value_range::BoundSide::Upper, Interval::Close, inf) {}
 
                 constexpr DynValueRange(RRefType<WrapperType> lb, RRefType<WrapperType> ub, const Interval litv = Interval::Close, const Interval uitv = Interval::Close)
                     : _lb(value_range::BoundSide::Lower, litv, move<WrapperType>(lb)), _ub(value_range::BoundSide::Upper, uitv, move<WrapperType>(ub)) {}
@@ -464,29 +507,58 @@ namespace ospf
                 template<Interval litv, Interval uitv>
                 inline constexpr DynValueRange operator+(const ValueRange<ValueType, litv, uitv>& rhs)
                 {
-                    // todo
+                    const Interval lower_interval = interserct_between(lower_interval(), rhs.lower_interval());
+                    const Interval upper_interval = interserct_between(upper_interval(), rhs.upper_interval());
+                    return DynValueRange<ValueType>
+                    {
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Lower, lower_interval, _lb.value() + rhs.lower_bound().value() },
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Upper, upper_interval, _ub.value() + rhs.upper_bound().value() }
+                    };
                 }
 
                 template<Interval litv, Interval uitv>
                 inline constexpr DynValueRange operator-(const ValueRange<ValueType, litv, uitv>& rhs)
                 {
-                    // todo
+                    const Interval lower_interval = interserct_between(lower_interval(), rhs.upper_interval());
+                    const Interval upper_interval = interserct_between(upper_interval(), rhs.lower_interval());
+                    return DynValueRange<ValueType>
+                    {
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Lower, lower_interval, _lb.value() - rhs.upper_bound().value() },
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Upper, upper_interval, _ub.value() - rhs.lower_bound().value() }
+                    };
                 }
 
                 inline constexpr DynValueRange operator+(const DynValueRange& rhs)
                 {
-                    // todo
+                    const Interval lower_interval = interserct_between(lower_interval(), rhs.lower_interval());
+                    const Interval upper_interval = interserct_between(upper_interval(), rhs.upper_interval());
+                    return DynValueRange<ValueType>
+                    {
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Lower, lower_interval, _lb.value() + rhs.lower_bound().value() },
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Upper, upper_interval, _ub.value() + rhs.upper_bound().value() }
+                    };
                 }
 
                 inline constexpr DynValueRange operator-(const DynValueRange& rhs)
                 {
-                    // todo
+                    const Interval lower_interval = interserct_between(lower_interval(), rhs.upper_interval());
+                    const Interval upper_interval = interserct_between(upper_interval(), rhs.lower_interval());
+                    return DynValueRange<ValueType>
+                    {
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Lower, lower_interval, _lb.value() - rhs.upper_bound().value() },
+                        value_range::DynBound<ValueType>{ value_range::BoundSide::Upper, upper_interval, _ub.value() - rhs.lower_bound().value() }
+                    };
                 }
 
             OSPF_CRTP_PERMISSION:
                 inline static constexpr DynValueRange OSPF_CRTP_FUNCTION(construct)(RRefType<BoundType> lb, RRefType<BoundType> ub) noexcept
                 {
                     return DynValueRange{ move<BoundType>(lb), move<BoundType>(ub) };
+                }
+
+                inline constexpr void OSPF_CRTP_FUNCTION(swap_interval)(void) noexcept
+                {
+                    std::swap(_lb._interval, _ub._interval);
                 }
 
                 inline constexpr LRefType<BoundType> OSPF_CRTP_FUNCTION(get_lower_bound)(void) noexcept
@@ -511,12 +583,12 @@ namespace ospf
 
                 inline constexpr const TraitType OSPF_CRTP_FUNCTION(lower_trait)(void) const noexcept
                 {
-                    return TraitType{ _litv };
+                    return TraitType{ _lb.interval() };
                 }
 
                 inline constexpr const TraitType OSPF_CRTP_FUNCTION(upper_trait)(void) const noexcept
                 {
-                    return TraitType{ _uitv };
+                    return TraitType{ _ub.interval() };
                 }
 
             private:
@@ -542,39 +614,39 @@ namespace ospf
             extern template class ValueRange<i64, Interval::Close, Interval::Close>;
             extern template class ValueRange<u64, Interval::Open, Interval::Open>;
             extern template class ValueRange<u64, Interval::Close, Interval::Close>;
-            extern template class ValueRange<i128, Interval::Open, Interval::Open>;
-            extern template class ValueRange<i128, Interval::Close, Interval::Close>;
-            extern template class ValueRange<u128, Interval::Open, Interval::Open>;
-            extern template class ValueRange<u128, Interval::Close, Interval::Close>;
-            extern template class ValueRange<i256, Interval::Open, Interval::Open>;
-            extern template class ValueRange<i256, Interval::Close, Interval::Close>;
-            extern template class ValueRange<u256, Interval::Open, Interval::Open>;
-            extern template class ValueRange<u256, Interval::Close, Interval::Close>;
-            extern template class ValueRange<i512, Interval::Open, Interval::Open>;
-            extern template class ValueRange<i512, Interval::Close, Interval::Close>;
-            extern template class ValueRange<u512, Interval::Open, Interval::Open>;
-            extern template class ValueRange<u512, Interval::Close, Interval::Close>;
-            extern template class ValueRange<i1024, Interval::Open, Interval::Open>;
-            extern template class ValueRange<i1024, Interval::Close, Interval::Close>;
-            extern template class ValueRange<u1024, Interval::Open, Interval::Open>;
-            extern template class ValueRange<u1024, Interval::Close, Interval::Close>;
-            extern template class ValueRange<bigint, Interval::Open, Interval::Open>;
-            extern template class ValueRange<bigint, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<i128, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<i128, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<u128, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<u128, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<i256, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<i256, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<u256, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<u256, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<i512, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<i512, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<u512, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<u512, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<i1024, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<i1024, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<u1024, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<u1024, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<bigint, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<bigint, Interval::Close, Interval::Close>;
 
             extern template class ValueRange<f32, Interval::Open, Interval::Open>;
             extern template class ValueRange<f32, Interval::Close, Interval::Close>;
             extern template class ValueRange<f64, Interval::Open, Interval::Open>;
             extern template class ValueRange<f64, Interval::Close, Interval::Close>;
-            extern template class ValueRange<f128, Interval::Open, Interval::Open>;
-            extern template class ValueRange<f128, Interval::Close, Interval::Close>;
-            extern template class ValueRange<f256, Interval::Open, Interval::Open>;
-            extern template class ValueRange<f256, Interval::Close, Interval::Close>;
-            extern template class ValueRange<f512, Interval::Open, Interval::Open>;
-            extern template class ValueRange<f512, Interval::Close, Interval::Close>;
-            extern template class ValueRange<dec50, Interval::Open, Interval::Open>;
-            extern template class ValueRange<dec50, Interval::Close, Interval::Close>;
-            extern template class ValueRange<dec100, Interval::Open, Interval::Open>;
-            extern template class ValueRange<dec100, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<f128, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<f128, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<f256, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<f256, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<f512, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<f512, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<dec50, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<dec50, Interval::Close, Interval::Close>;
+            //extern template class ValueRange<dec100, Interval::Open, Interval::Open>;
+            //extern template class ValueRange<dec100, Interval::Close, Interval::Close>;
 
             extern template class DynValueRange<i8>;
             extern template class DynValueRange<u8>;
@@ -584,49 +656,88 @@ namespace ospf
             extern template class DynValueRange<u32>;
             extern template class DynValueRange<i64>;
             extern template class DynValueRange<u64>;
-            extern template class DynValueRange<i128>;
-            extern template class DynValueRange<u128>;
-            extern template class DynValueRange<i256>;
-            extern template class DynValueRange<u256>;
-            extern template class DynValueRange<i512>;
-            extern template class DynValueRange<u512>;
-            extern template class DynValueRange<i1024>;
-            extern template class DynValueRange<u1024>;
-            extern template class DynValueRange<bigint>;
+            //extern template class DynValueRange<i128>;
+            //extern template class DynValueRange<u128>;
+            //extern template class DynValueRange<i256>;
+            //extern template class DynValueRange<u256>;
+            //extern template class DynValueRange<i512>;
+            //extern template class DynValueRange<u512>;
+            //extern template class DynValueRange<i1024>;
+            //extern template class DynValueRange<u1024>;
+            //extern template class DynValueRange<bigint>;
 
             extern template class DynValueRange<f32>;
             extern template class DynValueRange<f64>;
-            extern template class DynValueRange<f128>;
-            extern template class DynValueRange<f256>;
-            extern template class DynValueRange<f512>;
-            extern template class DynValueRange<dec50>;
-            extern template class DynValueRange<dec100>;
+            //extern template class DynValueRange<f128>;
+            //extern template class DynValueRange<f256>;
+            //extern template class DynValueRange<f512>;
+            //extern template class DynValueRange<dec50>;
+            //extern template class DynValueRange<dec100>;
         };
     };
 };
 
 template<ospf::Arithmetic T, ospf::Interval litv, ospf::Interval uitv>
-inline constexpr ospf::DynValueRange<T> operator+(const T& lhs, const ospf::ValueRange<T, litv, uitv>& rhs)
+inline constexpr ospf::ValueRange<T, litv, uitv> operator+(const T& lhs, const ospf::ValueRange<T, litv, uitv>& rhs)
 {
-    // todo
+    return ospf::ValueRange<T, litv, uitv>
+    {
+        lhs + rhs.lower_bound().value(),
+        lhs + rhs.upper_bound().value()
+    };
 }
 
 template<ospf::Arithmetic T, ospf::Interval litv, ospf::Interval uitv>
-inline constexpr ospf::DynValueRange<T> operator*(const T& lhs, const ospf::ValueRange<T, litv, uitv>& rhs)
+    requires (litv == uitv)
+inline constexpr ospf::ValueRange<T, litv, uitv> operator*(const T& lhs, const ospf::ValueRange<T, litv, uitv>& rhs)
 {
-    // todo
+    if (ospf::is_negative(lhs))
+    {
+        return ospf::ValueRange<T, litv, uitv>
+        {
+            lhs * rhs.upper_bound().value(),
+            lhs * rhs.lower_bound().value()
+        };
+    }
+    else
+    {
+        return ospf::ValueRange<T, litv, uitv>
+        {
+            lhs * rhs.lower_bound().value(),
+            lhs * rhs.upper_bound().value()
+        };
+    }
 }
 
 template<ospf::Arithmetic T>
 inline constexpr ospf::DynValueRange<T> operator+(const T& lhs, const ospf::DynValueRange<T>& rhs)
 {
-    // todo
+    return ospf::DynValueRange<T>
+    {
+        lhs + rhs.lower_bound().value(), lhs + rhs.upper_bound().value(),
+        rhs.lower_interval(), rhs.upper_interval()
+    };
 }
 
 template<ospf::Arithmetic T>
 inline constexpr ospf::DynValueRange<T> operator*(const T& lhs, const ospf::DynValueRange<T>& rhs)
 {
-    // todo
+    if (ospf::is_negative(lhs))
+    {
+        return ospf::DynValueRange<T>
+        {
+            lhs * rhs.upper_bound().value(), lhs * rhs.lower_bound().value(),
+            rhs.upper_interval(), rhs.lower_interval()
+        };
+    }
+    else
+    {
+        return ospf::DynValueRange<T>
+        {
+            lhs * rhs.lower_bound().value(), lhs * rhs.upper_bound().value(),
+            rhs.lower_interval(), rhs.upper_interval()
+        };
+    }
 }
 
 namespace std

@@ -136,8 +136,8 @@ namespace ospf
                         {
                             return std::visit([](const auto& value) -> ValueType
                                 {
-                                    using ValueType = OriginType<decltype(value)>;
-                                    if constexpr (DecaySameAs<ValueType, Infinity>)
+                                    using ThisValueType = OriginType<decltype(value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
                                     {
                                         if constexpr (DecaySameAs<decltype(RealNumberTrait<ValueType>::inf()), std::optional<ValueType>>)
                                         {
@@ -148,7 +148,7 @@ namespace ospf
                                             return *RealNumberTrait<ValueType>::inf().value_or(*BoundedTrait<ValueType>::maximum());
                                         }
                                     }
-                                    else if constexpr (DecaySameAs<ValueType, NegativeInfinity>)
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
                                     {
                                         if constexpr (DecaySameAs<decltype(RealNumberTrait<ValueType>::neg_inf()), std::optional<ValueType>>)
                                         {
@@ -169,8 +169,8 @@ namespace ospf
                         {
                             return std::visit([](const auto& value) -> ValueType
                                 {
-                                    using ValueType = OriginType<decltype(value)>;
-                                    if constexpr (DecaySameAs<ValueType, Infinity>)
+                                    using ThisValueType = OriginType<decltype(value)>;
+                                    if constexpr (DecaySameAs<ThisValueType, Infinity>)
                                     {
                                         if constexpr (DecaySameAs<decltype(BoundedTrait<ValueType>::maximum()), std::optional<ValueType>>)
                                         {
@@ -181,7 +181,7 @@ namespace ospf
                                             return **BoundedTrait<ValueType>::maximum();
                                         }
                                     }
-                                    else if constexpr (DecaySameAs<ValueType, NegativeInfinity>)
+                                    else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
                                     {
                                         if constexpr (DecaySameAs<decltype(BoundedTrait<ValueType>::minimum()), std::optional<ValueType>>)
                                         {
@@ -1707,7 +1707,7 @@ namespace ospf
                                 }
                                 else
                                 {
-                                    return std::visit([](const auto& rhs)
+                                    return std::visit([&lhs](const auto& rhs)
                                         {
                                             using RhsValueType = OriginType<decltype(rhs)>;
                                             if constexpr (DecaySameAs<RhsValueType, Infinity>)
@@ -1754,7 +1754,7 @@ namespace ospf
                                 }
                                 else
                                 {
-                                    return std::visit([](const auto& rhs)
+                                    return std::visit([&lhs](const auto& rhs)
                                         {
                                             using RhsValueType = OriginType<decltype(rhs)>;
                                             if constexpr (DecaySameAs<RhsValueType, Infinity>)
@@ -1801,7 +1801,7 @@ namespace ospf
                                 }
                                 else
                                 {
-                                    return std::visit([](const auto& rhs)
+                                    return std::visit([&lhs](const auto& rhs)
                                         {
                                             using RhsValueType = OriginType<decltype(rhs)>;
                                             if constexpr (DecaySameAs<RhsValueType, Infinity>)
@@ -1848,7 +1848,7 @@ namespace ospf
                                 }
                                 else
                                 {
-                                    return std::visit([](const auto& rhs)
+                                    return std::visit([&lhs](const auto& rhs)
                                         {
                                             using RhsValueType = OriginType<decltype(rhs)>;
                                             if constexpr (DecaySameAs<RhsValueType, Infinity>)
@@ -1882,7 +1882,7 @@ namespace ospf
                                     using ThisValueType = OriginType<decltype(this_value)>;
                                     if constexpr (DecaySameAs<ThisValueType, Infinity>)
                                     {
-                                        return false
+                                        return false;
                                     }
                                     else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
                                     {
@@ -1930,7 +1930,7 @@ namespace ospf
                                     using ThisValueType = OriginType<decltype(this_value)>;
                                     if constexpr (DecaySameAs<ThisValueType, Infinity>)
                                     {
-                                        return RealNumberTrait<ValueType>::inf(value);
+                                        return RealNumberTrait<ValueType>::is_inf(value);
                                     }
                                     else if constexpr (DecaySameAs<ThisValueType, NegativeInfinity>)
                                     {
@@ -2062,6 +2062,8 @@ namespace ospf
                     }
 
                 public:
+                    template<typename = void>
+                        requires std::three_way_comparable<ValueType>
                     inline constexpr std::compare_three_way_result_t<ValueType> operator<=>(const ValueWrapper& value) const noexcept
                     {
                         using RetType = std::compare_three_way_result_t<ValueType>;
@@ -2121,6 +2123,8 @@ namespace ospf
                             }, _variant);
                     }
 
+                    template<typename = void>
+                        requires std::three_way_comparable<ValueType>
                     inline constexpr std::compare_three_way_result_t<ValueType> operator<=>(const ValueType& value) const noexcept
                     {
                         using RetType = std::compare_three_way_result_t<ValueType>;
@@ -2187,23 +2191,23 @@ namespace ospf
                 extern template class ValueWrapper<u32>;
                 extern template class ValueWrapper<i64>;
                 extern template class ValueWrapper<u64>;
-                extern template class ValueWrapper<i128>;
-                extern template class ValueWrapper<u128>;
-                extern template class ValueWrapper<i256>;
-                extern template class ValueWrapper<u256>;
-                extern template class ValueWrapper<i512>;
-                extern template class ValueWrapper<u512>;
-                extern template class ValueWrapper<i1024>;
-                extern template class ValueWrapper<u1024>;
-                extern template class ValueWrapper<bigint>;
+                //extern template class ValueWrapper<i128>;
+                //extern template class ValueWrapper<u128>;
+                //extern template class ValueWrapper<i256>;
+                //extern template class ValueWrapper<u256>;
+                //extern template class ValueWrapper<i512>;
+                //extern template class ValueWrapper<u512>;
+                //extern template class ValueWrapper<i1024>;
+                //extern template class ValueWrapper<u1024>;
+                //extern template class ValueWrapper<bigint>;
 
                 extern template class ValueWrapper<f32>;
                 extern template class ValueWrapper<f64>;
-                extern template class ValueWrapper<f128>;
-                extern template class ValueWrapper<f256>;
-                extern template class ValueWrapper<f512>;
-                extern template class ValueWrapper<dec50>;
-                extern template class ValueWrapper<dec100>;
+                //extern template class ValueWrapper<f128>;
+                //extern template class ValueWrapper<f256>;
+                //extern template class ValueWrapper<f512>;
+                //extern template class ValueWrapper<dec50>;
+                //extern template class ValueWrapper<dec100>;
             };
         };
     };
@@ -2298,7 +2302,7 @@ inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(con
                 {
                     return lhs - rhs_value;
                 }
-            }, rhs)
+            }, rhs);
     }
     else
     {
@@ -2854,7 +2858,8 @@ inline constexpr const bool operator>=(const T& lhs, const ospf::value_range::Va
 }
 
 template<ospf::Arithmetic T>
-inline constexpr const bool operator<=>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
+    requires std::three_way_comparable<T>
+inline constexpr std::compare_three_way_result_t<T> operator<=>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     using RetType = std::compare_three_way_result_t<T>;
 

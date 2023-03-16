@@ -20,7 +20,7 @@ namespace ospf
                 && WithPrecision<T>
                 && Invariant<T>
                 && std::default_initializable<RealNumberTrait<T>>
-                && requires (const T & value)
+                && requires (const T& value)
             {
                 { RealNumberTrait<T>::two() } -> DecaySameAs<T>;
                 { RealNumberTrait<T>::three() } -> DecaySameAs<T>;
@@ -31,51 +31,6 @@ namespace ospf
                 { RealNumberTrait<T>::is_nan(value) } -> DecaySameAs<bool>;
                 { RealNumberTrait<T>::is_inf(value) } -> DecaySameAs<bool>;
                 { RealNumberTrait<T>::is_neg_inf(value) } -> DecaySameAs<bool>;
-            };
-
-            template<typename T>
-            concept Integer = RealNumber<T>
-                // RangeTo, Log, PowF, Exp
-                && std::three_way_comparable<T, std::weak_ordering>;
-
-            template<typename T>
-            concept IntegerNumber = Integer<T>
-                && Signed<T>
-                && NumberField<T>;
-            // Pow
-
-            template<typename T>
-            concept UIntegerNumber = Integer<T>
-                && Unsigned<T>
-                && NumberField<T>;
-            // Pow
-
-            template<typename T>
-            concept RationalNumber = RealNumber<T>
-                && NumberField<T>
-                // Log, PowF, Exp, Pow
-                && std::three_way_comparable<T, std::weak_ordering>
-                && Integer<typename T::IntegerType>
-                && requires (const T & value)
-            {
-                { value.num() } -> DecaySameAs<typename T::IntegerType>;
-                { value.den() } -> DecaySameAs<typename T::IntegerType>;
-            };
-
-            template<RealNumber T>
-            struct FloatingNumberTrait;
-
-            template<typename T>
-            concept FloatingNumber = RealNumber<T>
-                && Signed<T>
-                && NumberField<T>
-                // Log, PowF, Exp, Pow
-                && std::default_initializable<FloatingNumberTrait<T>>
-                && requires
-            {
-                { FloatingNumberTrait<T>::pi() } -> DecaySameAs<T>;
-                { FloatingNumberTrait<T>::e() } -> DecaySameAs<T>;
-                // floor, ceil, round, trunc, fract
             };
 
             // NumericIntegerNumber, NumericUIntegerNumber
@@ -437,26 +392,6 @@ namespace ospf
                 }
             };
 
-            template<>
-            struct RealNumberTrait<i1024>
-                : public real_number::IntegerNumberTraitTemplate<i1024>
-            {
-                inline static constexpr const i1024 two(void) noexcept
-                {
-                    return i1024{ 2_i64 };
-                }
-
-                inline static constexpr const i1024 three(void) noexcept
-                {
-                    return i1024{ 3_i64 };
-                }
-
-                inline static constexpr const i1024 five(void) noexcept
-                {
-                    return i1024{ 5_i64 };
-                }
-            };
-
             template<usize bits>
             struct RealNumberTrait<intx<bits>>
                 : public real_number::IntegerNumberTraitTemplate<intx<bits>>
@@ -524,7 +459,7 @@ namespace ospf
                     static const bigint value{ 5_i64 };
                     return value;
                 }
-            }; 
+            };
 
             template<>
             struct RealNumberTrait<f32>
@@ -559,35 +494,21 @@ namespace ospf
                     return -std::numeric_limits<f32>::infinity();
                 }
 
-                inline static constexpr const bool is_nan(const f32 value) noexcept
+                inline static const bool is_nan(const f32 value) noexcept
                 {
                     return boost::math::isnan(value);
                 }
 
-                inline static constexpr const bool is_inf(const f32 value) noexcept
+                inline static const bool is_inf(const f32 value) noexcept
                 {
                     return SignedTrait<f32>::is_positive(value)
                         && boost::math::isinf(value);
                 }
 
-                inline static constexpr const bool is_neg_inf(const f32 value) noexcept
+                inline static const bool is_neg_inf(const f32 value) noexcept
                 {
                     return SignedTrait<f32>::is_negative(value)
                         && boost::math::isinf(value);
-                }
-            };
-
-            template<>
-            struct FloatingNumberTrait<f32>
-            {
-                inline static constexpr const f32 pi(void) noexcept
-                {
-                    return boost::math::constants::pi<f32>();
-                }
-
-                inline static constexpr const f32 e(void) noexcept
-                {
-                    return boost::math::constants::e<f32>();
                 }
             };
 
@@ -624,35 +545,21 @@ namespace ospf
                     return -std::numeric_limits<f64>::infinity();
                 }
 
-                inline static constexpr const bool is_nan(const f64 value) noexcept
+                inline static const bool is_nan(const f64 value) noexcept
                 {
                     return boost::math::isnan(value);
                 }
 
-                inline static constexpr const bool is_inf(const f64 value) noexcept
+                inline static const bool is_inf(const f64 value) noexcept
                 {
                     return SignedTrait<f64>::is_positive(value)
                         && boost::math::isinf(value);
                 }
 
-                inline static constexpr const bool is_neg_inf(const f64 value) noexcept
+                inline static const bool is_neg_inf(const f64 value) noexcept
                 {
                     return SignedTrait<f64>::is_negative(value)
                         && boost::math::isinf(value);
-                }
-            };
-
-            template<>
-            struct FloatingNumberTrait<f64>
-            {
-                inline static constexpr const f64 pi(void) noexcept
-                {
-                    return boost::math::constants::pi<f64>();
-                }
-
-                inline static constexpr const f64 e(void) noexcept
-                {
-                    return boost::math::constants::e<f64>();
                 }
             };
 
@@ -708,20 +615,6 @@ namespace ospf
             };
 
             template<>
-            struct FloatingNumberTrait<f128>
-            {
-                inline static const f128 pi(void) noexcept
-                {
-                    return boost::math::constants::pi<f128>();
-                }
-
-                inline static const f128 e(void) noexcept
-                {
-                    return boost::math::constants::e<f128>();
-                }
-            };
-
-            template<>
             struct RealNumberTrait<f256>
             {
                 inline static const f256 two(void) noexcept
@@ -773,20 +666,6 @@ namespace ospf
             };
 
             template<>
-            struct FloatingNumberTrait<f256>
-            {
-                inline static const f256 pi(void) noexcept
-                {
-                    return boost::math::constants::pi<f256>();
-                }
-
-                inline static const f256 e(void) noexcept
-                {
-                    return boost::math::constants::e<f256>();
-                }
-            };
-
-            template<>
             struct RealNumberTrait<f512>
             {
                 inline static const f512 two(void) noexcept
@@ -834,20 +713,6 @@ namespace ospf
                 {
                     return SignedTrait<f512>::is_negative(value)
                         && boost::math::isinf(value);
-                }
-            };
-
-            template<>
-            struct FloatingNumberTrait<f512>
-            {
-                inline static const f512 pi(void) noexcept
-                {
-                    return boost::math::constants::pi<f512>();
-                }
-
-                inline static const f512 e(void) noexcept
-                {
-                    return boost::math::constants::e<f512>();
                 }
             };
 
@@ -909,22 +774,6 @@ namespace ospf
             };
 
             template<>
-            struct FloatingNumberTrait<dec50>
-            {
-                inline static const dec50& pi(void) noexcept
-                {
-                    static const dec50 value{ boost::math::constants::pi<dec50>() };
-                    return value;
-                }
-
-                inline static const dec50& e(void) noexcept
-                {
-                    static const dec50 value{ boost::math::constants::e<dec50>() };
-                    return value;
-                }
-            };
-
-            template<>
             struct RealNumberTrait<dec100>
             {
                 inline static const dec100& two(void) noexcept
@@ -977,22 +826,6 @@ namespace ospf
                 {
                     return SignedTrait<dec100>::is_negative(value)
                         && boost::math::isinf(value);
-                }
-            };
-
-            template<>
-            struct FloatingNumberTrait<dec100>
-            {
-                inline static const dec100& pi(void) noexcept
-                {
-                    static const dec100 value{ boost::math::constants::pi<dec100>() };
-                    return value;
-                }
-
-                inline static const dec100& e(void) noexcept
-                {
-                    static const dec100 value{ boost::math::constants::e<dec100>() };
-                    return value;
                 }
             };
 
@@ -1050,6 +883,154 @@ namespace ospf
                 {
                     return SignedTrait<dec<digits>>::is_negative(value)
                         && boost::math::isinf(value);
+                }
+            };
+
+            template<typename T>
+            concept Integer = RealNumber<T>
+                && Rem<T> && RemAssign<T>
+                // RangeTo, Log, PowF, Exp
+                && std::three_way_comparable<T, std::weak_ordering>;
+
+            template<typename T>
+            concept IntegerNumber = Integer<T>
+                && Signed<T>
+                && NumberField<T>;
+            // Pow
+
+            template<typename T>
+            concept UIntegerNumber = Integer<T>
+                && Unsigned<T>
+                && NumberField<T>;
+            // Pow
+
+            template<typename T>
+            concept RationalNumber = RealNumber<T>
+                && NumberField<T>
+                // Log, PowF, Exp, Pow
+                && std::three_way_comparable<T, std::weak_ordering>
+                && Integer<typename T::IntegerType>
+                && requires (const T& value)
+            {
+                { value.num() } -> DecaySameAs<typename T::IntegerType>;
+                { value.den() } -> DecaySameAs<typename T::IntegerType>;
+            };
+
+            template<RealNumber T>
+            struct FloatingNumberTrait;
+
+            template<typename T>
+            concept FloatingNumber = RealNumber<T>
+                && Signed<T>
+                && NumberField<T>
+                // Log, PowF, Exp, Pow
+                && std::default_initializable<FloatingNumberTrait<T>>
+                && requires
+            {
+                { FloatingNumberTrait<T>::pi() } -> DecaySameAs<T>;
+                { FloatingNumberTrait<T>::e() } -> DecaySameAs<T>;
+                // floor, ceil, round, trunc, fract
+            };
+
+            template<>
+            struct FloatingNumberTrait<f32>
+            {
+                inline static constexpr const f32 pi(void) noexcept
+                {
+                    return boost::math::constants::pi<f32>();
+                }
+
+                inline static constexpr const f32 e(void) noexcept
+                {
+                    return boost::math::constants::e<f32>();
+                }
+            };
+
+            template<>
+            struct FloatingNumberTrait<f64>
+            {
+                inline static constexpr const f64 pi(void) noexcept
+                {
+                    return boost::math::constants::pi<f64>();
+                }
+
+                inline static constexpr const f64 e(void) noexcept
+                {
+                    return boost::math::constants::e<f64>();
+                }
+            };
+
+            template<>
+            struct FloatingNumberTrait<f128>
+            {
+                inline static const f128 pi(void) noexcept
+                {
+                    return boost::math::constants::pi<f128>();
+                }
+
+                inline static const f128 e(void) noexcept
+                {
+                    return boost::math::constants::e<f128>();
+                }
+            };
+
+            template<>
+            struct FloatingNumberTrait<f256>
+            {
+                inline static const f256 pi(void) noexcept
+                {
+                    return boost::math::constants::pi<f256>();
+                }
+
+                inline static const f256 e(void) noexcept
+                {
+                    return boost::math::constants::e<f256>();
+                }
+            };
+
+            template<>
+            struct FloatingNumberTrait<f512>
+            {
+                inline static const f512 pi(void) noexcept
+                {
+                    return boost::math::constants::pi<f512>();
+                }
+
+                inline static const f512 e(void) noexcept
+                {
+                    return boost::math::constants::e<f512>();
+                }
+            };
+
+            template<>
+            struct FloatingNumberTrait<dec50>
+            {
+                inline static const dec50& pi(void) noexcept
+                {
+                    static const dec50 value{ boost::math::constants::pi<dec50>() };
+                    return value;
+                }
+
+                inline static const dec50& e(void) noexcept
+                {
+                    static const dec50 value{ boost::math::constants::e<dec50>() };
+                    return value;
+                }
+            };
+
+            template<>
+            struct FloatingNumberTrait<dec100>
+            {
+                inline static const dec100& pi(void) noexcept
+                {
+                    static const dec100 value{ boost::math::constants::pi<dec100>() };
+                    return value;
+                }
+
+                inline static const dec100& e(void) noexcept
+                {
+                    static const dec100 value{ boost::math::constants::e<dec100>() };
+                    return value;
                 }
             };
 
