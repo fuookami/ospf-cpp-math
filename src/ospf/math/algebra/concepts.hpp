@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ospf/math/algebra/concepts/arithmetic.hpp>
+#include <ospf/math/algebra/concepts/field.hpp>
 #include <ospf/math/algebra/concepts/bounded.hpp>
 #include <ospf/math/algebra/concepts/precision.hpp>
 #include <ospf/math/algebra/concepts/variant.hpp>

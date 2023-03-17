@@ -25,9 +25,6 @@
     <Filter Include="src\ospf\math\algebra\operator">
       <UniqueIdentifier>{27c2aa96-0f02-44a2-abf9-29555eeba4e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\ospf\math\algebra\ordinary">
-      <UniqueIdentifier>{492ae55c-1511-4502-9ab5-8df253f20be1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\ospf\math\algebra\rational">
       <UniqueIdentifier>{61296e49-c80e-4ccb-81d8-786aa32998d0}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,12 @@
     </Filter>
     <Filter Include="src\ospf\math\algebra\numeric_integer">
       <UniqueIdentifier>{8f05c135-eba0-41e2-971b-ddaa14a4e2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\operator\fractal">
+      <UniqueIdentifier>{8f6a2f7c-a69e-48f3-8230-46247d73cd29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\algebra\operator\chaotic">
+      <UniqueIdentifier>{20aa70b7-5add-4053-af67-0777774caf37}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +175,48 @@
       <Filter>src\ospf\math\algebra</Filter>
     </ClInclude>
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\neg.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\pow.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\chaotic\lorenz_attractor.hpp">
+      <Filter>src\ospf\math\algebra\operator\chaotic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\fractal\mandelbar_set.hpp">
+      <Filter>src\ospf\math\algebra\operator\fractal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\scale\scale.hpp">
+      <Filter>src\ospf\math\algebra\scale</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\scale\dyn_scale.hpp">
+      <Filter>src\ospf\math\algebra\scale</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\rational\rational.hpp">
+      <Filter>src\ospf\math\algebra\rational</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\rational\dyn_rational.hpp">
+      <Filter>src\ospf\math\algebra\rational</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry\delaunay.hpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\combinatorics\permutations.hpp">
+      <Filter>src\ospf\math\combinatorics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\combinatorics.hpp">
+      <Filter>src\ospf\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry.hpp">
+      <Filter>src\ospf\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\chaotic.hpp">
+      <Filter>src\ospf\math\algebra\operator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\fractal.hpp">
+      <Filter>src\ospf\math\algebra\operator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\reciprocal.hpp">
       <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
     </ClInclude>
   </ItemGroup>

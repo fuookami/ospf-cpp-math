@@ -12,7 +12,7 @@ namespace ospf
             {
                 template<typename T>
                 concept Neg = Arithmetic<T>
-                    && requires (const T & value)
+                    && requires (const T& value)
                     {
                         { -value } -> DecaySameAs<T>;
                     };

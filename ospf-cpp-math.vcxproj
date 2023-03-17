@@ -158,8 +158,12 @@
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\div.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\mul.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\neg.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\pow.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\reciprocal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\rem.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\sub.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\chaotic.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\chaotic\lorenz_attractor.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\equal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\greater.hpp" />
@@ -169,16 +173,26 @@
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\less_equal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\unequal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\comparison\zero.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\fractal.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\fractal\mandelbar_set.hpp" />
     <ClInclude Include="src\ospf\math\algebra\rational.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\rational\dyn_rational.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\rational\rational.hpp" />
     <ClInclude Include="src\ospf\math\algebra\scale.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\scale\dyn_scale.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\scale\scale.hpp" />
     <ClInclude Include="src\ospf\math\algebra\value_range.hpp" />
     <ClInclude Include="src\ospf\math\algebra\value_range\bound.hpp" />
     <ClInclude Include="src\ospf\math\algebra\value_range\interval.hpp" />
     <ClInclude Include="src\ospf\math\algebra\value_range\value_range.hpp" />
     <ClInclude Include="src\ospf\math\algebra\value_range\value_wrapper.hpp" />
+    <ClInclude Include="src\ospf\math\combinatorics.hpp" />
+    <ClInclude Include="src\ospf\math\combinatorics\permutations.hpp" />
     <ClInclude Include="src\ospf\math\functional\operator.hpp" />
     <ClInclude Include="src\ospf\math\functional\predicate.hpp" />
     <ClInclude Include="src\ospf\math\funtional.hpp" />
+    <ClInclude Include="src\ospf\math\geometry.hpp" />
+    <ClInclude Include="src\ospf\math\geometry\delaunay.hpp" />
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp" />
   </ItemGroup>
   <ItemGroup>

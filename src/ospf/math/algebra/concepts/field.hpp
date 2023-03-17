@@ -4,7 +4,6 @@
 #include <ospf/math/algebra/operator/arithmetic/sub.hpp>
 #include <ospf/math/algebra/operator/arithmetic/mul.hpp>
 #include <ospf/math/algebra/operator/arithmetic/div.hpp>
-#include <ospf/math/algebra/operator/arithmetic/rem.hpp>
 
 namespace ospf
 {
@@ -14,8 +13,6 @@ namespace ospf
         {
             inline namespace concepts
             {
-                // todo: fix like i8 + i8 -> i32
-
                 template<typename T>
                 concept PlusSemiGroup = Arithmetic<T> && Add<T> && AddAssign<T>;
 

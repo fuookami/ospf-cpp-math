@@ -5,6 +5,8 @@
 #include <ospf/math/algebra/concepts/scalar.hpp>
 #include <ospf/math/algebra/concepts/signed.hpp>
 #include <ospf/math/algebra/concepts/variant.hpp>
+#include <ospf/math/algebra/operator/arithmetic/rem.hpp>
+#include <ospf/math/algebra/operator/arithmetic/reciprocal.hpp>
 
 namespace ospf
 {
@@ -19,6 +21,7 @@ namespace ospf
             concept RealNumber = Scalar<T>
                 && WithPrecision<T>
                 && Invariant<T>
+                && Reciprocal<T>
                 && std::default_initializable<RealNumberTrait<T>>
                 && requires (const T& value)
             {

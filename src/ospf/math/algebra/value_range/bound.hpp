@@ -18,13 +18,13 @@ namespace ospf
                     Upper,
                 };
 
-                template<Arithmetic T, Interval itv>
+                template<Invariant T, Interval itv>
                 class Bound
                 {
-                    template<Arithmetic, Interval, Interval>
+                    template<Invariant, Interval, Interval>
                     friend class ValueRange;
 
-                    template<Arithmetic>
+                    template<Invariant>
                     friend class DynValueRange;
 
                 public:
@@ -92,9 +92,15 @@ namespace ospf
                     WrapperType _value;
                 };
 
-                template<Arithmetic T>
+                template<Invariant T>
                 class DynBound
                 {
+                    template<Invariant, Interval, Interval>
+                    friend class ValueRange;
+
+                    template<Invariant>
+                    friend class DynValueRange;
+
                 public:
                     using ValueType = OriginType<T>;
                     using WrapperType = ValueWrapper<ValueType>;
@@ -142,7 +148,7 @@ namespace ospf
                     }
 
                 public:
-                    template<Arithmetic U>
+                    template<Invariant U>
                         requires std::convertible_to<ValueType, U>
                     inline constexpr DynBound<U> to(void) const noexcept
                     {
@@ -161,7 +167,7 @@ namespace ospf
 
 namespace std
 {
-    template<ospf::Arithmetic T, ospf::Interval itv>
+    template<ospf::Invariant T, ospf::Interval itv>
     struct formatter<ospf::value_range::Bound<T, itv>, char>
         : public formatter<std::string_view, char>
     {
@@ -194,7 +200,7 @@ namespace std
         }
     };
 
-    template<ospf::Arithmetic T, ospf::Interval itv>
+    template<ospf::Invariant T, ospf::Interval itv>
     struct formatter<ospf::value_range::Bound<T, itv>, ospf::wchar>
         : public formatter<std::string_view, ospf::wchar>
     {
@@ -229,7 +235,7 @@ namespace std
         }
     };
 
-    template<ospf::Arithmetic T>
+    template<ospf::Invariant T>
     struct formatter<ospf::value_range::DynBound<T>, char>
         : public formatter<std::string_view, char>
     {
@@ -263,7 +269,7 @@ namespace std
         }
     };
 
-    template<ospf::Arithmetic T>
+    template<ospf::Invariant T>
     struct formatter<ospf::value_range::DynBound<T>, ospf::wchar>
         : public formatter<std::wstring_view, ospf::wchar>
     {

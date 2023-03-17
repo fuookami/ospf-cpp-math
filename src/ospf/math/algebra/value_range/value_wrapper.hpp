@@ -24,7 +24,7 @@ namespace ospf
         {
             namespace value_range
             {
-                template<Arithmetic T>
+                template<Invariant T>
                 class ValueWrapper
                 {
                     using Variant = std::variant<OriginType<T>, Infinity, NegativeInfinity>;
@@ -200,7 +200,7 @@ namespace ospf
                         }
                     }
 
-                    template<Arithmetic U>
+                    template<Invariant U>
                         requires std::convertible_to<ValueType, U>
                     inline constexpr ValueWrapper<U> to(void) const noexcept
                     {
@@ -2213,7 +2213,7 @@ namespace ospf
     };
 };
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
     requires ospf::Add<T>
 inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
@@ -2269,7 +2269,7 @@ inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator+(con
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
     requires ospf::Sub<T>
 inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
@@ -2325,7 +2325,7 @@ inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator-(con
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
     requires ospf::Mul<T>
 inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
@@ -2456,7 +2456,7 @@ inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator*(con
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
     requires ospf::Div<T>
 inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs)
 {
@@ -2571,7 +2571,7 @@ inline constexpr ospf::RetType<ospf::value_range::ValueWrapper<T>> operator/(con
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
 inline constexpr const bool operator==(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
@@ -2616,7 +2616,7 @@ inline constexpr const bool operator==(const T& lhs, const ospf::value_range::Va
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
 inline constexpr const bool operator!=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
@@ -2661,7 +2661,7 @@ inline constexpr const bool operator!=(const T& lhs, const ospf::value_range::Va
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
 inline constexpr const bool operator<(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
@@ -2710,7 +2710,7 @@ inline constexpr const bool operator<(const T& lhs, const ospf::value_range::Val
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
 inline constexpr const bool operator<=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
@@ -2759,7 +2759,7 @@ inline constexpr const bool operator<=(const T& lhs, const ospf::value_range::Va
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
 inline constexpr const bool operator>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
@@ -2808,7 +2808,7 @@ inline constexpr const bool operator>(const T& lhs, const ospf::value_range::Val
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
 inline constexpr const bool operator>=(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
     if constexpr (ospf::RealNumber<T>)
@@ -2857,7 +2857,7 @@ inline constexpr const bool operator>=(const T& lhs, const ospf::value_range::Va
     }
 }
 
-template<ospf::Arithmetic T>
+template<ospf::Invariant T>
     requires std::three_way_comparable<T>
 inline constexpr std::compare_three_way_result_t<T> operator<=>(const T& lhs, const ospf::value_range::ValueWrapper<T>& rhs) noexcept
 {
@@ -2909,13 +2909,13 @@ inline constexpr std::compare_three_way_result_t<T> operator<=>(const T& lhs, co
 
 namespace std
 {
-    template<ospf::Arithmetic T>
+    template<ospf::Invariant T>
     inline void swap(ospf::value_range::ValueWrapper<T>& lhs, ospf::value_range::ValueWrapper<T>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
 
-    template<ospf::Arithmetic T, ospf::CharType CharT>
+    template<ospf::Invariant T, ospf::CharType CharT>
     struct formatter<ospf::value_range::ValueWrapper<T>, CharT>
         : public formatter<std::basic_string_view<CharT>, CharT>
     {
