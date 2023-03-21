@@ -219,6 +219,27 @@
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\reciprocal.hpp">
       <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry\point.hpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry\rectangle.hpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry\triangle.hpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry\projection.hpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\vector.hpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\matrix.hpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\tensor.hpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\equal.cpp">
@@ -247,6 +268,12 @@
     </ClCompile>
     <ClCompile Include="src\ospf\math\algebra\value_range\value_range.cpp">
       <Filter>src\ospf\math\algebra\value_range</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\algebra\vector.cpp">
+      <Filter>src\ospf\math\algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\geometry\point.cpp">
+      <Filter>src\ospf\math\geometry</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

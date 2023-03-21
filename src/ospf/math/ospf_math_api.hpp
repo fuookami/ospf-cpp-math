@@ -17,7 +17,7 @@
 #ifndef IMPORTED_OSPF_MATH_LIB
 #ifdef IMPORT_OSPF_MATH_LIB
 #define OSPF_LIB_NAME "ospf-cpp-math"
-#include <OSPF/utils/config/auto_link.hpp>
+#include <ospf/auto_link.hpp>
 #define IMPORTED_OSPF_MATH_LIB
 #endif
 #endif
