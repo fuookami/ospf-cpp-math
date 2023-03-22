@@ -18,7 +18,7 @@ namespace ospf
                 struct PowOperator
                 {
                     template<i64 index>
-                    inline constexpr RetType<T> operator()(ArgCLRefType<T> value) noexcept
+                    inline constexpr RetType<T> operator()(ArgCLRefType<T> value) const noexcept
                     {
                         if constexpr (index == 0_i64)
                         {

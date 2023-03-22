@@ -57,6 +57,13 @@ namespace ospf
                 }
 
             public:
+                inline constexpr void copy_if_reference(void) noexcept
+                {
+                    _from.copy_if_reference();
+                    _to.copy_if_reference();
+                }
+
+            public:
                 inline constexpr RetType<ValueType> length(void) const noexcept
                 {
                     ValueType sum{ ArithmeticTrait<ValueType>::zero() };
@@ -64,7 +71,7 @@ namespace ospf
                     {
                         sum += sqr((*_to)[i] - (*_from)[i]);
                     }
-                    return sqrt(sum);
+                    return **sqrt(sum);
                 }
 
             public:

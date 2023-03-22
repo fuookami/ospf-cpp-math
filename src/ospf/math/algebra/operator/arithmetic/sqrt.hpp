@@ -19,11 +19,11 @@ namespace ospf
                     requires NumberField<T>
                 struct SqrtOperator
                 {
-                    inline constexpr std::optional<ValOrRef<T>> operator()(ArgCLRefType<T> value, ArgCLRefType<T> precision = PrecisionTrait<T>::decimal_precision()) noexcept
+                    inline constexpr std::optional<ValOrRef<T>> operator()(ArgCLRefType<T> value, ArgCLRefType<T> precision = PrecisionTrait<T>::decimal_precision()) const noexcept
                     {
                         if (is_negative(value))
                         {
-                            if constexpr (DecaySameAs<RealNumberTrait<T>::nan(), std::optional<T>>)
+                            if constexpr (DecaySameAs<decltype(RealNumberTrait<T>::nan()), std::optional<T>>)
                             {
                                 auto nan = RealNumberTrait<T>::nan();
                                 if (nan.has_value())
@@ -62,7 +62,7 @@ namespace ospf
 
                 template<RealNumber T>
                     requires CopyFaster<T> && NumberField<T>
-                inline constexpr RetType<T> sqrt(const T value, const T precision = PrecisionTrait<T>::decimal_precision()) noexcept
+                inline constexpr std::optional<ValOrRef<T>> sqrt(const T value, const T precision = PrecisionTrait<T>::decimal_precision()) noexcept
                 {
                     static const SqrtOperator<T> op{};
                     return op(value, precision);
@@ -70,7 +70,7 @@ namespace ospf
 
                 template<RealNumber T>
                     requires ReferenceFaster<T> && NumberField<T>
-                inline constexpr RetType<T> sqrt(const T value, const T& precision = PrecisionTrait<T>::decimal_precision()) noexcept
+                inline constexpr std::optional<ValOrRef<T>> sqrt(const T value, const T& precision = PrecisionTrait<T>::decimal_precision()) noexcept
                 {
                     static const SqrtOperator<T> op{};
                     return op(value, precision);

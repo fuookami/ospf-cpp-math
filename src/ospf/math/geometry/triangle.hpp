@@ -51,6 +51,14 @@ namespace ospf
                 }
 
             public:
+                inline constexpr void copy_if_reference(void) noexcept
+                {
+                    _p1.copy_if_reference();
+                    _p2.copy_if_reference();
+                    _p3.copy_if_reference();
+                }
+
+            public:
                 inline constexpr RetType<EdgeType> e1(void) const noexcept
                 {
                     return EdgeType::between(_p1, _p2);
@@ -75,7 +83,7 @@ namespace ospf
                     const auto c = e3.length();
                     const auto p = (a + b + c) / RealNumberTrait<ValueType>::two();
                     const auto s = p * (p - a) * (p - b) * (p - c);
-                    return sqrt(s);
+                    return **sqrt(s);
                 }
 
                 inline constexpr const bool illegal(void) const noexcept

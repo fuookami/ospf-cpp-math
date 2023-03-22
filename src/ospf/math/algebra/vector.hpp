@@ -38,7 +38,7 @@ namespace ospf
                     {
                         sum += sqr(_values[i]);
                     }
-                    return sqrt(sum);
+                    return **sqrt(sum);
                 }
 
                 inline constexpr Vector unit(void) const noexcept
@@ -152,7 +152,7 @@ namespace ospf
             public:
                 inline constexpr RetType<ValueType> norm(void) const noexcept
                 {
-                    return sqrt(sqr(x()) + sqr(y()));
+                    return **sqrt(sqr(x()) + sqr(y()));
                 }
 
                 inline constexpr Vector unit(void) const noexcept
@@ -251,7 +251,7 @@ namespace ospf
             public:
                 inline constexpr RetType<ValueType> norm(void) const noexcept
                 {
-                    return sqrt(sqr(x()) + sqr(y()));
+                    return **sqrt(sqr(x()) + sqr(y()));
                 }
 
                 inline constexpr Vector unit(void) const noexcept

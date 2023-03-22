@@ -42,7 +42,7 @@ namespace ospf
 
                 inline constexpr ArgCLRefType<ValueType> radius(void) const noexcept
                 {
-                    return _radius_length;
+                    return _radius;
                 }
 
             private:
@@ -72,7 +72,7 @@ namespace ospf
 
                     auto x = ((triangle.p3().y() - triangle.p1().y()) * m + (triangle.p1().y() - triangle.p2().y()) * u) * s;
                     auto y = ((triangle.p1().x() - triangle.p3().x()) * m + (triangle.p2().x() - triangle.p1().x()) * u) * s;
-                    auto r = sqrt(sqr(triangle.p1().x() - x) + sqr(triangle.p1().y() - y));
+                    auto r = **sqrt(sqr(triangle.p1().x() - x) + sqr(triangle.p1().y() - y));
                     
                     return Circle{ PointType{ move<ValueType>(x), move<ValueType>(y) }, move<ValueType>(r) };
                 }
@@ -93,7 +93,7 @@ namespace ospf
                     : _center(move<COW<PointType>>(center)), _radius(move<ValueType>(radius)) {}
 
             public:
-                inline constexpr ArgCLRefType<Point2> center(void) const noexcept
+                inline constexpr ArgCLRefType<PointType> center(void) const noexcept
                 {
                     return _center;
                 }
@@ -114,7 +114,7 @@ namespace ospf
                 }
 
             private:
-                Point2 _center;
+                PointType _center;
                 ValueType _radius;
             };
 
