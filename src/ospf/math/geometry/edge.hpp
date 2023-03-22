@@ -17,26 +17,26 @@ namespace ospf
                 using PointType = Point<dim, ValueType>;
 
             public:
-                inline static constexpr Edge between(ArgCLRefType<ValOrRef<PointType>> from, ArgCLRefType<ValOrRef<PointType>> to) noexcept
+                inline static constexpr Edge between(ArgCLRefType<COW<PointType>> from, ArgCLRefType<COW<PointType>> to) noexcept
                 {
                     return Edge{ from, to };
                 }
 
                 template<typename = void>
-                    requires ReferenceFaster<ValOrRef<PointType>> && std::movable<ValOrRef<PointType>>
-                inline static constexpr Edge between(ArgRRefType<ValOrRef<PointType>> from, ArgRRefType<ValOrRef<PointType>> to) noexcept
+                    requires ReferenceFaster<COW<PointType>> && std::movable<COW<PointType>>
+                inline static constexpr Edge between(ArgRRefType<COW<PointType>> from, ArgRRefType<COW<PointType>> to) noexcept
                 {
-                    return Edge{ move<ValOrRef<PointType>>(from), move<ValOrRef<PointType>>(to) };
+                    return Edge{ move<COW<PointType>>(from), move<COW<PointType>>(to) };
                 }
 
             public:
-                constexpr Edge(ArgCLRefType<ValOrRef<PointType>> from, ArgCLRefType<ValOrRef<PointType>> to)
+                constexpr Edge(ArgCLRefType<COW<PointType>> from, ArgCLRefType<COW<PointType>> to)
                     : _from(from), _to(to) {}
 
                 template<typename = void>
-                    requires ReferenceFaster<ValOrRef<PointType>> && std::movable<ValOrRef<PointType>>
-                constexpr Edge(ArgRRefType<ValOrRef<PointType>> from, ArgRRefType<ValOrRef<PointType>> to)
-                    : _from(move<ValOrRef<PointType>>(from)), _to(move<ValOrRef<PointType>>(to)) {}
+                    requires ReferenceFaster<COW<PointType>> && std::movable<COW<PointType>>
+                constexpr Edge(ArgRRefType<COW<PointType>> from, ArgRRefType<COW<PointType>> to)
+                    : _from(move<COW<PointType>>(from)), _to(move<COW<PointType>>(to)) {}
 
             public:
                 constexpr Edge(const Edge& ano) = default;
@@ -46,12 +46,12 @@ namespace ospf
                 constexpr ~Edge(void) noexcept = default;
 
             public:
-                inline constexpr const PointType& from(void) const noexcept
+                inline constexpr ArgCLRefType<PointType> from(void) const noexcept
                 {
                     return *_from;
                 }
 
-                inline constexpr const PointType& to(void) const noexcept
+                inline constexpr ArgCLRefType<PointType> to(void) const noexcept
                 {
                     return *_to;
                 }

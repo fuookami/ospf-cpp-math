@@ -13,6 +13,7 @@ namespace ospf
             {
             public:
                 using ValueType = OriginType<T>;
+                using VectorType = Vector<dim, ValueType>;
 
             public:
                 constexpr Point(std::array<ValueType, dim> coordinate)
@@ -26,9 +27,9 @@ namespace ospf
                 constexpr ~Point(void) noexcept = default;
 
             public:
-                inline constexpr operator RetType<Vector<dim, ValueType>>(void) const noexcept
+                inline constexpr operator RetType<VectorType>(void) const noexcept
                 {
-                    return Vector<dim, ValueType>{ _coordinate };
+                    return VectorType{ _coordinate };
                 }
 
             public:
@@ -38,7 +39,7 @@ namespace ospf
                 }
 
             public:
-                inline constexpr RetType<Point> operator+(ArgCLRefType<Vector<dim, ValueType>> vector) const noexcept
+                inline constexpr Point operator+(ArgCLRefType<VectorType> vector) const noexcept
                 {
                     return Point
                     { 
@@ -49,7 +50,7 @@ namespace ospf
                     };
                 }
 
-                inline constexpr RetType<Point> operator-(ArgCLRefType<Vector<dim, ValueType>> vector) const noexcept
+                inline constexpr Point operator-(ArgCLRefType<VectorType> vector) const noexcept
                 {
                     return Point
                     { 
@@ -63,101 +64,219 @@ namespace ospf
             public:
                 inline constexpr const bool operator==(const Point& rhs) const noexcept
                 {
-                    return _coordinate == rhs._coordinate;
+                    static const Equal<ValueType> op{};
+                    for (usize i{ 0_uz }; i != dim; ++i)
+                    {
+                        if (!op(_coordinate[i], rhs._coordinate[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
                 }
 
                 inline constexpr const bool operator!=(const Point& rhs) const noexcept
                 {
-                    return _coordinate != rhs._coordinate;
+                    static const Equal<ValueType> op{};
+                    for (usize i{ 0_uz }; i != dim; ++i)
+                    {
+                        if (!op(_coordinate[i], rhs._coordinate[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
                 }
 
             private:
                 std::array<ValueType, dim> _coordinate;
             };
 
-            template<RealNumber T = f64>
-            class Point2
-                : public Point<2_uz, T>
+            template<RealNumber T>
+            class Point<2_uz, T>
             {
-                using Base = Point<2_uz, T>;
+            public:
+                using ValueType = OriginType<T>;
+                using VectorType = Vector2<ValueType>;
 
             public:
-                using typename Base::ValueType;
+                constexpr Point(std::array<ValueType, 2_uz> coordinate)
+                    : _coordinate(std::move(coordinate)) {}
+
+                constexpr Point(ArgCLRefType<ValueType> x, ArgCLRefType<ValueType> y)
+                    : _coordinate(x, y) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<ValueType> && std::movable<ValueType>
+                constexpr Point(ArgRRefType<ValueType> x, ArgRRefType<ValueType> y)
+                    : _coordinate(move<ValueType>(x), move<ValueType>(y)) {}
 
             public:
-                constexpr Point2(ArgRRefType<Base> base)
-                    : Base(move<Base>(base)) {}
-
-                constexpr Point2(std::array<ValueType, 2_uz> coordinate)
-                    : Base(std::move(coordinate)) {}
-
-                constexpr Point2(ArgRRefType<T> x, ArgRRefType<T> y)
-                    : Base(move<ValueType>(x), move<ValueType>(y)) {}
-
-            public:
-                constexpr Point2(const Point2& ano) = default;
-                constexpr Point2(Point2&& ano) noexcept = default;
-                constexpr Point2& operator=(const Point2& rhs) = default;
-                constexpr Point2& operator=(Point2&& rhs) noexcept = default;
-                constexpr ~Point2(void) noexcept = default;
+                constexpr Point(const Point& ano) = default;
+                constexpr Point(Point&& ano) noexcept = default;
+                constexpr Point& operator=(const Point& rhs) = default;
+                constexpr Point& operator=(Point&& rhs) noexcept = default;
+                constexpr ~Point(void) noexcept = default;
 
             public:
                 inline constexpr ArgCLRefType<ValueType> x(void) const noexcept
                 {
-                    return this->operator[](0_uz);
+                    return _coordinate[0_uz];
                 }
 
                 inline constexpr ArgCLRefType<ValueType> y(void) const noexcept
                 {
-                    return this->operator[](1_uz);
+                    return _coordinate[1_uz];
                 }
+
+            public:
+                inline constexpr operator RetType<VectorType>(void) const noexcept
+                {
+                    return VectorType{ _coordinate };
+                }
+
+            public:
+                inline constexpr ArgCLRefType<ValueType> operator[](const usize i) const noexcept
+                {
+                    return _coordinate[i];
+                }
+
+            public:
+                inline constexpr Point operator+(ArgCLRefType<VectorType> rhs) const noexcept
+                {
+                    return Point
+                    { 
+                        x() + rhs.x(),
+                        y() + rhs.y()
+                    };
+                }
+
+                inline constexpr Point operator-(ArgCLRefType<VectorType> rhs) const noexcept
+                {
+                    return Point
+                    {
+                        x() - rhs.x(),
+                        y() - rhs.y()
+                    };
+                }
+
+            public:
+                inline constexpr const bool operator==(const Point& rhs) const noexcept
+                {
+                    static const Equal<ValueType> op{};
+                    return op(x(), rhs.x()) && op(y(), rhs.y());
+                }
+
+                inline constexpr const bool operator!=(const Point& rhs) const noexcept
+                {
+                    static const Unequal<ValueType> op{};
+                    return op(x(), rhs.y()) || op(y(), rhs.y());
+                }
+
+            private:
+                std::array<ValueType, 2_uz> _coordinate;
             };
 
-            template<RealNumber T = f64>
-            class Point3
-                : public Point<3_uz, T>
+            template<RealNumber T>
+            class Point<3_uz, T>
             {
-                using Base = Point<3_uz, T>;
+            public:
+                using ValueType = OriginType<T>;
+                using VectorType = Vector3<ValueType>;
 
             public:
-                using typename Base::ValueType;
+                constexpr Point(std::array<ValueType, 3_uz> coordinate)
+                    : _coordinate(std::move(coordinate)) {}
+
+                constexpr Point(ArgCLRefType<ValueType> x, ArgCLRefType<ValueType> y, ArgCLRefType<ValueType> z)
+                    : _coordinate(x, y, z) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<ValueType> && std::movable<ValueType>
+                constexpr Point(ArgRRefType<ValueType> x, ArgRRefType<ValueType> y, ArgRRefType<ValueType> z)
+                    : _coordinate(move<ValueType>(x), move<ValueType>(y), move<ValueType>(z)) {}
 
             public:
-                constexpr Point3(ArgRRefType<Base> base)
-                    : Base(move<Base>(base)) {}
-
-                constexpr Point3(std::array<ValueType, 3_uz> coordinate)
-                    : Base(std::move(coordinate)) {}
-
-                constexpr Point3(ArgRRefType<T> x, ArgRRefType<T> y, ArgRRefType<T> z)
-                    : Base(move<ValueType>(x), move<ValueType>(y), move<ValueType>(z)) {}
-
-            public:
-                constexpr Point3(const Point3& ano) = default;
-                constexpr Point3(Point3&& ano) noexcept = default;
-                constexpr Point3& operator=(const Point3& rhs) = default;
-                constexpr Point3& operator=(Point3&& rhs) noexcept = default;
-                constexpr ~Point3(void) noexcept = default;
+                constexpr Point(const Point& ano) = default;
+                constexpr Point(Point&& ano) noexcept = default;
+                constexpr Point& operator=(const Point& rhs) = default;
+                constexpr Point& operator=(Point&& rhs) noexcept = default;
+                constexpr ~Point(void) noexcept = default;
 
             public:
                 inline constexpr ArgCLRefType<ValueType> x(void) const noexcept
                 {
-                    return this->operator[](0_uz);
+                    return _coordinate[0_uz];
                 }
 
                 inline constexpr ArgCLRefType<ValueType> y(void) const noexcept
                 {
-                    return this->operator[](1_uz);
+                    return _coordinate[1_uz];
                 }
 
                 inline constexpr ArgCLRefType<ValueType> z(void) const noexcept
                 {
-                    return this->operator[](2_uz);
+                    return _coordinate[2_uz];
                 }
+
+            public:
+                inline constexpr operator RetType<VectorType>(void) const noexcept
+                {
+                    return VectorType{ _coordinate };
+                }
+
+            public:
+                inline constexpr ArgCLRefType<ValueType> operator[](const usize i) const noexcept
+                {
+                    return _coordinate[i];
+                }
+
+            public:
+                inline constexpr Point operator+(ArgCLRefType<VectorType> rhs) const noexcept
+                {
+                    return Point
+                    {
+                        x() + rhs.x(),
+                        y() + rhs.y(),
+                        z() + rhs.z()
+                    };
+                }
+
+                inline constexpr Point operator-(ArgCLRefType<VectorType> rhs) const noexcept
+                {
+                    return Point
+                    {
+                        x() - rhs.x(),
+                        y() - rhs.y(),
+                        x() - rhs.z()
+                    };
+                }
+
+            public:
+                inline constexpr const bool operator==(const Point& rhs) const noexcept
+                {
+                    static const Equal<ValueType> op{};
+                    return op(x(), rhs.x()) && op(y(), rhs.y()) && op(z(), rhs.z());
+                }
+
+                inline constexpr const bool operator!=(const Point& rhs) const noexcept
+                {
+                    static const Unequal<ValueType> op{};
+                    return op(x(), rhs.y()) || op(y(), rhs.y()) || op(z(), rhs.z());
+                }
+
+            private:
+                std::array<ValueType, 2_uz> _coordinate;
             };
 
-            extern template class Point2<f64>;
-            extern template class Point3<f64>;
+            template<RealNumber T = f64>
+            using Point2 = Point<2_uz, T>;
+
+            template<RealNumber T = f64>
+            using Point3 = Point<3_uz, T>;
+
+            extern template class Point<2_uz, f64>;
+            extern template class Point<2_uz, f64>;
         };
     };
 };

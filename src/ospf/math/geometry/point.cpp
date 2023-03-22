@@ -2,6 +2,6 @@
 
 namespace ospf::math::geometry
 {
-    template class Point2<f64>;
-    template class Point3<f64>;
+    template class Point<2_uz, f64>;
+    template class Point<2_uz, f64>;
 };
