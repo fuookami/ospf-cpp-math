@@ -45,13 +45,13 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr LessSignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
-                            : _precision(std::abs(precision)) {}
+                        constexpr LessSignedImpreciseImpl(ArgCLRefType<ValueType> precision)
+                            : _precision(abs(precision)) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        LessSignedImpreciseImpl(ArgRRefType<ValueType> precision)
-                            : _precision(std::abs(move<ValueType>(precision))) {}
+                        constexpr LessSignedImpreciseImpl(ArgRRefType<ValueType> precision)
+                            : _precision(abs(move<ValueType>(precision))) {}
 
                     public:
                         constexpr LessSignedImpreciseImpl(const LessSignedImpreciseImpl& ano) = default;
@@ -78,12 +78,12 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr LessUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                        constexpr LessUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision)
                             : _precision(precision) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        LessUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
+                        constexpr LessUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(move<ValueType>(precision)) {}
 
                     public:
@@ -144,7 +144,7 @@ namespace ospf
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    static Impl impl(ArgRRefType<ValueType> precision) noexcept
+                    static constexpr Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
                         if constexpr (Precise<ValueType>)
                         {
@@ -166,17 +166,17 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires WithoutPrecision<ValueType>
-                    constexpr Less(ArgCLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
+                    constexpr Less(ArgCLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero())
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires WithPrecision<ValueType>
-                    constexpr Less(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Less(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Less(ArgRRefType<ValueType> precision)
+                    constexpr Less(ArgRRefType<ValueType> precision)
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
@@ -242,12 +242,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Less(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Less(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Less(ArgRRefType<ValueType> precision)
+                    constexpr Less(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
@@ -269,12 +269,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Less(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Less(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Less(ArgRRefType<ValueType> precision)
+                    constexpr Less(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:

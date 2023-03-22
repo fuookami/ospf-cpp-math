@@ -162,6 +162,7 @@
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\pow.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\reciprocal.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\rem.hpp" />
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\sqrt.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\sub.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\chaotic.hpp" />
     <ClInclude Include="src\ospf\math\algebra\operator\chaotic\lorenz_attractor.hpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="src\ospf\math\funtional.hpp" />
     <ClInclude Include="src\ospf\math\geometry.hpp" />
     <ClInclude Include="src\ospf\math\geometry\delaunay.hpp" />
+    <ClInclude Include="src\ospf\math\geometry\edge.hpp" />
     <ClInclude Include="src\ospf\math\geometry\point.hpp" />
     <ClInclude Include="src\ospf\math\geometry\projection.hpp" />
     <ClInclude Include="src\ospf\math\geometry\rectangle.hpp" />
@@ -213,6 +215,7 @@
     <ClCompile Include="src\ospf\math\algebra\value_range\value_range.cpp" />
     <ClCompile Include="src\ospf\math\algebra\value_range\value_wrapper.cpp" />
     <ClCompile Include="src\ospf\math\algebra\vector.cpp" />
+    <ClCompile Include="src\ospf\math\geometry\edge.cpp" />
     <ClCompile Include="src\ospf\math\geometry\point.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

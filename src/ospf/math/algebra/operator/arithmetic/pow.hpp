@@ -14,6 +14,7 @@ namespace ospf
             inline namespace arithmetic_operator
             {
                 template<Invariant T>
+                    requires NumberField<T>
                 struct PowOperator
                 {
                     template<i64 index>
@@ -58,6 +59,34 @@ namespace ospf
                 {
                     static const PowOperator<T> op{};
                     return op.template operator()<index>(value);
+                }
+
+                template<Invariant T>
+                    requires CopyFaster<T> && NumberField<T>
+                inline constexpr RetType<T> sqr(const T value) noexcept
+                {
+                    return pow<2_i64>(value);
+                }
+
+                template<Invariant T>
+                    requires ReferenceFaster<T> && NumberField<T>
+                inline constexpr RetType<T> sqr(const T& value) noexcept
+                {
+                    return pow<2_i64>(value);
+                }
+
+                template<Invariant T>
+                    requires CopyFaster<T> && NumberField<T>
+                inline constexpr RetType<T> cub(const T value) noexcept
+                {
+                    return pow<3_i64>(value);
+                }
+
+                template<Invariant T>
+                    requires ReferenceFaster<T> && NumberField<T>
+                inline constexpr RetType<T> cub(const T& value) noexcept
+                {
+                    return pow<3_i64>(value);
                 }
             };
         };

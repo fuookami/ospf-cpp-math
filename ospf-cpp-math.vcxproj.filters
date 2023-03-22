@@ -52,6 +52,9 @@
     <Filter Include="src\ospf\math\algebra\operator\chaotic">
       <UniqueIdentifier>{20aa70b7-5add-4053-af67-0777774caf37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\graph">
+      <UniqueIdentifier>{60a033d4-7c48-469f-99db-fb832c3b8ed2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
@@ -240,6 +243,12 @@
     <ClInclude Include="src\ospf\math\algebra\tensor.hpp">
       <Filter>src\ospf\math\algebra</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\geometry\edge.hpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\algebra\operator\arithmetic\sqrt.hpp">
+      <Filter>src\ospf\math\algebra\operator\arithmetic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\equal.cpp">
@@ -273,6 +282,9 @@
       <Filter>src\ospf\math\algebra</Filter>
     </ClCompile>
     <ClCompile Include="src\ospf\math\geometry\point.cpp">
+      <Filter>src\ospf\math\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\geometry\edge.cpp">
       <Filter>src\ospf\math\geometry</Filter>
     </ClCompile>
   </ItemGroup>

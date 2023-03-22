@@ -2,6 +2,8 @@
 
 #include <ospf/functional/array.hpp>
 #include <ospf/math/algebra/concepts/real_number.hpp>
+#include <ospf/math/algebra/operator/arithmetic/pow.hpp>
+#include <ospf/math/algebra/operator/arithmetic/sqrt.hpp>
 
 namespace ospf
 {
@@ -27,6 +29,17 @@ namespace ospf
                 constexpr ~Vector(void) noexcept = default;
 
             public:
+                inline constexpr RetType<ValueType> length(void) const noexcept
+                {
+                    ValueType sum{ ArithmeticTrait<ValueType>::zero() };
+                    for (usize i{ 0_uz }; i != dim; ++i)
+                    {
+                        sum += sqr(_values[i]);
+                    }
+                    return sqrt(sum);
+                }
+
+            public:
                 inline constexpr ArgCLRefType<ValueType> operator[](const usize i) const noexcept
                 {
                     return _values[i];
@@ -35,18 +48,35 @@ namespace ospf
             public:
                 inline constexpr Vector operator+(const Vector& rhs) const noexcept
                 {
-                    return Vector{ make_array<ValueType, dim>([this, &rhs](const usize i)
+                    return Vector
+                    {
+                        make_array<ValueType, dim>([this, &rhs](const usize i)
                         {
                             return this->_values[i] + rhs._values[i];
-                        }) };
+                        })
+                    };
                 }
 
                 inline constexpr Vector operator-(const Vector& rhs) const noexcept
                 {
-                    return Vector{ make_array<ValueType, dim>([this, &rhs](const usize i)
+                    return Vector
+                    {
+                        make_array<ValueType, dim>([this, &rhs](const usize i)
                         {
                             return this->_values[i] - rhs._values[i];
-                        }) };
+                        })
+                    };
+                }
+
+            public:
+                inline constexpr const bool operator==(const Vector& rhs) const noexcept
+                {
+                    return _values == rhs._values;
+                }
+
+                inline constexpr const bool operator!=(const Vector& rhs) const noexcept
+                {
+                    return _values != rhs._values;
                 }
 
             private:

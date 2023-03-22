@@ -45,13 +45,13 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr EqualSignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
-                            : _precision(std::abs(precision)) {}
+                        constexpr EqualSignedImpreciseImpl(ArgCLRefType<ValueType> precision)
+                            : _precision(abs(precision)) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        EqualSignedImpreciseImpl(ArgRRefType<ValueType> precision)
-                            : _precision(std::abs(move<ValueType>(precision))) {}
+                        constexpr EqualSignedImpreciseImpl(ArgRRefType<ValueType> precision)
+                            : _precision(abs(move<ValueType>(precision))) {}
 
                     public:
                         constexpr EqualSignedImpreciseImpl(const EqualSignedImpreciseImpl& ano) = default;
@@ -63,7 +63,7 @@ namespace ospf
                     public:
                         inline constexpr const bool operator()(ArgCLRefType<ValueType> lhs, ArgCLRefType<ValueType> rhs) const noexcept
                         {
-                            return std::abs(lhs - rhs) <= _precision;
+                            return abs(lhs - rhs) <= _precision;
                         }
 
                     private:
@@ -78,12 +78,12 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr EqualUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                        constexpr EqualUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision)
                             : _precision(precision) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        EqualUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
+                        constexpr EqualUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(move<ValueType>(precision)) {}
 
                     public:
@@ -144,7 +144,7 @@ namespace ospf
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    static Impl impl(ArgRRefType<ValueType> precision) noexcept
+                    static constexpr Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
                         if constexpr (Precise<ValueType>)
                         {
@@ -166,17 +166,17 @@ namespace ospf
                 public:
                     template<typename = void>
                         requires WithoutPrecision<ValueType>
-                    constexpr Equal(ArgCLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero)
+                    constexpr Equal(ArgCLRefType<ValueType> precision = ArithmeticTrait<ValueType>::zero())
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires WithPrecision<ValueType>
-                    constexpr Equal(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Equal(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : _impl(impl(precision)) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Equal(ArgRRefType<ValueType> precision)
+                    constexpr Equal(ArgRRefType<ValueType> precision)
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
@@ -242,12 +242,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Equal(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Equal(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Equal(ArgRRefType<ValueType> precision)
+                    constexpr Equal(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
@@ -269,12 +269,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Equal(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Equal(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Equal(ArgRRefType<ValueType> precision)
+                    constexpr Equal(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:

@@ -45,13 +45,13 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr ZeroSignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
-                            : _precision(std::abs(precision)) {}
+                        constexpr ZeroSignedImpreciseImpl(ArgCLRefType<ValueType> precision)
+                            : _precision(abs(precision)) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        ZeroSignedImpreciseImpl(ArgRRefType<ValueType> precision)
-                            : _precision(std::abs(move<ValueType>(precision))) {}
+                        constexpr ZeroSignedImpreciseImpl(ArgRRefType<ValueType> precision)
+                            : _precision(abs(move<ValueType>(precision))) {}
 
                     public:
                         constexpr ZeroSignedImpreciseImpl(const ZeroSignedImpreciseImpl& ano) = default;
@@ -78,12 +78,12 @@ namespace ospf
                         using ValueType = OriginType<T>;
 
                     public:
-                        constexpr ZeroUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                        constexpr ZeroUnsignedImpreciseImpl(ArgCLRefType<ValueType> precision)
                             : _precision(precision) {}
 
                         template<typename = void>
                             requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                        ZeroUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
+                        constexpr ZeroUnsignedImpreciseImpl(ArgRRefType<ValueType> precision)
                             : _precision(move<ValueType>(precision)) {}
 
                     public:
@@ -137,7 +137,7 @@ namespace ospf
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    static Impl impl(ArgRRefType<ValueType> precision) noexcept
+                    static constexpr Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
                         if constexpr (Precise<ValueType>)
                         {
@@ -169,7 +169,7 @@ namespace ospf
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Zero(ArgRRefType<ValueType> precision)
+                    constexpr Zero(ArgRRefType<ValueType> precision)
                         : _impl(impl(move<ValueType>(precision))) {}
 
                 public:
@@ -228,12 +228,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Zero(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Zero(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Zero(ArgRRefType<ValueType> precision)
+                    constexpr Zero(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:
@@ -255,12 +255,12 @@ namespace ospf
                     using typename Impl::ValueType;
 
                 public:
-                    constexpr Zero(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision)
+                    constexpr Zero(ArgCLRefType<ValueType> precision = PrecisionTrait<ValueType>::decimal_precision())
                         : Impl(precision) {}
 
                     template<typename = void>
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
-                    Zero(ArgRRefType<ValueType> precision)
+                    constexpr Zero(ArgRRefType<ValueType> precision)
                         : Impl(move<ValueType>(precision)) {}
 
                 public:

@@ -40,18 +40,35 @@ namespace ospf
             public:
                 inline constexpr RetType<Point> operator+(ArgCLRefType<Vector<dim, ValueType>> vector) const noexcept
                 {
-                    return Point{ make_array<ValueType, dim>([this, &vector](const usize i)
+                    return Point
+                    { 
+                        make_array<ValueType, dim>([this, &vector](const usize i) -> RetType<ValueType>
                         {
                             return this->_coordinate[i] + vector[i];
-                        }) };
+                        })
+                    };
                 }
 
                 inline constexpr RetType<Point> operator-(ArgCLRefType<Vector<dim, ValueType>> vector) const noexcept
                 {
-                    return Point{ make_array<ValueType, dim>([this, &vector](const usize i)
+                    return Point
+                    { 
+                        make_array<ValueType, dim>([this, &vector](const usize i) -> RetType<ValueType>
                         {
                             return this->_coordinate[i] - vector[i];
-                        }) };
+                        })
+                    };
+                }
+
+            public:
+                inline constexpr const bool operator==(const Point& rhs) const noexcept
+                {
+                    return _coordinate == rhs._coordinate;
+                }
+
+                inline constexpr const bool operator!=(const Point& rhs) const noexcept
+                {
+                    return _coordinate != rhs._coordinate;
                 }
 
             private:
