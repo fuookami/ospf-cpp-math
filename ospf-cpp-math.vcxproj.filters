@@ -55,6 +55,18 @@
     <Filter Include="src\ospf\math\graph">
       <UniqueIdentifier>{60a033d4-7c48-469f-99db-fb832c3b8ed2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\symbol">
+      <UniqueIdentifier>{09879233-59fa-4758-97a3-a5bc7dcf44a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\symbol\inequality">
+      <UniqueIdentifier>{8e95ff9f-02a1-4296-a629-dbf8aca6a3ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\symbol\monomial">
+      <UniqueIdentifier>{9815fc10-980d-484a-8b49-47de24b70d97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\symbol\polynomial">
+      <UniqueIdentifier>{fc68061f-81c0-4cfc-bfde-857f29cf0a93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
@@ -267,6 +279,30 @@
     <ClInclude Include="src\ospf\math\geometry\triangulation.hpp">
       <Filter>src\ospf\math\geometry</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\symbol.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\symbol_system.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\monomial.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\polynomial.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\inequality.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol.hpp">
+      <Filter>src\ospf\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\category.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\inequality\sign.hpp">
+      <Filter>src\ospf\math\symbol\inequality</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\equal.cpp">
@@ -316,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="src\ospf\math\geometry\rectangle.cpp">
       <Filter>src\ospf\math\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ospf\math\symbol\symbol.cpp">
+      <Filter>src\ospf\math\symbol</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
