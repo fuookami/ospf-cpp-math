@@ -118,7 +118,7 @@ namespace ospf
                 private:
                     static constexpr Impl impl(ArgCLRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>)
+                        if constexpr (Precise<ValueType> || WithoutPrecision<ValueType>)
                         {
                             return PreciseImpl{ precision };
                         }
@@ -139,7 +139,7 @@ namespace ospf
                         requires ReferenceFaster<ValueType> && std::movable<ValueType>
                     static constexpr Impl impl(ArgRRefType<ValueType> precision) noexcept
                     {
-                        if constexpr (Precise<ValueType>)
+                        if constexpr (Precise<ValueType> || WithoutPrecision<ValueType>)
                         {
                             return PreciseImpl{ move<ValueType>(precision) };
                         }

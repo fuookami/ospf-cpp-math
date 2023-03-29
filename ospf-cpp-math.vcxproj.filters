@@ -303,6 +303,9 @@
     <ClInclude Include="src\ospf\math\symbol\inequality\sign.hpp">
       <Filter>src\ospf\math\symbol\inequality</Filter>
     </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\expression.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\equal.cpp">
@@ -352,9 +355,6 @@
     </ClCompile>
     <ClCompile Include="src\ospf\math\geometry\rectangle.cpp">
       <Filter>src\ospf\math\geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ospf\math\symbol\symbol.cpp">
-      <Filter>src\ospf\math\symbol</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ospf/math/algebra/concepts/real_number.hpp>
+#include <ospf/math/symbol/expression.hpp>
 #include <boost/locale.hpp>
 
 namespace ospf
@@ -9,9 +9,12 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<RealNumber T = f64>
+            template<Invariant T, typename Self>
             class Symbol
+                : public Expression<T, Self>
             {
+                OSPF_CRTP_IMPL;
+
             public:
                 using ValueType = OriginType<T>;
 
@@ -27,7 +30,7 @@ namespace ospf
                 constexpr Symbol(Symbol&& ano) noexcept = default;
                 constexpr Symbol& operator=(const Symbol& rhs) = default;
                 constexpr Symbol& operator=(Symbol&& rhs) noexcept = default;
-                constexpr virtual ~Symbol(void) noexcept = default;
+                constexpr ~Symbol(void) noexcept = default;
 
             public:
                 inline constexpr std::string_view name(void) const noexcept
@@ -52,20 +55,58 @@ namespace ospf
                     _display_name = std::move(new_display_name);
                 }
 
+            public:
+                inline constexpr const bool pure(void) const noexcept
+                {
+                    return Trait::is_pure(self());
+                }
+
+            private:
+                struct Trait : public Self
+                {
+                    inline static constexpr const bool is_pure(const Self& self) noexcept
+                    {
+                        static const auto impl = &Self::OSPF_CRTP_FUNCTION(is_pure);
+                        return (self.*impl)();
+                    }
+                };
+
             private:
                 std::string _name;
                 std::optional<std::string> _display_name;
             };
 
-            extern template class Symbol<f64>;
+            template<typename V, typename T>
+            concept SymbolType = Invariant<V> && std::derived_from<OriginType<T>, Symbol<V, T>>;
+
+            template<typename V, typename... Ts>
+            struct IsAllSymbolType;
+
+            template<typename V, typename T>
+            struct IsAllSymbolType<V, T>
+            {
+                static constexpr const bool value = SymbolType<V, T>;
+            };
+
+            template<typename V, typename T, typename... Ts>
+            struct IsAllSymbolType<V, T, Ts...>
+            {
+                static constexpr const bool value = SymbolType<V, T> && IsAllSymbolType<V, Ts...>::value;
+            };
+
+            template<typename V, typename... Ts>
+            static constexpr const bool is_all_symbol_type = IsAllSymbolType<V, Ts...>::value;
+
+            template<typename V, typename... Ts>
+            concept AllSymbolType = is_all_symbol_type<V, Ts...>;
         };
     };
 };
 
 namespace std
 {
-    template<ospf::RealNumber T, ospf::CharType CharT>
-    struct formatter<ospf::Symbol<T>, CharT>
+    template<ospf::Invariant T, typename Self, ospf::CharType CharT>
+    struct formatter<ospf::Symbol<T, Self>, CharT>
         : public formatter<basic_string_view<CharT>, CharT>
     {
         template<typename FormatContext>
@@ -77,8 +118,8 @@ namespace std
         }
     };
 
-    template<ospf::RealNumber T>
-    struct formatter<ospf::Symbol<T>, char>
+    template<ospf::Invariant T, typename Self>
+    struct formatter<ospf::Symbol<T, Self>, char>
         : public formatter<string_view, char>
     {
         template<typename FormatContext>
