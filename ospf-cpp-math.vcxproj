@@ -212,12 +212,25 @@
     <ClInclude Include="src\ospf\math\symbol.hpp" />
     <ClInclude Include="src\ospf\math\symbol\category.hpp" />
     <ClInclude Include="src\ospf\math\symbol\expression.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\function.hpp" />
     <ClInclude Include="src\ospf\math\symbol\inequality.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\inequality\inequality.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\inequality\judgement.hpp" />
     <ClInclude Include="src\ospf\math\symbol\inequality\sign.hpp" />
     <ClInclude Include="src\ospf\math\symbol\monomial.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\monomial\concepts.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\monomial\linear.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\monomial\quadratic.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\monomial\standard.hpp" />
     <ClInclude Include="src\ospf\math\symbol\polynomial.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\polynomial\concepts.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\polynomial\linear.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\polynomial\quadratic.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\polynomial\standard.hpp" />
     <ClInclude Include="src\ospf\math\symbol\symbol.hpp" />
-    <ClInclude Include="src\ospf\math\symbol\symbol_system.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\symbol\concepts.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\symbol\expression.hpp" />
+    <ClInclude Include="src\ospf\math\symbol\symbol\pure.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ospf\math\algebra\operator\comparison\equal.cpp" />

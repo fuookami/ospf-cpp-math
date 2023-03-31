@@ -67,6 +67,12 @@
     <Filter Include="src\ospf\math\symbol\polynomial">
       <UniqueIdentifier>{fc68061f-81c0-4cfc-bfde-857f29cf0a93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ospf\math\symbol\function">
+      <UniqueIdentifier>{edbcad20-d161-45e0-a896-44e2e25b7e23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ospf\math\symbol\symbol">
+      <UniqueIdentifier>{b1299c75-84d2-473a-9958-5cf8f85eab67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ospf\math\ospf_math_api.hpp">
@@ -282,9 +288,6 @@
     <ClInclude Include="src\ospf\math\symbol\symbol.hpp">
       <Filter>src\ospf\math\symbol</Filter>
     </ClInclude>
-    <ClInclude Include="src\ospf\math\symbol\symbol_system.hpp">
-      <Filter>src\ospf\math\symbol</Filter>
-    </ClInclude>
     <ClInclude Include="src\ospf\math\symbol\monomial.hpp">
       <Filter>src\ospf\math\symbol</Filter>
     </ClInclude>
@@ -305,6 +308,48 @@
     </ClInclude>
     <ClInclude Include="src\ospf\math\symbol\expression.hpp">
       <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\monomial\concepts.hpp">
+      <Filter>src\ospf\math\symbol\monomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\monomial\linear.hpp">
+      <Filter>src\ospf\math\symbol\monomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\monomial\quadratic.hpp">
+      <Filter>src\ospf\math\symbol\monomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\monomial\standard.hpp">
+      <Filter>src\ospf\math\symbol\monomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\polynomial\concepts.hpp">
+      <Filter>src\ospf\math\symbol\polynomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\polynomial\linear.hpp">
+      <Filter>src\ospf\math\symbol\polynomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\polynomial\quadratic.hpp">
+      <Filter>src\ospf\math\symbol\polynomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\polynomial\standard.hpp">
+      <Filter>src\ospf\math\symbol\polynomial</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\inequality\inequality.hpp">
+      <Filter>src\ospf\math\symbol\inequality</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\inequality\judgement.hpp">
+      <Filter>src\ospf\math\symbol\inequality</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\function.hpp">
+      <Filter>src\ospf\math\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\symbol\concepts.hpp">
+      <Filter>src\ospf\math\symbol\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\symbol\pure.hpp">
+      <Filter>src\ospf\math\symbol\symbol</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ospf\math\symbol\symbol\expression.hpp">
+      <Filter>src\ospf\math\symbol\symbol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
