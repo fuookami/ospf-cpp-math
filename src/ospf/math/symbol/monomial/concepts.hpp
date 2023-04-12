@@ -49,6 +49,19 @@ namespace ospf
                     return _cell;
                 }
 
+            public:
+                inline constexpr Monomial& operator*=(ArgCLRefType<ValueType> rhs) noexcept
+                {
+                    _coefficient *= rhs;
+                    return *this;
+                }
+
+                inline constexpr Monomial& operator/=(ArgCLRefType<ValueType> rhs) noexcept
+                {
+                    _coefficient /= rhs;
+                    return *this;
+                }
+
             OSPF_CRTP_PERMISSION:
                 inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
                 {

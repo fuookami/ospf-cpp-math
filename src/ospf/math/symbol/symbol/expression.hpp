@@ -43,7 +43,7 @@ namespace ospf
 
                 inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
                 {
-                    const auto ret = values(this->name());
+                    auto ret = values(this->name());
                     if (ret.is_succeeded())
                     {
                         return std::move(ret).unwrap();
