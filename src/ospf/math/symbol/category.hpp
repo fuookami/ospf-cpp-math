@@ -8,7 +8,7 @@ namespace ospf
     {
         inline namespace symbol
         {
-            enum class SymbolCategory : u8
+            enum class ExpressionCategory : u8
             {
                 Linear,
                 Quadratic,

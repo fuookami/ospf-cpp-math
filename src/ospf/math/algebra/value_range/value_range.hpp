@@ -747,7 +747,7 @@ namespace std
         : public formatter<std::string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::ValueRange<T, litv, uitv>> range, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::ValueRange<T, litv, uitv>> range, FormatContext& fc) const
         {
             static const formatter<std::string_view, char> _formatter{};
             return _formatter.format(std::format("{}, {}", range.lower_bound(), range.upper_bound()), fc);
@@ -759,7 +759,7 @@ namespace std
         : public formatter<std::wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::ValueRange<T, litv, uitv>> range, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::ValueRange<T, litv, uitv>> range, FormatContext& fc) const
         {
             static const formatter<std::wstring_view, ospf::wchar> _formatter{};
             return _formatter.format(std::format(L"{}, {}", range.lower_bound(), range.upper_bound()), fc);
@@ -771,7 +771,7 @@ namespace std
         : public formatter<std::string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::DynValueRange<T>> range, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::DynValueRange<T>> range, FormatContext& fc) const
         {
             static const formatter<std::string_view, char> _formatter{};
             return _formatter.format(std::format("{}, {}", range.lower_bound(), range.upper_bound()), fc);
@@ -783,7 +783,7 @@ namespace std
         : public formatter<std::wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::DynValueRange<T>> range, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::DynValueRange<T>> range, FormatContext& fc) const
         {
             static const formatter<std::wstring_view, ospf::wchar> _formatter{};
             return _formatter.format(std::format(L"{}, {}", range.lower_bound(), range.upper_bound()), fc);

@@ -11,14 +11,14 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T, SymbolCategory cat, typename Self>
+            template<Invariant T, ExpressionCategory cat, typename Self>
             class Expression
             {
                 OSPF_CRTP_IMPL;
 
             public:
                 using ValueType = OriginType<T>;
-                static constexpr const SymbolCategory category = cat;
+                static constexpr const ExpressionCategory category = cat;
 
             public:
                 constexpr Expression(void) = default;
@@ -31,7 +31,7 @@ namespace ospf
             public:
                 inline constexpr Result<ValueType> value(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
                 {
-                    return Trait::get_value(self(), values());
+                    return Trait::get_value(self(), values);
                 }
 
                 inline constexpr Result<ValueType> value(const StringHashMap<std::string_view, ValueType>& values) const noexcept
@@ -79,7 +79,7 @@ namespace ospf
                         && DecaySameAsOrConvertibleTo<std::invoke_result_t<F, std::string_view>, V>
                         && std::convertible_to<ValueType, V> 
                         && std::convertible_to<V, ValueType>
-                inline constexpr Result<V> value(const F& f) const noexcept
+                inline constexpr Result<V> value(const F& values) const noexcept
                 {
                     return static_cast<V>(value([&values](const std::string_view symbol) -> Result<ValueType>
                         {
@@ -101,9 +101,9 @@ namespace ospf
 
             template<typename T>
             concept ExpressionType = Invariant<typename T::ValueType>
-                && requires (const T & expression, const std::function<Result<typename T::ValueType>(const std::string_view)>& values)
+                && requires (const T& expression, const std::function<Result<typename T::ValueType>(const std::string_view)>& values)
                 {
-                    { T::category } -> DecaySameAs<SymbolCategory>;
+                    { T::category } -> DecaySameAs<ExpressionCategory>;
                     { expression.value(values) } -> DecaySameAs<typename T::ValueType>;
                 };
 
@@ -128,7 +128,7 @@ namespace ospf
             template<typename... Ts>
             concept AllExpressionType = is_all_expression_type<Ts...>;
 
-            template<typename V, SymbolCategory cat, typename T>
+            template<typename V, ExpressionCategory cat, typename T>
             concept ExpressionTypeOf = Invariant<typename T::ValueType> 
                 && Invariant<V> 
                 && DecaySameAsOrConvertibleTo<typename T::ValueType, V>
@@ -138,25 +138,25 @@ namespace ospf
                     { expression.value(values) } -> DecaySameAs<V>;
                 };
 
-            template<typename V, SymbolCategory cat, typename... Ts>
+            template<typename V, ExpressionCategory cat, typename... Ts>
             struct IsAllExpressionTypeOf;
 
-            template<typename V, SymbolCategory cat, typename T>
+            template<typename V, ExpressionCategory cat, typename T>
             struct IsAllExpressionTypeOf<V, cat, T>
             {
                 static constexpr const bool value = ExpressionTypeOf<V, cat, T>;
             };
 
-            template<typename V, SymbolCategory cat, typename T, typename... Ts>
+            template<typename V, ExpressionCategory cat, typename T, typename... Ts>
             struct IsAllExpressionTypeOf<V, cat, T, Ts...>
             {
                 static constexpr const bool value = ExpressionTypeOf<V, cat, T> && IsAllExpressionTypeOf<V, cat, Ts...>::value;
             };
 
-            template<typename V, SymbolCategory cat, typename... Ts>
+            template<typename V, ExpressionCategory cat, typename... Ts>
             inline static constexpr const bool is_all_expression_type_of = IsAllExpressionTypeOf<V, cat, Ts...>::value;
 
-            template<typename V, SymbolCategory cat, typename... Ts>
+            template<typename V, ExpressionCategory cat, typename... Ts>
             concept AllExpressionTypeOf = is_all_expression_type_of<V, cat, Ts...>;
         };
     };

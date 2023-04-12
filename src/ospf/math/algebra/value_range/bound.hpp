@@ -172,7 +172,7 @@ namespace std
         : public formatter<std::string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::Bound<T, itv>> bound, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::Bound<T, itv>> bound, FormatContext& fc) const
         {
             static const formatter<std::string_view, char> _formatter{};
             if (bound.value().is_inf_or_neg_inf())
@@ -205,7 +205,7 @@ namespace std
         : public formatter<std::string_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::Bound<T, itv>> bound, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::Bound<T, itv>> bound, FormatContext& fc) const
         {
             static const formatter<std::wstring_view, ospf::wchar> _formatter{};
             if (bound.value().is_inf_or_neg_inf())
@@ -240,7 +240,7 @@ namespace std
         : public formatter<std::string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::DynBound<T>> bound, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::DynBound<T>> bound, FormatContext& fc) const
         {
             static const formatter<std::string_view, char> _formatter{};
             if (bound.value().is_inf_or_neg_inf())
@@ -274,7 +274,7 @@ namespace std
         : public formatter<std::wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::DynBound<T>> bound, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::DynBound<T>> bound, FormatContext& fc) const
         {
             static const formatter<std::wstring_view, ospf::wchar> _formatter{};
             if (bound.value().is_inf_or_neg_inf())

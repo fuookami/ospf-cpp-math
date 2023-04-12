@@ -215,7 +215,6 @@
     <ClInclude Include="src\ospf\math\symbol\function.hpp" />
     <ClInclude Include="src\ospf\math\symbol\inequality.hpp" />
     <ClInclude Include="src\ospf\math\symbol\inequality\inequality.hpp" />
-    <ClInclude Include="src\ospf\math\symbol\inequality\judgement.hpp" />
     <ClInclude Include="src\ospf\math\symbol\inequality\sign.hpp" />
     <ClInclude Include="src\ospf\math\symbol\monomial.hpp" />
     <ClInclude Include="src\ospf\math\symbol\monomial\concepts.hpp" />

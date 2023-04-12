@@ -15,9 +15,6 @@ namespace ospf
                 OSPF_CRTP_IMPL;
 
             public:
-                using ValueType = OriginType<T>;
-
-            public:
                 constexpr Symbol(std::string name)
                     : _name(std::move(name)) {}
 
@@ -60,9 +57,6 @@ namespace ospf
                     return Trait::is_pure(self());
                 }
 
-            public:
-                // todo: value
-
             private:
                 struct Trait : public Self
                 {
@@ -98,7 +92,7 @@ namespace ospf
             template<typename T, typename... Ts>
             struct IsAllSymbolType<T, Ts...>
             {
-                static constexpr const bool value = SymbolType<T>&& IsAllSymbolType<Ts...>::value;
+                static constexpr const bool value = SymbolType<T> && IsAllSymbolType<Ts...>::value;
             };
 
             template<typename... Ts>
@@ -117,7 +111,7 @@ namespace std
         : public formatter<basic_string_view<CharT>, CharT>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Symbol<Self>& symbol, FormatContext& fc)
+        inline decltype(auto) format(const ospf::Symbol<Self>& symbol, FormatContext& fc) const
         {
             static const auto _formatter = formatter<basic_string_view<CharT>, CharT>{};
             const auto display_name = boost::locale::conv::to_utf<CharT>(string{ symbol.display_name() }, locale{});
@@ -130,7 +124,7 @@ namespace std
         : public formatter<string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Symbol<Self>& symbol, FormatContext& fc)
+        inline decltype(auto) format(const ospf::Symbol<Self>& symbol, FormatContext& fc) const
         {
             static const auto _formatter = formatter<string_view, char>{};
             return _formatter.format(symbol.display_name(), fc);

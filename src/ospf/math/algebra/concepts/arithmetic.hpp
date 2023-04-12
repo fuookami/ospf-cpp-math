@@ -442,7 +442,7 @@ namespace std
         : public formatter<std::string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Infinity _, FormatContext& fc)
+        inline decltype(auto) format(const ospf::Infinity _, FormatContext& fc) const
         {
             static const formatter<std::string_view, char> _formatter{};
             return _formatter.format("inf", fc);
@@ -454,7 +454,7 @@ namespace std
         : public formatter<std::wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Infinity _, FormatContext& fc)
+        inline decltype(auto) format(const ospf::Infinity _, FormatContext& fc) const
         {
             static const formatter<std::wstring_view, ospf::wchar> _formatter{};
             return _formatter.format(L"inf", fc);
@@ -466,7 +466,7 @@ namespace std
         : public formatter<std::string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::NegativeInfinity _, FormatContext& fc)
+        inline decltype(auto) format(const ospf::NegativeInfinity _, FormatContext& fc) const
         {
             static const formatter<std::string_view, char> _formatter{};
             return _formatter.format("-inf", fc);
@@ -478,7 +478,7 @@ namespace std
         : public formatter<std::wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::NegativeInfinity _, FormatContext& fc)
+        inline decltype(auto) format(const ospf::NegativeInfinity _, FormatContext& fc) const
         {
             static const formatter<std::wstring_view, ospf::wchar> _formatter{};
             return _formatter.format(L"-inf", fc);

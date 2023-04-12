@@ -2920,7 +2920,7 @@ namespace std
         : public formatter<std::basic_string_view<CharT>, CharT>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::ValueWrapper<T>> value, FormatContext& fc)
+        inline decltype(auto) format(ospf::ArgCLRefType<ospf::value_range::ValueWrapper<T>> value, FormatContext& fc) const
         {
             return std::visit([](const auto& value)
                 {
