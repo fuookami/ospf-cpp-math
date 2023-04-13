@@ -1,4 +1,4 @@
-#pragma once
+#pragma once1
 
 #include <ospf/math/symbol/expression.hpp>
 #include <boost/locale.hpp>
@@ -55,6 +55,19 @@ namespace ospf
                 inline constexpr const bool pure(void) const noexcept
                 {
                     return Trait::is_pure(self());
+                }
+
+            public:
+                template<typename Other>
+                inline constexpr const bool operator==(const Symbol<Other>& rhs) const noexcept
+                {
+                    return this == &rhs || _name == rhs._name;
+                }
+
+                template<typename Other>
+                inline constexpr const bool operator!=(const Symbol<Other>& rhs) const noexcept
+                {
+                    return this != &rhs && _name != rhs._name;
                 }
 
             private:

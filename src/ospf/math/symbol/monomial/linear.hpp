@@ -61,7 +61,7 @@ namespace ospf
             OSPF_CRTP_PERMISSION:
                 inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
                 {
-                    return std::visit([&values](const auto& sym) -> Result<ValueType>
+                    return std::visit([&values](const auto sym) -> Result<ValueType>
                         {
                             using ThisType = OriginType<decltype(sym)>;
                             if constexpr (DecaySameAs<ThisType, Ref<PureSymbolType>)
@@ -100,7 +100,7 @@ namespace std
         inline decltype(auto) format(const ospf::LinearMonomialCell<T, PSym, ESym>& cell, FormatContext& fc) const
         {
             static const auto _formatter = formatter<basic_string_view<CharT>, CharT>{};
-            const auto display_name = boost::locale::conv::to_utf<CharT>(string{ std::visit([](const auto& sym)
+            const auto display_name = boost::locale::conv::to_utf<CharT>(string{ std::visit([](const auto sym)
                 {
                     return sym->display_name();
                 }, cell.symbol()) }, locale{});
@@ -116,7 +116,7 @@ namespace std
         inline decltype(auto) format(const ospf::LinearMonomialCell<T, PSym, ESym>& cell, FormatContext& fc) const
         {
             static const auto _formatter = formatter<string_view, char>{};
-            const auto display_name = std::visit([](const auto& sym)
+            const auto display_name = std::visit([](const auto sym)
                 {
                     return sym->display_name();
                 }, cell.symbol());
