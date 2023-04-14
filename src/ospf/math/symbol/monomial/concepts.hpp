@@ -11,10 +11,12 @@ namespace ospf
         inline namespace symbol
         {
             template<Invariant T, ExpressionCategory cat, typename Cell>
-                requires ExpressionTypeOf<T, cat, Cell>
+                requires ExpressionTypeOf<Cell, T, cat>
             class Monomial
                 : public Expression<T, cat, Monomial<T, cat, Cell>>
             {
+                using Impl = Expression<T, cat, Monomial>;
+
             public:
                 using ValueType = OriginType<T>;
                 using CellType = OriginType<Cell>;
@@ -50,6 +52,17 @@ namespace ospf
                 }
 
             public:
+                inline constexpr Monomial operator-(void) const& noexcept
+                {
+                    return Monomial{ -_coefficient, _cell };
+                }
+
+                inline constexpr Monomial operator-(void) && noexcept
+                {
+                    return Monomial{ -_coefficient, move<CellType>(_cell) };
+                }
+
+            public:
                 inline constexpr Monomial& operator*=(ArgCLRefType<ValueType> rhs) noexcept
                 {
                     _coefficient *= rhs;
@@ -59,6 +72,15 @@ namespace ospf
                 inline constexpr Monomial& operator/=(ArgCLRefType<ValueType> rhs) noexcept
                 {
                     _coefficient /= rhs;
+                    return *this;
+                }
+
+                template<typename = void>
+                    requires requires (CellType& lhs, const CellType& rhs) { lhs *= rhs; }
+                inline constexpr Monomial& operator*=(const Monomial& rhs)
+                {
+                    _coefficient *= rhs._coefficient;
+                    _cell *= rhs._cell;
                     return *this;
                 }
 
@@ -102,12 +124,12 @@ namespace ospf
             template<typename... Ts>
             concept AllMonomialType = is_all_monomial_type<Ts...>;
 
-            template<typename V, ExpressionCategory cat, typename T>
-            concept MonomialTypeOf = ExpressionTypeOf<V, cat, T>
+            template<typename T, typename V, ExpressionCategory cat>
+            concept MonomialTypeOf = ExpressionTypeOf<T, V, cat>
                 && requires (const T& monomial)
                 {
                     { T::coefficient() } -> DecaySameAs<typename T::ValueType>;
-                    { T::cell() } -> ExpressionType;
+                    { T::cell() } -> ExpressionTypeOf<V, cat>;
                 };
 
             template<typename V, ExpressionCategory cat, typename... Ts>
@@ -122,7 +144,7 @@ namespace ospf
             template<typename V, ExpressionCategory cat, typename T, typename... Ts>
             struct IsAllMonomialTypeOf<V, cat, T, Ts...>
             {
-                static constexpr const bool value = MonomialTypeOf<V, cat, T> && IsAllMonomialTypeOf<V, cat, Ts...>;
+                static constexpr const bool value = MonomialTypeOf<V, cat, T> && IsAllMonomialTypeOf<V, cat, Ts...>::value;
             };
 
             template<typename V, ExpressionCategory cat, typename... Ts>

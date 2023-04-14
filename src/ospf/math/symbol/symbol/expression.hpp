@@ -95,8 +95,8 @@ namespace ospf
             template<typename... Ts>
             concept AllExpressionSymbolType = AllExpressionType<Ts...> && AllSymbolType<Ts...>;
 
-            template<typename V, ExpressionCategory cat, typename T>
-            concept ExpressionSymbolTypeOf = ExpressionTypeOf<V, cat, T> && SymbolType<T>;
+            template<typename T, typename V, ExpressionCategory cat>
+            concept ExpressionSymbolTypeOf = ExpressionTypeOf<T, V, cat> && SymbolType<T>;
 
             template<typename V, ExpressionCategory cat, typename... Ts>
             concept AllExpressionSymbolTypeOf = AllExpressionTypeOf<V, cat, Ts...> && AllSymbolType<Ts...>;

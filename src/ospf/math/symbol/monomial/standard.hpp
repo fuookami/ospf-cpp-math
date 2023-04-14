@@ -12,12 +12,12 @@ namespace ospf
         inline namespace symbol
         {
             template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Standard>>
-                requires ExpressionSymbolTypeOf<T, ExpressionCategory::Standard, ESym>
+                requires ExpressionSymbolTypeOf<ESym, T, ExpressionCategory::Standard>
             class StandardMonomialCell
-                : public Expression<T, ExpressionCategory::Standard, StandardMonomialCell<T, PSym, ESym>>
+                : public Expression<T, ExpressionCategory::Standard, StandardMonomialCell>
             {
                 using Variant = std::variant<Ref<OriginType<PSym>>, Ref<OriginType<ESym>>>;
-                using Impl = Expression<T, ExpressionCategory::Standard, StandardMonomialCell<T, PSym, ESym>>;
+                using Impl = Expression<T, ExpressionCategory::Standard, StandardMonomialCell>;
 
             public:
                 using ValueType = OriginType<T>;

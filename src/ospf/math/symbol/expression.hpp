@@ -128,7 +128,7 @@ namespace ospf
             template<typename... Ts>
             concept AllExpressionType = is_all_expression_type<Ts...>;
 
-            template<typename V, ExpressionCategory cat, typename T>
+            template<typename T, typename V, ExpressionCategory cat>
             concept ExpressionTypeOf = Invariant<typename T::ValueType> 
                 && Invariant<V> 
                 && DecaySameAsOrConvertibleTo<typename T::ValueType, V>
@@ -144,13 +144,13 @@ namespace ospf
             template<typename V, ExpressionCategory cat, typename T>
             struct IsAllExpressionTypeOf<V, cat, T>
             {
-                static constexpr const bool value = ExpressionTypeOf<V, cat, T>;
+                static constexpr const bool value = ExpressionTypeOf<T, V, cat>;
             };
 
             template<typename V, ExpressionCategory cat, typename T, typename... Ts>
             struct IsAllExpressionTypeOf<V, cat, T, Ts...>
             {
-                static constexpr const bool value = ExpressionTypeOf<V, cat, T> && IsAllExpressionTypeOf<V, cat, Ts...>::value;
+                static constexpr const bool value = ExpressionTypeOf<T, V, cat> && IsAllExpressionTypeOf<V, cat, Ts...>::value;
             };
 
             template<typename V, ExpressionCategory cat, typename... Ts>

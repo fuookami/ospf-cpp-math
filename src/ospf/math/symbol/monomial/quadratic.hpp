@@ -11,12 +11,12 @@ namespace ospf
         inline namespace symbol
         {
             template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Quadratic>>
-                requires ExpressionSymbolTypeOf<T, ExpressionCategory::Quadratic, ESym>
+                requires ExpressionSymbolTypeOf<ESym, T, ExpressionCategory::Quadratic>
             class QuadraticMonomialCell
                 : public Expression<T, ExpressionCategory::Quadratic, QuadraticMonomialCell<T, PSym, ESym>>
             {
                 using Variant = std::variant<Ref<OriginType<PSym>>, Ref<OriginType<ESym>>>;
-                using Impl = Expression<T, ExpressionCategory::Quadratic, QuadraticMonomialCell<T, PSym, ESym>>;
+                using Impl = Expression<T, ExpressionCategory::Quadratic, QuadraticMonomialCell>;
 
             public:
                 using ValueType = OriginType<T>;
