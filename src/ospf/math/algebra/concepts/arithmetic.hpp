@@ -36,6 +36,20 @@ namespace ospf
                     };
 
                 template<>
+                struct ArithmeticTrait<bool>
+                {
+                    inline static constexpr const bool zero(void) noexcept
+                    {
+                        return false;
+                    }
+
+                    inline static constexpr const bool one(void) noexcept
+                    {
+                        return true;
+                    }
+                };
+
+                template<>
                 struct ArithmeticTrait<u8>
                 {
                     inline static constexpr const u8 zero(void) noexcept 

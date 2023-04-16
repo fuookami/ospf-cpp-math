@@ -9,30 +9,47 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Linear>>
-                requires ExpressionSymbolTypeOf<ESym, T, ExpressionCategory::Linear>
+            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Linear>>
+                requires ExpressionSymbolTypeOf<ESym, T, ST, ExpressionCategory::Linear>
             class LinearMonomialCell
-                : public Expression<T, ExpressionCategory::Linear, LinearMonomialCell<T, PSym, ESym>>
+                : public Expression<T, ST, ExpressionCategory::Linear, LinearMonomialCell<T, PSym, ESym>>
             {
                 using Variant = std::variant<Ref<OriginType<PSym>>, Ref<OriginType<ESym>>>;
-                using Impl = Expression<T, ExpressionCategory::Linear, LinearMonomialCell>;
+                using Impl = Expression<T, ST, ExpressionCategory::Linear, LinearMonomialCell>;
 
             public:
                 using ValueType = OriginType<T>;
+                using SymbolValueType = OriginType<ST>;
+                using TransferType = Extractor<SymbolValueType, ValueType>;
                 using PureSymbolType = OriginType<PSym>;
                 using ExprSymbolType = OriginType<ESym>;
 
             public:
+                template<typename = void>
+                    requires DecaySameAsOrConvertibleTo<SymbolValueType, ValueType>
                 constexpr LinearMonomialCell(const PureSymbolType& sym)
                     : _symbol(std::in_place_index<0_uz>, Ref<PureSymbolType>{ sym }) {}
 
+                template<typename = void>
+                    requires DecaySameAsOrConvertibleTo<SymbolValueType, ValueType>
                 constexpr LinearMonomialCell(ArgCLRefType<Ref<PureSymbolType>> sym)
                     : _symbol(std::in_place_index<0_uz>, sym) {}
 
                 template<typename = void>
-                    requires ReferenceFaster<Ref<PureSymbolType>> && std::movable<Ref<PureSymbolType>>
+                    requires DecaySameAsOrConvertibleTo<SymbolValueType, ValueType> && ReferenceFaster<Ref<PureSymbolType>> && std::movable<Ref<PureSymbolType>>
                 constexpr LinearMonomialCell(ArgRRefType<Ref<PureSymbolType>> sym)
                     : _symbol(std::in_place_index<0_uz>, move<Ref<PureSymbolType>>(sym)) {}
+
+                constexpr LinearMonomialCell(const PureSymbolType& sym, TransferType transfer)
+                    : _symbol(std::in_place_index<0_uz>, Ref<PureSymbolType>{ sym }), _transfer(std::move(transfer)) {}
+
+                constexpr LinearMonomialCell(ArgCLRefType<Ref<PureSymbolType>> sym, TransferType transfer)
+                    : _symbol(std::in_place_index<0_uz>, sym), _transfer(std::move(transfer)) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<Ref<PureSymbolType>> && std::movable<Ref<PureSymbolType>>
+                constexpr LinearMonomialCell(ArgRRefType<Ref<PureSymbolType>> sym, TransferType transfer)
+                    : _symbol(std::in_place_index<0_uz>, move<Ref<PureSymbolType>>(sym)), _transfer(std::move(transfer)) {}
 
                 constexpr LinearMonomialCell(const ExprSymbolType& sym)
                     : _symbol(std::in_place_index<1_uz>, Ref<ExprSymbolType>{ sym }) {}
@@ -59,14 +76,32 @@ namespace ospf
                 }
 
             OSPF_CRTP_PERMISSION:
-                inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
+                inline constexpr RetType<ValueType> OSPF_CRTP_FUNCTION(get_value_by)(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
                 {
-                    return std::visit([&values](const auto sym) -> Result<ValueType>
+                    return std::visit([this, &values](const auto sym) -> Result<ValueType>
                         {
                             using ThisType = OriginType<decltype(sym)>;
                             if constexpr (DecaySameAs<ThisType, Ref<PureSymbolType>)
                             {
-                                return values(sym->name());
+                                if (_transfer.has_value())
+                                {
+                                    return (*_transfer)(values(sym->name()));
+                                }
+                                else
+                                {
+                                    if constexpr (DecaySameAs<SymbolValueType, ValueType>)
+                                    {
+                                        return values(sym->name());
+                                    }
+                                    else if (std::convertible_to<SymbolValueType, ValueType>)
+                                    {
+                                        return static_cast<SymbolValueType>(values(sym->name()));
+                                    }
+                                    else
+                                    {
+                                        return OSPFError{ OSPFErrCode::ApplicationFail, std::format("lost transfer for {} to {}", TypeInfo<SymbolValueType>::name(), TypeInfo<ValueType>::name()) };
+                                    }
+                                }
                             }
                             else
                             {
@@ -77,10 +112,11 @@ namespace ospf
 
             private:
                 Variant _symbol;
+                std::optional<TransferType> _transfer;
             };
 
-            template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Linear>>
-            using LinearMonomial = Monomial<T, ExpressionCategory::Linear, LinearMonomialCell<T, PSym, ESym>>;
+            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Linear>>
+            using LinearMonomial = Monomial<T, ST, ExpressionCategory::Linear, LinearMonomialCell<T, ST, PSym, ESym>>;
 
             namespace linear
             {

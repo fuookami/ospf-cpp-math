@@ -28,7 +28,7 @@ namespace ospf
                 constexpr ~PureSymbol(void) noexcept = default;
 
             OSPF_CRTP_PERMISSION:
-                inline constexpr const bool is_pure(void) const noexcept
+                inline constexpr const bool OSPF_CRTP_FUNCTION(is_pure)(void) const noexcept
                 {
                     return true;
                 }

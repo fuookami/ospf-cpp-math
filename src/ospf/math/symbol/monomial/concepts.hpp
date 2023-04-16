@@ -10,15 +10,16 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T, ExpressionCategory cat, typename Cell>
-                requires ExpressionTypeOf<Cell, T, cat>
+            template<Invariant T, Invariant ST, ExpressionCategory cat, typename Cell>
+                requires ExpressionTypeOf<Cell, T, ST, cat>
             class Monomial
-                : public Expression<T, cat, Monomial<T, cat, Cell>>
+                : public Expression<T, ST, cat, Monomial<T, ST, cat, Cell>>
             {
-                using Impl = Expression<T, cat, Monomial>;
+                using Impl = Expression<T, ST, cat, Monomial>;
 
             public:
                 using ValueType = OriginType<T>;
+                using SymbolValueType = OriginType<ST>;
                 using CellType = OriginType<Cell>;
 
             public:
@@ -52,7 +53,7 @@ namespace ospf
                 }
 
             public:
-                inline constexpr Monomial operator-(void) const& noexcept
+                inline constexpr Monomial operator-(void) const & noexcept
                 {
                     return Monomial{ -_coefficient, _cell };
                 }
@@ -85,9 +86,10 @@ namespace ospf
                 }
 
             OSPF_CRTP_PERMISSION:
-                inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
+                inline constexpr RetType<ValueType> OSPF_CRTP_FUNCTION(get_value_by)(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
                 {
-                    return _coefficient * _cell.value(values);
+                    OSPF_TRY_GET(symbol_value, _cell.value(values));
+                    return _coefficient * symbol_value;
                 }
 
             private:
@@ -124,46 +126,46 @@ namespace ospf
             template<typename... Ts>
             concept AllMonomialType = is_all_monomial_type<Ts...>;
 
-            template<typename T, typename V, ExpressionCategory cat>
-            concept MonomialTypeOf = ExpressionTypeOf<T, V, cat>
+            template<typename T, typename V, typename SV, ExpressionCategory cat>
+            concept MonomialTypeOf = ExpressionTypeOf<T, V, SV, cat>
                 && requires (const T& monomial)
                 {
                     { T::coefficient() } -> DecaySameAs<typename T::ValueType>;
-                    { T::cell() } -> ExpressionTypeOf<V, cat>;
+                    { T::cell() } -> ExpressionTypeOf<V, SV, cat>;
                 };
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             struct IsAllMonomialTypeOf;
 
-            template<typename V, ExpressionCategory cat, typename T>
-            struct IsAllMonomialTypeOf<V, cat, T>
+            template<typename V, typename SV, ExpressionCategory cat, typename T>
+            struct IsAllMonomialTypeOf<V, SV, cat, T>
             {
-                static constexpr const bool value = MonomialTypeOf<V, cat, T>
+                static constexpr const bool value = MonomialTypeOf<V, SV, cat, T>
             };
 
-            template<typename V, ExpressionCategory cat, typename T, typename... Ts>
-            struct IsAllMonomialTypeOf<V, cat, T, Ts...>
+            template<typename V, typename SV, ExpressionCategory cat, typename T, typename... Ts>
+            struct IsAllMonomialTypeOf<V, SV, cat, T, Ts...>
             {
-                static constexpr const bool value = MonomialTypeOf<V, cat, T> && IsAllMonomialTypeOf<V, cat, Ts...>::value;
+                static constexpr const bool value = MonomialTypeOf<V, SV, cat, T> && IsAllMonomialTypeOf<V, SV, cat, Ts...>::value;
             };
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
-            static constexpr const bool is_all_monomial_type_of = IsAllMonomialTypeOf<V, cat, Ts...>::value;
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
+            static constexpr const bool is_all_monomial_type_of = IsAllMonomialTypeOf<V, SV, cat, Ts...>::value;
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
-            concept AllMonomialTypeOf = is_all_monomial_type_of<V, cat, Ts...>;
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
+            concept AllMonomialTypeOf = is_all_monomial_type_of<V, SV, cat, Ts...>;
         };
     };
 };
 
 namespace std
 {
-    template<ospf::Invariant T, ospf::ExpressionCategory cat, typename Cell>
-    struct formatter<ospf::Monomial<T, cat, Cell>>
+    template<ospf::Invariant T, ospf::Invariant ST, ospf::ExpressionCategory cat, typename Cell>
+    struct formatter<ospf::Monomial<T, ST, cat, Cell>>
         : public formatter<string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Monomial<T, cat, Cell>& monomial, FormatContext& fc) const
+        inline decltype(auto) format(const ospf::Monomial<T, ST, cat, Cell>& monomial, FormatContext& fc) const
         {
             static const auto _formatter = formatter<string_view, char>{};
             static const ospf::Equal<T> eq{};
@@ -196,12 +198,12 @@ namespace std
         }
     };
 
-    template<ospf::Invariant T, ospf::ExpressionCategory cat, typename Cell>
-    struct formatter<ospf::Monomial<T, cat, Cell>>
+    template<ospf::Invariant T, ospf::Invariant ST, ospf::ExpressionCategory cat, typename Cell>
+    struct formatter<ospf::Monomial<T, ST, cat, Cell>>
         : public formatter<wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Monomial<T, cat, Cell, Self>& monomial, FormatContext& fc) const
+        inline decltype(auto) format(const ospf::Monomial<T, ST, cat, Cell>& monomial, FormatContext& fc) const
         {
             static const auto _formatter = formatter<wstring_view, ospf::wchar>{};
             static const ospf::Equal<T> eq{};

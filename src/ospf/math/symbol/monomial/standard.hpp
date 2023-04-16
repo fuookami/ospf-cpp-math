@@ -11,31 +11,49 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Standard>>
-                requires ExpressionSymbolTypeOf<ESym, T, ExpressionCategory::Standard>
+            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Standard>>
+                requires ExpressionSymbolTypeOf<ESym, T, ST, ExpressionCategory::Standard>
             class StandardMonomialCell
-                : public Expression<T, ExpressionCategory::Standard, StandardMonomialCell>
+                : public Expression<T, ST, ExpressionCategory::Standard, StandardMonomialCell>
             {
                 using Variant = std::variant<Ref<OriginType<PSym>>, Ref<OriginType<ESym>>>;
-                using Impl = Expression<T, ExpressionCategory::Standard, StandardMonomialCell>;
+                using Impl = Expression<T, ST, ExpressionCategory::Standard, StandardMonomialCell>;
 
             public:
                 using ValueType = OriginType<T>;
+                using SymbolValueType = OriginType<ST>;
+                using TransferType = Extractor<ValueType, SymbolValueType>;
                 using PureSymbolType = OriginType<PSym>;
                 using ExprSymbolType = OriginType<ESym>;
 
             public:
+                template<typename = void>
+                    requires DecaySameAsOrConvertibleTo<SymbolValueType, ValueType>
                 constexpr StandardMonomialCell(const PureSymbolType& sym)
                     : _symbols({ std::make_pair(Variant{ std::in_place_index<0_uz>, Ref<PureSymbolType>{ sym } }, 1_u64) }) {}
 
+                template<typename = void>
+                    requires DecaySameAsOrConvertibleTo<SymbolValueType, ValueType>
                 constexpr StandardMonomialCell(ArgCLRefType<Ref<PureSymbolType>> sym)
                     : _symbols({ std::make_pair(Variant{ std::in_place_index<0_uz>, sym }, 1_u64) }) {}
 
                 template<typename = void>
-                    requires ReferenceFaster<Ref<PureSymbolType>> && std::movable<Ref<PureSymbolType>>
+                    requires DecaySameAsOrConvertibleTo<SymbolValueType, ValueType> && ReferenceFaster<Ref<PureSymbolType>> && std::movable<Ref<PureSymbolType>>
                 constexpr StandardMonomialCell(ArgRRefType<Ref<PureSymbolType>> sym)
                     : _symbols({ std::make_pair(Variant{ std::in_place_index<0_uz>, move<Ref<PureSymbolType>>(sym) }, 1_u64) }) {}
 
+                constexpr StandardMonomialCell(const PureSymbolType& sym, TransferType transfer)
+                    : _symbols({ std::make_pair(Variant{ std::in_place_index<0_uz>, Ref<PureSymbolType>{ sym } }, 1_u64) }), _transfer(std::move(transfer)) {}
+
+                constexpr StandardMonomialCell(ArgCLRefType<Ref<PureSymbolType>> sym, TransferType transfer)
+                    : _symbols({ std::make_pair(Variant{ std::in_place_index<0_uz>, sym }, 1_u64) }), _transfer(std::move(transfer)) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<Ref<PureSymbolType>> && std::movable<Ref<PureSymbolType>>
+                constexpr StandardMonomialCell(ArgRRefType<Ref<PureSymbolType>> sym, TransferType transfer)
+                    : _symbols({ std::make_pair(Variant{ std::in_place_index<0_uz>, move<Ref<PureSymbolType>>(sym) }, 1_u64) }), _transfer(std::move(transfer)) {}
+
+            public:
                 constexpr StandardMonomialCell(const ExprSymbolType& sym)
                     : _symbols({ std::make_pair(Variant{ std::in_place_index<1_uz>, Ref<ExprSymbolType>{ sym } }, 1_u64) }) {}
 
@@ -47,8 +65,23 @@ namespace ospf
                 constexpr StandardMonomialCell(ArgRRefType<Ref<ExprSymbolType>> sym)
                     : _symbols({ std::make_pair(Variant{ std::in_place_index<1_uz>, move<Ref<ExprSymbolType>>(sym) } , 1_u64) }) {}
 
+                constexpr StandardMonomialCell(const ExprSymbolType& sym, TransferType transfer)
+                    : _symbols({ std::make_pair(Variant{ std::in_place_index<1_uz>, Ref<ExprSymbolType>{ sym } }, 1_u64) }), _transfer(std::move(transfer)) {}
+
+                constexpr StandardMonomialCell(ArgCLRefType<Ref<ExprSymbolType>> sym, TransferType transfer)
+                    : _symbols({ std::make_pair(Variant{ std::in_place_index<1_uz>, sym }, 1_u64) }), _transfer(std::move(transfer)) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<Ref<ExprSymbolType>> && std::movable<Ref<ExprSymbolType>>
+                constexpr StandardMonomialCell(ArgRRefType<Ref<ExprSymbolType>> sym, TransferType transfer)
+                    : _symbols({ std::make_pair(Variant{ std::in_place_index<1_uz>, move<Ref<ExprSymbolType>>(sym) } , 1_u64) }), _transfer(std::move(transfer)) {}
+
+            public:
                 constexpr StandardMonomialCell(std::vector<std::pair<Variant, u64>> symbols)
                     : _symbols(std::move(symbols)) {}
+
+                constexpr StandardMonomialCell(std::vector<std::pair<Variant, u64>> symbols, TransferType transfer)
+                    : _symbols(std::move(symbols)), _transfer(std::move(transfer)) {}
 
             public:
                 constexpr StandardMonomialCell(const StandardMonomialCell& ano) = default;
@@ -247,29 +280,41 @@ namespace ospf
                     auto ret = ArithmeticTrait<ValueType>::zero();
                     for (const auto [symbol, index] : _symbols)
                     {
-                        OSPF_TRY_GET(value, std::visit([&values](const auto sym) -> Result<ValueType>
+                        OSPF_TRY_GET(value, std::visit([this, &values](const auto sym) -> Result<ValueType>
                             {
                                 using ThisType = OriginType<decltype(sym)>;
                                 if constexpr (DecaySameAs<ThisType, Ref<PureSymbolType>>)
                                 {
-                                    return values(sym->name());
+                                    if constexpr (DecaySameAs<SymbolValueType, ValueType>)
+                                    {
+                                        return values(sym->name());
+                                    }
+                                    else if (std::convertible_to<SymbolValueType, ValueType>)
+                                    {
+                                        return static_cast<SymbolValueType>(values(sym->name()));
+                                    }
+                                    else
+                                    {
+                                        return OSPFError{ OSPFErrCode::ApplicationFail, std::format("lost transfer for {} to {}", TypeInfo<SymbolValueType>::name(), TypeInfo<ValueType>::name()) };
+                                    }
                                 }
                                 else
                                 {
                                     return sym->value(values);
                                 }
                             }, symbol));
-                        ret += pow(value, static_cast<i64>(index));
+                        ret *= pow(value, static_cast<i64>(index));
                     }
                     return ret;
                 }
 
             private:
                 std::vector<std::pair<Variant, u64>> _symbols;
+                std::optional<TransferType> _transfer;
             };
 
-            template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Standard>>
-            using StandardMonomial = Monomial<T, ExpressionCategory::Standard, StandardMonomialCell<T, PSym, ESym>>;
+            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Standard>>
+            using StandardMonomial = Monomial<T, ST, ExpressionCategory::Standard, StandardMonomialCell<T, PSym, ESym>>;
 
             namespace standard
             {
@@ -281,12 +326,12 @@ namespace ospf
 
 namespace std
 {
-    template<ospf::Invariant T, ospf::PureSymbolType PSym, typename ESym>
-    struct formatter<ospf::StandardMonomialCell<T, PSym, ESym>, char>
+    template<ospf::Invariant T, ospf::Invariant ST, ospf::PureSymbolType PSym, typename ESym>
+    struct formatter<ospf::StandardMonomialCell<T, ST, PSym, ESym>, char>
         : public formatter<string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::StandardMonomialCell<T, PSym, ESym>& cell, FormatContext& fc) const
+        inline decltype(auto) format(const ospf::StandardMonomialCell<T, ST, PSym, ESym>& cell, FormatContext& fc) const
         {
             ostringstream sout;
             assert(!cell.symbols().empty());
@@ -314,12 +359,12 @@ namespace std
         }
     };
 
-    template<ospf::Invariant T, ospf::PureSymbolType PSym, typename ESym>
-    struct formatter<ospf::StandardMonomialCell<T, PSym, ESym>, ospf::wchar>
+    template<ospf::Invariant T, ospf::Invariant ST, ospf::PureSymbolType PSym, typename ESym>
+    struct formatter<ospf::StandardMonomialCell<T, ST, PSym, ESym>, ospf::wchar>
         : public formatter<wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::StandardMonomialCell<T, PSym, ESym>& cell, FormatContext& fc) const
+        inline decltype(auto) format(const ospf::StandardMonomialCell<T, ST, PSym, ESym>& cell, FormatContext& fc) const
         {
             wostringstream sout;
             assert(!cell.symbols().empty());

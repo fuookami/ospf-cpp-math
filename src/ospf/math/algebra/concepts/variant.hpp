@@ -32,6 +32,8 @@ namespace ospf
                         { trait.value(std::declval<StringHashMap<std::string_view, f64>>()) } -> DecaySameAs<std::optional<typename VariantTrait<T>::ValueType>>;
                     };
 
+                template<> struct InvariantTrait<bool> {};
+
                 template<> struct InvariantTrait<i8> {};
                 template<> struct InvariantTrait<u8> {};
                 template<> struct InvariantTrait<i16> {};

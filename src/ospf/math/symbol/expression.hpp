@@ -11,13 +11,14 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T, ExpressionCategory cat, typename Self>
+            template<Invariant T, Invariant ST, ExpressionCategory cat, typename Self>
             class Expression
             {
                 OSPF_CRTP_IMPL;
 
             public:
                 using ValueType = OriginType<T>;
+                using SymbolValueType = OriginType<ST>;
                 static constexpr const ExpressionCategory category = cat;
 
             public:
@@ -29,14 +30,14 @@ namespace ospf
                 constexpr ~Expression(void) noexcept = default;
 
             public:
-                inline constexpr Result<ValueType> value(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
+                inline constexpr Result<ValueType> value(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
                 {
                     return Trait::get_value(self(), values);
                 }
 
-                inline constexpr Result<ValueType> value(const StringHashMap<std::string_view, ValueType>& values) const noexcept
+                inline constexpr Result<ValueType> value(const StringHashMap<std::string_view, SymbolValueType>& values) const noexcept
                 {
-                    return value([&values](const std::string_view symbol) -> Result<ValueType> 
+                    return value([&values](const std::string_view symbol) -> Result<SymbolValueType>
                         {
                             const auto it = values.find(symbol);
                             if (it == values.cend())
@@ -48,50 +49,51 @@ namespace ospf
                 }
 
                 template<Invariant V>
-                    requires DecayNotSameAs<ValueType, V>
-                        && std::convertible_to<ValueType, V>
-                        && std::convertible_to<V, ValueType>
-                inline constexpr Result<V> value(const StringHashMap<std::string_view, V>& values) const noexcept
+                    requires DecayNotSameAs<V, SymbolValueType> && std::convertible_to<V, SymbolValueType>
+                inline constexpr Result<ValueType> value(const StringHashMap<std::string_view, V>& values) const noexcept
                 {
-                    return static_cast<V>(value([&values](const std::string_view symbol) -> Result<ValueType>
+                    return value([&values](const std::string_view symbol) -> Result<SymbolValueType>
                         {
                             const auto it = values.find(symbol);
                             if (it == values.cend())
                             {
                                 return OSPFError{ OSPFErrCode::ApplicationFail, std::format("value of symbol \"{}\" unmatched", symbol) };
                             }
-                            return static_cast<ValueType>(it->second);
-                        }));
-                }
 
-                template<typename F>
-                    requires DecaySameAsOrConvertibleTo<std::invoke_result_t<F, std::string_view>, ValueType>
-                inline constexpr Result<ValueType> value(const F& values) const noexcept
-                {
-                    return value([&values](const std::string_view symbol) -> Result<ValueType>
-                        {
-                            return values(symbol);
+                            using ThisType = OriginType<decltype(it->second)>;
+                            if constexpr (DecaySameAs<ThisType, SymbolValueType>)
+                            {
+                                return it->second;
+                            }
+                            else
+                            {
+                                return static_cast<SymbolValueType>(it->second);
+                            }
                         });
                 }
 
-                template<Invariant V, typename F>
-                    requires DecayNotSameAs<ValueType, V> 
-                        && DecaySameAsOrConvertibleTo<std::invoke_result_t<F, std::string_view>, V>
-                        && std::convertible_to<ValueType, V> 
-                        && std::convertible_to<V, ValueType>
-                inline constexpr Result<V> value(const F& values) const noexcept
+                template<typename F>
+                    requires DecaySameAsOrConvertibleTo<std::invoke_result_t<F, std::string_view>, SymbolValueType>
+                inline constexpr Result<ValueType> value(const F& values) const noexcept
                 {
-                    return static_cast<V>(value([&values](const std::string_view symbol) -> Result<ValueType>
+                    return value([&values](const std::string_view symbol) -> Result<SymbolValueType>
                         {
-                            return static_cast<ValueType>(values(symbol));
-                        }));
+                            using ThisType = OriginType<decltype(values(symbol))>;
+                            if constexpr (DecaySameAs<ThisType, SymbolValueType>)
+                            {
+                                return values(symbol);
+                            }
+                            else
+                            {
+                                return static_cast<SymbolValueType>(values(symbol));
+                            }
+                        });
                 }
-
 
             private:
                 struct Trait : public Self
                 {
-                    inline static constexpr Result<ValueType> get_value(const Self& self, const std::function<Result<ValueType>(const std::string_view)>& values) noexcept
+                    inline static constexpr Result<ValueType> get_value(const Self& self, const std::function<Result<SymbolValueType>(const std::string_view)>& values) noexcept
                     {
                         static const auto get_impl = &Self::OSPF_CRTP_FUNCTION(get_value_by);
                         return (self.*get_impl)(values);
@@ -101,7 +103,8 @@ namespace ospf
 
             template<typename T>
             concept ExpressionType = Invariant<typename T::ValueType>
-                && requires (const T& expression, const std::function<Result<typename T::ValueType>(const std::string_view)>& values)
+                && Invariant<typename T::SymbolValueType>
+                && requires (const T& expression, const std::function<Result<typename T::SymbolValueType>(const std::string_view)>& values)
                 {
                     { T::category } -> DecaySameAs<ExpressionCategory>;
                     { expression.value(values) } -> DecaySameAs<typename T::ValueType>;
@@ -128,36 +131,38 @@ namespace ospf
             template<typename... Ts>
             concept AllExpressionType = is_all_expression_type<Ts...>;
 
-            template<typename T, typename V, ExpressionCategory cat>
-            concept ExpressionTypeOf = Invariant<typename T::ValueType> 
+            template<typename T, typename V, typename SV, ExpressionCategory cat>
+            concept ExpressionTypeOf = ExpressionType<T>
                 && Invariant<V> 
+                && Invariant<SV>
                 && DecaySameAsOrConvertibleTo<typename T::ValueType, V>
+                && DecaySameAsOrConvertibleTo<typename T::SymbolValueType, SV>
                 && T::category == cat
-                && requires (const T& expression, const std::function<Result<V>(const std::string_view)>& values)
+                && requires (const T& expression, const std::function<Result<SV>(const std::string_view)>& values)
                 {
-                    { expression.value(values) } -> DecaySameAs<V>;
+                    { static_cast<V>(expression.value(values)) } -> DecaySameAs<V>;
                 };
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             struct IsAllExpressionTypeOf;
 
-            template<typename V, ExpressionCategory cat, typename T>
-            struct IsAllExpressionTypeOf<V, cat, T>
+            template<typename V, typename SV, ExpressionCategory cat, typename T>
+            struct IsAllExpressionTypeOf<V, SV, cat, T>
             {
-                static constexpr const bool value = ExpressionTypeOf<T, V, cat>;
+                static constexpr const bool value = ExpressionTypeOf<T, V, SV, cat>;
             };
 
-            template<typename V, ExpressionCategory cat, typename T, typename... Ts>
-            struct IsAllExpressionTypeOf<V, cat, T, Ts...>
+            template<typename V, typename SV, ExpressionCategory cat, typename T, typename... Ts>
+            struct IsAllExpressionTypeOf<V, SV, cat, T, Ts...>
             {
-                static constexpr const bool value = ExpressionTypeOf<T, V, cat> && IsAllExpressionTypeOf<V, cat, Ts...>::value;
+                static constexpr const bool value = ExpressionTypeOf<T, V, SV, cat> && IsAllExpressionTypeOf<V, SV, cat, Ts...>::value;
             };
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
-            inline static constexpr const bool is_all_expression_type_of = IsAllExpressionTypeOf<V, cat, Ts...>::value;
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
+            inline static constexpr const bool is_all_expression_type_of = IsAllExpressionTypeOf<V, SV, cat, Ts...>::value;
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
-            concept AllExpressionTypeOf = is_all_expression_type_of<V, cat, Ts...>;
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
+            concept AllExpressionTypeOf = is_all_expression_type_of<V, SV, cat, Ts...>;
         };
     };
 };

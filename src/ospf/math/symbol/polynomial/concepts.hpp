@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ospf/functional/array.hpp>
 #include <ospf/math/algebra/operator/arithmetic/abs.hpp>
 #include <ospf/math/symbol/monomial/concepts.hpp>
 #include <span>
@@ -10,22 +11,37 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T, ExpressionCategory cat, typename Mono>
-                requires MonomialTypeOf<Mono, T, cat>
+            template<Invariant T, Invariant ST, ExpressionCategory cat, typename Mono>
+                requires MonomialTypeOf<Mono, T, ST, cat>
             class Polynomial
-                : public Expression<T, cat, Polynomial<T, cat, Mono>>
+                : public Expression<T, ST, cat, Polynomial<T, ST, cat, Mono>>
             {
-                using Impl = Expression<T, cat, Polynomial>;
+                using Impl = Expression<T, ST, cat, Polynomial>;
 
             public:
                 using ValueType = OriginType<T>;
+                using SymbolValueType = OriginType<ST>;
                 using MonomialType = OriginType<Mono>;
 
             public:
                 constexpr Polynomial(void)
                     : _constant(ArithmeticTrait<ValueType>::zero()) {}
 
-                // todo
+                constexpr Polynomial(ArgCLRefType<ValueType> constant)
+                    : _constant(constant) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<ValueType> && std::movable<ValueType>
+                constexpr Polynomial(ArgRRefType<ValueType> constant)
+                    : _constant(move<ValueType>(constant)) {}
+
+                constexpr Polynomial(std::vector<MonomialType> monomials, ArgCLRefType<ValueType> constant)
+                    : _monos(std::move(monomials)), _constant(constant) {}
+
+                template<typename = void>
+                    requires ReferenceFaster<ValueType> && std::movable<ValueType>
+                constexpr Polynomial(std::vector<MonomialType> monomials, ArgRRefType<ValueType> constant)
+                    : _monos(std::move(monomials)), _constant(move<ValueType>(constant)) {}
 
             public:
                 constexpr Polynomial(const Polynomial& ano) = default;
@@ -43,6 +59,25 @@ namespace ospf
                 inline constexpr ArgCLRefType<ValueType> constant(void) const noexcept
                 {
                     return _constant;
+                }
+
+            public:
+                inline constexpr Polynomial operator-(void) const & noexcept
+                {
+                    return Polynomial{ make_array
+                    (
+                        boost::make_transform_iterator(_monos.cbegin(), [](const auto& mono) -> MonomialType { return -mono; }),
+                        boost::make_transform_iterator(_monos.cend(), [](const auto& mono) -> MonomialType { return -mono; })
+                    ), -_constant};
+                }
+
+                inline constexpr Polynomial operator-(void) && noexcept
+                {
+                    return Polynomial{ make_array
+                    (
+                        boost::make_transform_iterator(_monos.begin(), [](auto& mono) -> MonomialType { return -move<MonomialType>(mono); }),
+                        boost::make_transform_iterator(_monos.end(), [](auto& mono) -> MonomialType { return -move<MonomialType>(mono); })
+                    ), -_constant };
                 }
 
             public:
@@ -120,13 +155,15 @@ namespace ospf
                 }
 
             OSPF_CRTP_PERMISSION:
-                inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
+                inline constexpr RetType<ValueType> get_value_by(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
                 {
-                    return std::accumulate(_monos.cbegin(), _monos.cend(), ArithmeticTrait<ValueType>::zero(),
-                        [&values](ArgCLRefType<ValueType> lhs, const auto& rhs)
-                        {
-                            return lhs + rhs.value(values);
-                        }) + _constant;
+                    auto ret = _constant;
+                    for (const auto& mono : _monos)
+                    {
+                        OSPF_TRY_GET(value, mono.value(values));
+                        ret += value;
+                    }
+                    return ret;
                 }
 
             private:
@@ -158,47 +195,47 @@ namespace ospf
                 static constexpr const bool value = PolynomialType<T> && IsAllPolynomialType<Ts...>;
             };
 
-            template<typename V, ExpressionCategory cat, typename T>
-            concept PolynomialTypeOf = ExpressionTypeOf<T, V, cat>
-                && MonomialTypeOf<typename T::MonomialType, V, cat>
+            template<typename V, typename SV, ExpressionCategory cat, typename T>
+            concept PolynomialTypeOf = ExpressionTypeOf<T, V, SV, cat>
+                && MonomialTypeOf<typename T::MonomialType, V, SV, cat>
                 && requires (const T& polynomial)
                 {
                     { T::monomials() } -> std::ranges::output_range<typename T::MonomialType>;
                     { T::constant() } -> DecaySameAs<typename T::ValueType>;
                 };
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             struct IsAllPolynomialTypeOf;
 
-            template<typename V, ExpressionCategory cat, typename T>
-            struct IsAllPolynomialTypeOf<V, cat, T>
+            template<typename V, typename SV, ExpressionCategory cat, typename T>
+            struct IsAllPolynomialTypeOf<V, SV, cat, T>
             {
-                static constexpr const bool value = PolynomialTypeOf<T, V, cat>;
+                static constexpr const bool value = PolynomialTypeOf<T, V, SV, cat>;
             };
 
-            template<typename V, ExpressionCategory cat, typename T, typename... Ts>
-            struct IsAllPolynomialTypeOf<V, cat, T, Ts...>
+            template<typename V, typename SV, ExpressionCategory cat, typename T, typename... Ts>
+            struct IsAllPolynomialTypeOf<V, SV, cat, T, Ts...>
             {
-                static constexpr const bool value = PolynomialTypeOf<T, V, cat> && IsAllPolynomialTypeOf<V, cat, Ts...>::value;
+                static constexpr const bool value = PolynomialTypeOf<T, V, SV, cat> && IsAllPolynomialTypeOf<V, SV, cat, Ts...>::value;
             };
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
-            static constexpr const bool is_all_polynomial_type_of = IsAllPolynomialTypeOf<V, cat, Ts...>;
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
+            static constexpr const bool is_all_polynomial_type_of = IsAllPolynomialTypeOf<V, SV, cat, Ts...>;
 
-            template<typename V, ExpressionCategory cat, typename... Ts>
-            concept AllPolynomialTypeOf = is_all_polynomial_type_of<V, cat, Ts...>;
+            template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
+            concept AllPolynomialTypeOf = is_all_polynomial_type_of<V, SV, cat, Ts...>;
         };
     };
 };
 
 namespace std
 {
-    template<ospf::Invariant T, ospf::ExpressionCategory cat, typename Mono>
-    struct formatter<ospf::Polynomial<T, cat, Mono>>
+    template<ospf::Invariant T, ospf::Invariant ST, ospf::ExpressionCategory cat, typename Mono>
+    struct formatter<ospf::Polynomial<T, ST, cat, Mono>>
         : public formatter<string_view, char>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Polynomial<T, cat, Mono>& polynomial, FormatContext& fc) const
+        inline decltype(auto) format(const ospf::Polynomial<T, ST, cat, Mono>& polynomial, FormatContext& fc) const
         {
             std::ostringstream sout;
 
@@ -282,12 +319,12 @@ namespace std
         }
     };
 
-    template<ospf::Invariant T, ospf::ExpressionCategory cat, typename Mono>
-    struct formatter<ospf::Polynomial<T, cat, Mono>>
+    template<ospf::Invariant T, ospf::Invariant ST, ospf::ExpressionCategory cat, typename Mono>
+    struct formatter<ospf::Polynomial<T, ST, cat, Mono>>
         : public formatter<wstring_view, ospf::wchar>
     {
         template<typename FormatContext>
-        inline decltype(auto) format(const ospf::Polynomial<T, cat, Mono>& polynomial, FormatContext& fc) const
+        inline decltype(auto) format(const ospf::Polynomial<T, ST, cat, Mono>& polynomial, FormatContext& fc) const
         {
             std::wostringstream sout;
 
