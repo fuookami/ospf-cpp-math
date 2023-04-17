@@ -24,23 +24,23 @@ namespace ospf
                 using SymbolValueType = typename Lhs::SymbolValueType;
 
             public:
-                Inequality(ArgCLRefType<LhsType> lhs, ArgCLRefType<RhsType> rhs, const InequalitySign sign)
+                constexpr Inequality(ArgCLRefType<LhsType> lhs, ArgCLRefType<RhsType> rhs, const InequalitySign sign)
                     : _lhs(lhs), _rhs(rhs), _sign(sign) {}
 
                 template<typename = void>
                     requires ReferenceFaster<LhsType> && std::movable<LhsType>
-                Inequality(ArgRRefType<LhsType> lhs, ArgCLRefType<RhsType> rhs, const InequalitySign sign)
+                constexpr Inequality(ArgRRefType<LhsType> lhs, ArgCLRefType<RhsType> rhs, const InequalitySign sign)
                     : _lhs(move<LhsType>(lhs)), _rhs(rhs), _sign(sign) {}
 
                 template<typename = void>
                     requires ReferenceFaster<RhsType> && std::movable<RhsType>
-                Inequality(ArgCLRefType<LhsType> lhs, ArgRRefType<RhsType> rhs, const InequalitySign sign)
+                constexpr Inequality(ArgCLRefType<LhsType> lhs, ArgRRefType<RhsType> rhs, const InequalitySign sign)
                     : _lhs(lhs), _rhs(move<RhsType>(rhs)), _sign(sign) {}
 
                 template<typename = void>
                     requires ReferenceFaster<LhsType> && std::movable<LhsType> &&
                         ReferenceFaster<RhsType> && std::movable<RhsType>
-                Inequality(ArgRRefType<RhsType> lhs, ArgRRefType<RhsType> rhs, const InequalitySign sign)
+                            constexpr Inequality(ArgRRefType<RhsType> lhs, ArgRRefType<RhsType> rhs, const InequalitySign sign)
                     : _lhs(move<LhsType>(lhs)), _rhs(move<RhsType>(rhs)), _sign(sign) {}
 
             public:
@@ -68,7 +68,7 @@ namespace ospf
 
                 inline constexpr decltype(auto) comparison_operator(void) const noexcept
                 {
-                    using ValueType = Comparer<decltype(std::declval<LhsValueType>() - std::declval<RhsValueType>())>;
+                    using ValueType = OriginType<decltype(std::declval<LhsValueType>() - std::declval<RhsValueType>())>;
                     return comparison_operator_of<ValueType>(_sign);
                 }
 
