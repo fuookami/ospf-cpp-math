@@ -357,7 +357,54 @@ namespace ospf
 
             namespace quadratic
             {
-                // todo: operators
+                // operators between value and symbol
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr QuadraticMonomial operator*(const T& lhs, const PSym& rhs) noexcept
+                {
+                    return QuadraticMonomial{ static_cast<f64>(lhs), QuadraticMonomialCell{ rhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr QuadraticMonomial operator*(const T& lhs, const ESym& rhs) noexcept
+                {
+                    return QuadraticMonomial{ static_cast<f64>(lhs), QuadraticMonomialCell{ rhs } };
+                }
+
+                // operators between symbol and value
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr QuadraticMonomial operator*(const PSym& lhs, const T& rhs) noexcept
+                {
+                    return QuadraticMonomial{ static_cast<f64>(rhs), QuadraticMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr QuadraticMonomial operator*(const ESym& lhs, const T& rhs) noexcept
+                {
+                    return QuadraticMonomial{ static_cast<f64>(rhs), QuadraticMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr QuadraticMonomial operator/(const PSym& lhs, const T& rhs) noexcept
+                {
+                    return QuadraticMonomial{ reciprocal(static_cast<f64>(rhs)), QuadraticMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr QuadraticMonomial operator/(const ESym& lhs, const T& rhs) noexcept
+                {
+                    return QuadraticMonomial{ reciprocal(static_cast<f64>(rhs)), QuadraticMonomialCell{ lhs } };
+                }
+
+                // operators between symbol and symbol
+
+                // operators between monomial and symbol
+
+                // operators between symbol and monomial
             };
         };
     };

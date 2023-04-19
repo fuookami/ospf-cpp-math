@@ -2,6 +2,12 @@
 
 #include <ospf/math/symbol/expression.hpp>
 #include <ospf/math/symbol/inequality/sign.hpp>
+#include <ospf/math/symbol/monomial/linear.hpp>
+#include <ospf/math/symbol/monomial/quadratic.hpp>
+#include <ospf/math/symbol/monomial/standard.hpp>
+#include <ospf/math/symbol/polynomial/linear.hpp>
+#include <ospf/math/symbol/polynomial/quadratic.hpp>
+#include <ospf/math/symbol/polynomial/standard.hpp>
 
 namespace ospf
 {
@@ -40,7 +46,7 @@ namespace ospf
                 template<typename = void>
                     requires ReferenceFaster<LhsType> && std::movable<LhsType> &&
                         ReferenceFaster<RhsType> && std::movable<RhsType>
-                            constexpr Inequality(ArgRRefType<RhsType> lhs, ArgRRefType<RhsType> rhs, const InequalitySign sign)
+                constexpr Inequality(ArgRRefType<RhsType> lhs, ArgRRefType<RhsType> rhs, const InequalitySign sign)
                     : _lhs(move<LhsType>(lhs)), _rhs(move<RhsType>(rhs)), _sign(sign) {}
 
             public:
@@ -88,7 +94,306 @@ namespace ospf
                 InequalitySign _sign;
             };
 
-            // operators
+            template<ExpressionType Lhs, ExpressionType Rhs>
+            inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+            {
+                return Inequality<OriginType<Lhs>, OriginType<Rhs>>{ std::forward<Lhs>(lhs), std::forward<Rhs>(rhs), InequalitySign::Equal };
+            }
+
+            template<ExpressionType Lhs, ExpressionType Rhs>
+            inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+            {
+                return Inequality<OriginType<Lhs>, OriginType<Rhs>>{ std::forward<Lhs>(lhs), std::forward<Rhs>(rhs), InequalitySign::Unequal };
+            }
+
+            template<ExpressionType Lhs, ExpressionType Rhs>
+            inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+            {
+                return Inequality<OriginType<Lhs>, OriginType<Rhs>>{ std::forward<Lhs>(lhs), std::forward<Rhs>(rhs), InequalitySign::Less };
+            }
+
+            template<ExpressionType Lhs, ExpressionType Rhs>
+            inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+            {
+                return Inequality<OriginType<Lhs>, OriginType<Rhs>>{ std::forward<Lhs>(lhs), std::forward<Rhs>(rhs), InequalitySign::LessEqual };
+            }
+
+            template<ExpressionType Lhs, ExpressionType Rhs>
+            inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+            {
+                return Inequality<OriginType<Lhs>, OriginType<Rhs>>{ std::forward<Lhs>(lhs), std::forward<Rhs>(rhs), InequalitySign::Greater };
+            }
+
+            template<ExpressionType Lhs, ExpressionType Rhs>
+            inline constexpr decltype(auto) operator>=(Lhs&& lhs, Rhs&& rhs) noexcept
+            {
+                return Inequality<OriginType<Lhs>, OriginType<Rhs>>{ std::forward<Lhs>(lhs), std::forward<Rhs>(rhs), InequalitySign::GreaterEqual };
+            }
+
+            namespace linear
+            {
+                // operators between value and sym
+
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, LinearMonomial>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Equal };
+                }
+
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, LinearMonomial>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Unequal };
+                }
+
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, LinearMonomial>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Less };
+                }
+
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, LinearMonomial>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::LessEqual };
+                }
+
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, LinearMonomial>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Greater };
+                }
+
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator>=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, LinearMonomial>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::GreaterEqual };
+                }
+
+                // operators between sym and value
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, LinearPolynomial>{ LinearMonomial{ std::forward<Lhs>(lhs) }, LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Equal };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, LinearPolynomial>{ LinearMonomial{ std::forward<Lhs>(lhs) }, LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Unequal };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, LinearPolynomial>{ LinearMonomial{ std::forward<Lhs>(lhs) }, LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Less };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, LinearPolynomial>{ LinearMonomial{ std::forward<Lhs>(lhs) }, LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::LessEqual };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, LinearPolynomial>{ LinearMonomial{ std::forward<Lhs>(lhs) }, LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Greater };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, LinearPolynomial>{ LinearMonomial{ std::forward<Lhs>(lhs) }, LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::GreaterEqual };
+                }
+
+                // operators between value and expression
+
+                template<Invariant Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, OriginType<Rhs>>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Equal };
+                }
+
+                template<Invariant Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, OriginType<Rhs>>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Unequal };
+                }
+
+                template<Invariant Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, OriginType<Rhs>>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Less };
+                }
+
+                template<Invariant Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, OriginType<Rhs>>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::LessEqual };
+                }
+
+                template<Invariant Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, OriginType<Rhs>>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Greater };
+                }
+
+                template<Invariant Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearPolynomial, OriginType<Rhs>>{ LinearPolynomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::GreaterEqual };
+                }
+
+                // operators between expression and value
+
+                template<ExpressionType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearPolynomial>{ std::forward<Lhs>(lhs), LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Equal };
+                }
+
+                template<ExpressionType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearPolynomial>{ std::forward<Lhs>(lhs), LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Unequal };
+                }
+
+                template<ExpressionType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearPolynomial>{ std::forward<Lhs>(lhs), LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Less };
+                }
+
+                template<ExpressionType Lhs, Invariant Rhs>\
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearPolynomial>{ std::forward<Lhs>(lhs), LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::LessEqual };
+                }
+
+                template<ExpressionType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearPolynomial>{ std::forward<Lhs>(lhs), LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Greater };
+                }
+
+                template<ExpressionType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearPolynomial>{ std::forward<Lhs>(lhs), LinearPolynomial{ std::forward<Rhs>(rhs) }, InequalitySign::Greater };
+                }
+                
+                // operators between sym and expr
+                
+                template<PureSymbolType Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, OriginType<Rhs>>{ LinearMonomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Equal };
+                }
+
+                template<PureSymbolType Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, OriginType<Rhs>>{ LinearMonomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Unequal };
+                }
+
+                template<PureSymbolType Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, OriginType<Rhs>>{ LinearMonomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Less };
+                }
+
+                template<PureSymbolType Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, OriginType<Rhs>>{ LinearMonomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::LessEqual };
+                }
+
+                template<PureSymbolType Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, OriginType<Rhs>>{ LinearMonomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::Greater };
+                }
+
+                template<PureSymbolType Lhs, ExpressionType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<LinearMonomial, OriginType<Rhs>>{ LinearMonomial{ std::forward<Lhs>(lhs) }, std::forward<Rhs>(rhs), InequalitySign::GreaterEqual };
+                }
+
+                // operators between expr and sym
+
+                template<ExpressionType Lhs, PureSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator==(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearMonomial>{ std::forward<Lhs>(lhs), LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Equal };
+                }
+
+                template<ExpressionType Lhs, PureSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator!=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearMonomial>{ std::forward<Lhs>(lhs), LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Unequal };
+                }
+
+                template<ExpressionType Lhs, PureSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearMonomial>{ std::forward<Lhs>(lhs), LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Less };
+                }
+
+                template<ExpressionType Lhs, PureSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator<=(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearMonomial>{ std::forward<Lhs>(lhs), LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::LessEqual };
+                }
+
+                template<ExpressionType Lhs, PureSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearMonomial>{ std::forward<Lhs>(lhs), LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::Greater };
+                }
+
+                template<ExpressionType Lhs, PureSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator>(Lhs&& lhs, Rhs&& rhs) noexcept
+                {
+                    return Inequality<OriginType<Lhs>, LinearMonomial>{ std::forward<Lhs>(lhs), LinearMonomial{ std::forward<Rhs>(rhs) }, InequalitySign::GreaterEqual };
+                }
+            };
+
+            namespace quadratic
+            {
+                // operators
+            };
+
+            namespace standard
+            {
+                // operators
+            };
         };
     };
 };

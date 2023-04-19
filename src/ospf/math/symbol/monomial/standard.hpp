@@ -318,7 +318,54 @@ namespace ospf
 
             namespace standard
             {
-                // todo: operators
+                // operators between value and symbol
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr StandardMonomial operator*(const T& lhs, const PSym& rhs) noexcept
+                {
+                    return StandardMonomial{ static_cast<f64>(lhs), StandardMonomialCell{ rhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr StandardMonomial operator*(const T& lhs, const ESym& rhs) noexcept
+                {
+                    return StandardMonomial{ static_cast<f64>(lhs), StandardMonomialCell{ rhs } };
+                }
+
+                // operators between symbol and value
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr StandardMonomial operator*(const PSym& lhs, const T& rhs) noexcept
+                {
+                    return StandardMonomial{ static_cast<f64>(rhs), StandardMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr StandardMonomial operator*(const ESym& lhs, const T& rhs) noexcept
+                {
+                    return StandardMonomial{ static_cast<f64>(rhs), StandardMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr StandardMonomial operator/(const PSym& lhs, const T& rhs) noexcept
+                {
+                    return StandardMonomial{ reciprocal(static_cast<f64>(rhs)), StandardMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr StandardMonomial operator/(const ESym& lhs, const T& rhs) noexcept
+                {
+                    return StandardMonomial{ reciprocal(static_cast<f64>(rhs)), StandardMonomialCell{ lhs } };
+                }
+
+                // operators between symbol and symbol
+
+                // operators between monomial and symbol
+
+                // operators between symbol and monomial
             };
         };
     };

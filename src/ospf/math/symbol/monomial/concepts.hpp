@@ -26,13 +26,28 @@ namespace ospf
                 constexpr Monomial(CellType cell)
                     : _coefficient(ArithmeticTrait<ValueType>::one()), _cell(std::move(cell)) {}
 
+                template<typename... Args>
+                    requires std::constructible_from<CellType, Args...>
+                constexpr Monomial(Args&&... args)
+                    : _coefficient(ArithmeticTrait<ValueType>::one()), _cell({ std::forward<Args>(args)... }) {}
+
                 constexpr Monomial(ArgCLRefType<ValueType> coefficient, CellType cell)
                     : _coefficient(coefficient), _cell(std::move(cell)) {}
+
+                template<typename... Args>
+                    requires std::constructible_from<CellType, Args...>
+                constexpr Monomial(ArgCLRefType<ValueType> coefficient, Args&&... args)
+                    : _coefficient(coefficient), _cell({ std::forward<Args>(args)... }) {}
 
                 template<typename = void>
                     requires ReferenceFaster<ValueType> && std::movable<ValueType>
                 constexpr Monomial(ArgRRefType<ValueType> coefficient, CellType cell)
                     : _coefficient(move<ValueType>(coefficient)), _cell(std::move(cell)) {}
+
+                template<typename... Args>
+                    requires std::constructible_from<CellType, Args...> && ReferenceFaster<ValueType> && std::movable<ValueType>
+                constexpr Monomial(ArgRRefType<ValueType> coefficient, Args&&... args)
+                    : _coefficient(move<ValueType>(coefficient)), _cell({ std::forward<Args>(args)... }) {}
 
             public:
                 constexpr Monomial(const Monomial& ano) = default;
@@ -154,6 +169,10 @@ namespace ospf
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             concept AllMonomialTypeOf = is_all_monomial_type_of<V, SV, cat, Ts...>;
+
+            // operators between value and monomial
+            
+            // operators between monomial and value
         };
     };
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ospf/math/symbol/polynomial/concepts.hpp>
+#include <ospf/math/symbol/monomial/quadratic.hpp>
 
 namespace ospf
 {
@@ -8,12 +9,16 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ExpressionCategory::Quadratic>>
-            using QuadraticPolynomial = Polynomial<T, ExpressionCategory::Quadratic, QuadraticMonomial<f64, PSym, ESym>>;
+            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
+            using QuadraticPolynomial = Polynomial<T, ST, ExpressionCategory::Quadratic, QuadraticMonomial<T, ST, PSym, ESym>>;
 
             namespace quadratic
             {
-                // operators
+                // operators between value and symbol
+
+                // operators between symbol and value
+
+                // operators between symbol and symbol
             };
         };
     };

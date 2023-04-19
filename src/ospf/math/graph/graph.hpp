@@ -33,8 +33,7 @@ namespace ospf
                     _nodes.clear();
                     std::thread([](ObjectPool<NodeType> nodes, ObjectPool<EdgeType> edges)
                         {
-                            // nothing to do
-                            // just send to sub thread to destroy
+                            // nothing to do, just send the pools to sub thread to destroy
                         }, std::move(_node_pool), std::move(_edge_pool)).join();
                 }
 
@@ -107,7 +106,7 @@ namespace ospf
                     requires std::convertible_to<EdgeValueType, Args...>
                 inline const bool insert_edge(const Ref<NodeType> from, const Ref<NodeType> to, Args&&... args) noexcept
                 {
-                    if (connected(fron, to))
+                    if (connected(from, to))
                     {
                         return false;
                     }
@@ -139,7 +138,7 @@ namespace ospf
                     return ret;
                 }
 
-                inline const bool connected(const ospf::Ref<NodeType> from, const ospf::Ref<NodeType> to) const noexcept
+                inline const bool connected(const Ref<NodeType> from, const Ref<NodeType> to) const noexcept
                 {
                     const auto range = _edges.equal_range(from);
                     for (auto it{ range.first }; it != range.second; ++it)

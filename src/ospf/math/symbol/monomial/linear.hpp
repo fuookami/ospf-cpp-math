@@ -120,7 +120,44 @@ namespace ospf
 
             namespace linear
             {
-                // todo: operators
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr LinearMonomial operator*(const T& lhs, const PSym& rhs) noexcept
+                {
+                    return LinearMonomial{ static_cast<f64>(lhs), LinearMonomialCell{ rhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr LinearMonomial operator*(const T& lhs, const ESym& rhs) noexcept
+                {
+                    return LinearMonomial{ static_cast<f64>(lhs), LinearMonomialCell{ rhs } };
+                }
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr LinearMonomial operator*(const PSym& lhs, const T& rhs) noexcept
+                {
+                    return LinearMonomial{ static_cast<f64>(rhs), LinearMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr LinearMonomial operator*(const ESym& lhs, const T& rhs) noexcept
+                {
+                    return LinearMonomial{ static_cast<f64>(rhs), LinearMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, PureSymbolType PSym>
+                inline constexpr LinearMonomial operator/(const PSym& lhs, const T& rhs) noexcept
+                {
+                    return LinearMonomial{ reciprocal(static_cast<f64>(rhs)), LinearMonomialCell{ lhs } };
+                }
+
+                template<Invariant T, typename ESym>
+                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
+                inline constexpr LinearMonomial operator/(const ESym& lhs, const T& rhs) noexcept
+                {
+                    return LinearMonomial{ reciprocal(static_cast<f64>(rhs)), LinearMonomialCell{ lhs } };
+                }
             };
         };
     };
