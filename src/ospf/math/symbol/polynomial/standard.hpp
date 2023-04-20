@@ -9,7 +9,7 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Standard>>
+            template<Invariant T = f64, Invariant ST = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Standard>>
             using StandardPolynomial = Polynomial<T, ST, ExpressionCategory::Standard, StandardMonomial<T, ST, PSym, ESym>>;
 
             namespace standard

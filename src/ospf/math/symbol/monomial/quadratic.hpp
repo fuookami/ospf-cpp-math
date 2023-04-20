@@ -10,7 +10,7 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
+            template<Invariant T = f64, Invariant ST = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
                 requires ExpressionSymbolTypeOf<ESym, T, ST, ExpressionCategory::Quadratic>
             class QuadraticMonomialCell
                 : public Expression<T, ST, ExpressionCategory::Quadratic, QuadraticMonomialCell<T, ST, PSym, ESym>>
@@ -352,55 +352,20 @@ namespace ospf
                 std::optional<TransferType> _transfer;
             };
 
-            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
+            template<Invariant T = f64, Invariant ST = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
             using QuadraticMonomial = Monomial<T, ST, ExpressionCategory::Quadratic, QuadraticMonomialCell<T, ST, PSym, ESym>>;
 
             namespace quadratic
             {
                 // operators between value and symbol
 
-                template<Invariant T, PureSymbolType PSym>
-                inline constexpr QuadraticMonomial operator*(const T& lhs, const PSym& rhs) noexcept
-                {
-                    return QuadraticMonomial{ static_cast<f64>(lhs), QuadraticMonomialCell{ rhs } };
-                }
-
-                template<Invariant T, typename ESym>
-                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
-                inline constexpr QuadraticMonomial operator*(const T& lhs, const ESym& rhs) noexcept
-                {
-                    return QuadraticMonomial{ static_cast<f64>(lhs), QuadraticMonomialCell{ rhs } };
-                }
-
                 // operators between symbol and value
 
-                template<Invariant T, PureSymbolType PSym>
-                inline constexpr QuadraticMonomial operator*(const PSym& lhs, const T& rhs) noexcept
-                {
-                    return QuadraticMonomial{ static_cast<f64>(rhs), QuadraticMonomialCell{ lhs } };
-                }
-
-                template<Invariant T, typename ESym>
-                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
-                inline constexpr QuadraticMonomial operator*(const ESym& lhs, const T& rhs) noexcept
-                {
-                    return QuadraticMonomial{ static_cast<f64>(rhs), QuadraticMonomialCell{ lhs } };
-                }
-
-                template<Invariant T, PureSymbolType PSym>
-                inline constexpr QuadraticMonomial operator/(const PSym& lhs, const T& rhs) noexcept
-                {
-                    return QuadraticMonomial{ reciprocal(static_cast<f64>(rhs)), QuadraticMonomialCell{ lhs } };
-                }
-
-                template<Invariant T, typename ESym>
-                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
-                inline constexpr QuadraticMonomial operator/(const ESym& lhs, const T& rhs) noexcept
-                {
-                    return QuadraticMonomial{ reciprocal(static_cast<f64>(rhs)), QuadraticMonomialCell{ lhs } };
-                }
-
                 // operators between symbol and symbol
+
+                // operators between value and monomial
+
+                // operatros between monomial and value
 
                 // operators between monomial and symbol
 

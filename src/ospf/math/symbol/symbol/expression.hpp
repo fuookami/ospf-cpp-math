@@ -11,7 +11,7 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T, typename ST, ExpressionCategory cat>
+            template<Invariant T, Invariant ST, ExpressionCategory cat>
             class IExprSymbol
                 : public Symbol<IExprSymbol<T, ST, cat>>, public Expression<T, ST, cat, IExprSymbol<T, ST, cat>>
             {
@@ -56,7 +56,7 @@ namespace ospf
                     return false;
                 }
 
-                inline constexpr RetType<ValueType> OSPF_CRTP_FUNCTION(get_value_by)(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
+                inline constexpr RetType<ValueType> OSPF_CRTP_FUNCTION(get_value_by)(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
                 {
                     auto ret = values(this->name());
                     if (ret.is_succeeded())

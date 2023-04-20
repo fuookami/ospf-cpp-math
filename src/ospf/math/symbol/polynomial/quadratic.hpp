@@ -9,7 +9,7 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
+            template<Invariant T = f64, Invariant ST = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Quadratic>>
             using QuadraticPolynomial = Polynomial<T, ST, ExpressionCategory::Quadratic, QuadraticMonomial<T, ST, PSym, ESym>>;
 
             namespace quadratic

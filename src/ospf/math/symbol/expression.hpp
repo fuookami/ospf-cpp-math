@@ -107,7 +107,7 @@ namespace ospf
                 && requires (const T& expression, const std::function<Result<typename T::SymbolValueType>(const std::string_view)>& values)
                 {
                     { T::category } -> DecaySameAs<ExpressionCategory>;
-                    { expression.value(values) } -> DecaySameAs<typename T::ValueType>;
+                    { expression.value(values) } -> DecaySameAs<Result<typename T::ValueType>>;
                 };
 
             template<typename... Ts>
@@ -136,11 +136,11 @@ namespace ospf
                 && Invariant<V> 
                 && Invariant<SV>
                 && DecaySameAsOrConvertibleTo<typename T::ValueType, V>
-                && DecaySameAsOrConvertibleTo<typename T::SymbolValueType, SV>
+                && DecaySameAsOrConvertibleTo<SV, typename T::SymbolValueType>
                 && T::category == cat
                 && requires (const T& expression, const std::function<Result<SV>(const std::string_view)>& values)
                 {
-                    { static_cast<V>(expression.value(values)) } -> DecaySameAs<V>;
+                    { expression.value(values) } -> DecaySameAs<Result<typename T::ValueType>>;
                 };
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>

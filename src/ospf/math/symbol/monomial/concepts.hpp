@@ -57,14 +57,36 @@ namespace ospf
                 constexpr ~Monomial(void) noexcept = default;
 
             public:
+                template<Invariant V>
+                    requires DecayNotSameAs<ValueType, V> && std::convertible_to<ValueType, OriginType<V>>
+                inline constexpr operator Monomial<OriginType<V>, SymbolValueType, cat, CellType>(void) const & noexcept
+                {
+                    using ToValueType = OriginType<V>;
+                    return Monomial<ToValueType, SymbolValueType, cat, CellType>{ static_cast<ToValueType>(_coefficient), _cell };
+                }
+
+                template<Invariant V>
+                    requires DecayNotSameAs<ValueType, V> && std::convertible_to<ValueType, OriginType<V>>
+                inline constexpr operator Monomial<V, SymbolValueType, cat, CellType>(void) && noexcept
+                {
+                    using ToValueType = OriginType<V>;
+                    return Monomial<ToValueType, SymbolValueType, cat, CellType>{ static_cast<ToValueType>(_coefficient), move<CellType>(_cell) };
+                }
+
+            public:
                 inline constexpr ArgCLRefType<ValueType> coefficient(void) const noexcept
                 {
                     return _coefficient;
                 }
 
-                inline constexpr CLRefType<CellType> cell(void) const noexcept
+                inline constexpr CLRefType<CellType> cell(void) const & noexcept
                 {
                     return _cell;
+                }
+
+                inline constexpr CellType cell(void) && noexcept
+                {
+                    return move<CellType>(_cell);
                 }
 
             public:
@@ -114,10 +136,11 @@ namespace ospf
 
             template<typename T>
             concept MonomialType = ExpressionType<T>
+                && ExpressionType<typename T::CellType>
                 && requires (const T& monomial)
                 {
-                    { T::coefficient() } -> DecaySameAs<typename T::ValueType>;
-                    { T::cell() } -> ExpressionType;
+                    { monomial.coefficient() } -> DecaySameAs<typename T::ValueType>;
+                    { monomial.cell() } -> DecaySameAs<typename T::CellType>;
                 };
 
             template<typename... Ts>
@@ -143,10 +166,11 @@ namespace ospf
 
             template<typename T, typename V, typename SV, ExpressionCategory cat>
             concept MonomialTypeOf = ExpressionTypeOf<T, V, SV, cat>
+                && ExpressionTypeOf<typename T::CellType, V, SV, cat>
                 && requires (const T& monomial)
                 {
-                    { T::coefficient() } -> DecaySameAs<typename T::ValueType>;
-                    { T::cell() } -> ExpressionTypeOf<V, SV, cat>;
+                    { monomial.coefficient() } -> DecaySameAs<typename T::ValueType>;
+                    { monomial.cell() } -> DecaySameAs<typename T::CellType>;
                 };
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
@@ -169,10 +193,6 @@ namespace ospf
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             concept AllMonomialTypeOf = is_all_monomial_type_of<V, SV, cat, Ts...>;
-
-            // operators between value and monomial
-            
-            // operators between monomial and value
         };
     };
 };

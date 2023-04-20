@@ -9,10 +9,10 @@ namespace ospf
     {
         inline namespace symbol
         {
-            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Linear>>
+            template<Invariant T = f64, Invariant ST = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Linear>>
                 requires ExpressionSymbolTypeOf<ESym, T, ST, ExpressionCategory::Linear>
             class LinearMonomialCell
-                : public Expression<T, ST, ExpressionCategory::Linear, LinearMonomialCell<T, PSym, ESym>>
+                : public Expression<T, ST, ExpressionCategory::Linear, LinearMonomialCell<T, ST, PSym, ESym>>
             {
                 using Variant = std::variant<Ref<OriginType<PSym>>, Ref<OriginType<ESym>>>;
                 using Impl = Expression<T, ST, ExpressionCategory::Linear, LinearMonomialCell>;
@@ -115,49 +115,18 @@ namespace ospf
                 std::optional<TransferType> _transfer;
             };
 
-            template<Invariant T = f64, Invariant ST = T, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Linear>>
+            template<Invariant T = f64, Invariant ST = f64, PureSymbolType PSym = PureSymbol, typename ESym = IExprSymbol<T, ST, ExpressionCategory::Linear>>
             using LinearMonomial = Monomial<T, ST, ExpressionCategory::Linear, LinearMonomialCell<T, ST, PSym, ESym>>;
 
             namespace linear
             {
-                template<Invariant T, PureSymbolType PSym>
-                inline constexpr LinearMonomial operator*(const T& lhs, const PSym& rhs) noexcept
-                {
-                    return LinearMonomial{ static_cast<f64>(lhs), LinearMonomialCell{ rhs } };
-                }
+                // operators between value and symbol
 
-                template<Invariant T, typename ESym>
-                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
-                inline constexpr LinearMonomial operator*(const T& lhs, const ESym& rhs) noexcept
-                {
-                    return LinearMonomial{ static_cast<f64>(lhs), LinearMonomialCell{ rhs } };
-                }
+                // operators between symbol and value
 
-                template<Invariant T, PureSymbolType PSym>
-                inline constexpr LinearMonomial operator*(const PSym& lhs, const T& rhs) noexcept
-                {
-                    return LinearMonomial{ static_cast<f64>(rhs), LinearMonomialCell{ lhs } };
-                }
+                // operators between value and monomial
 
-                template<Invariant T, typename ESym>
-                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
-                inline constexpr LinearMonomial operator*(const ESym& lhs, const T& rhs) noexcept
-                {
-                    return LinearMonomial{ static_cast<f64>(rhs), LinearMonomialCell{ lhs } };
-                }
-
-                template<Invariant T, PureSymbolType PSym>
-                inline constexpr LinearMonomial operator/(const PSym& lhs, const T& rhs) noexcept
-                {
-                    return LinearMonomial{ reciprocal(static_cast<f64>(rhs)), LinearMonomialCell{ lhs } };
-                }
-
-                template<Invariant T, typename ESym>
-                    requires ExpressionSymbolTypeOf<ESym, f64, f64, ExpressionCategory::Linear>
-                inline constexpr LinearMonomial operator/(const ESym& lhs, const T& rhs) noexcept
-                {
-                    return LinearMonomial{ reciprocal(static_cast<f64>(rhs)), LinearMonomialCell{ lhs } };
-                }
+                // operatros between monomial and value
             };
         };
     };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ospf/functional/array.hpp>
 #include <ospf/math/algebra/operator/arithmetic/abs.hpp>
 #include <ospf/math/symbol/monomial/concepts.hpp>
 #include <span>
@@ -24,10 +23,7 @@ namespace ospf
                 using MonomialType = OriginType<Mono>;
 
             public:
-                constexpr Polynomial(void)
-                    : _constant(ArithmeticTrait<ValueType>::zero()) {}
-
-                constexpr Polynomial(ArgCLRefType<ValueType> constant)
+                constexpr Polynomial(ArgCLRefType<ValueType> constant = ArithmeticTrait<ValueType>::zero())
                     : _constant(constant) {}
 
                 template<typename = void>
@@ -35,7 +31,7 @@ namespace ospf
                 constexpr Polynomial(ArgRRefType<ValueType> constant)
                     : _constant(move<ValueType>(constant)) {}
 
-                constexpr Polynomial(std::vector<MonomialType> monomials, ArgCLRefType<ValueType> constant)
+                constexpr Polynomial(std::vector<MonomialType> monomials, ArgCLRefType<ValueType> constant = ArithmeticTrait<ValueType>::zero())
                     : _monos(std::move(monomials)), _constant(constant) {}
 
                 template<typename = void>
@@ -51,6 +47,33 @@ namespace ospf
                 constexpr ~Polynomial(void) noexcept = default;
 
             public:
+                template<Invariant V>
+                    requires DecayNotSameAs<ValueType, V>&& std::convertible_to<ValueType, OriginType<V>>
+                inline constexpr operator Polynomial<OriginType<V>, SymbolValueType, cat, MonomialType>(void) const & noexcept
+                {
+                    using ToValueType = OriginType<V>;
+                    using ToMonomialType = Monomial<ToValueType, SymbolValueType, cat, typename MonomialType::CellType>;
+                    return Polynomial<ToValueType, SymbolValueType, cat, ToMonomialType>{ std::vector<ToMonomialType>
+                    {
+                        boost::make_transform_iterator(_monos.cbegin(), [](const auto& mono) -> ToMonomialType { return static_cast<ToMonomialType>(mono); }),
+                        boost::make_transform_iterator(_monos.cend(), [](const auto& mono) -> ToMonomialType { return static_cast<ToMonomialType>(mono); })
+                    }, static_cast<ToValueType>(_constant) };
+                }
+
+                template<Invariant V>
+                    requires DecayNotSameAs<ValueType, V>&& std::convertible_to<ValueType, OriginType<V>>
+                inline constexpr operator Polynomial<OriginType<V>, SymbolValueType, cat, MonomialType>(void) && noexcept
+                {
+                    using ToValueType = OriginType<V>;
+                    using ToMonomialType = Monomial<ToValueType, SymbolValueType, cat, typename MonomialType::CellType>;
+                    return Polynomial<ToValueType, SymbolValueType, cat, ToMonomialType>{ std::vector<ToMonomialType>
+                    {
+                        boost::make_transform_iterator(_monos.begin(), [](auto& mono) -> ToMonomialType { return static_cast<ToMonomialType>(move<MonomialType>(mono)); }),
+                        boost::make_transform_iterator(_monos.end(), [](auto& mono) -> ToMonomialType { return static_cast<ToMonomialType>(move<MonomialType>(mono)); })
+                    }, static_cast<ToValueType>(_constant) };
+                }
+
+            public:
                 inline constexpr const std::span<const MonomialType> monomials(void) const noexcept
                 {
                     return _monos;
@@ -64,20 +87,20 @@ namespace ospf
             public:
                 inline constexpr Polynomial operator-(void) const & noexcept
                 {
-                    return Polynomial{ make_array
-                    (
+                    return Polynomial{ std::vector<MonomialType>
+                    {
                         boost::make_transform_iterator(_monos.cbegin(), [](const auto& mono) -> MonomialType { return -mono; }),
                         boost::make_transform_iterator(_monos.cend(), [](const auto& mono) -> MonomialType { return -mono; })
-                    ), -_constant};
+                    }, -_constant };
                 }
 
                 inline constexpr Polynomial operator-(void) && noexcept
                 {
-                    return Polynomial{ make_array
-                    (
+                    return Polynomial{ std::vector<MonomialType>
+                    {
                         boost::make_transform_iterator(_monos.begin(), [](auto& mono) -> MonomialType { return -move<MonomialType>(mono); }),
                         boost::make_transform_iterator(_monos.end(), [](auto& mono) -> MonomialType { return -move<MonomialType>(mono); })
-                    ), -_constant };
+                    }, -_constant };
                 }
 
             public:
@@ -155,7 +178,7 @@ namespace ospf
                 }
 
             OSPF_CRTP_PERMISSION:
-                inline constexpr RetType<ValueType> get_value_by(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
+                inline constexpr RetType<ValueType> OSPF_CRTP_FUNCTION(get_value_by)(const std::function<Result<SymbolValueType>(const std::string_view)>& values) const noexcept
                 {
                     auto ret = _constant;
                     for (const auto& mono : _monos)
@@ -176,8 +199,8 @@ namespace ospf
                 && MonomialType<typename T::MonomialType>
                 && requires (const T& polynomial)
                 {
-                    { T::monomials() } -> std::ranges::output_range<typename T::MonomialType>;
-                    { T::constant() } -> DecaySameAs<typename T::ValueType>;
+                    { polynomial.monomials() } -> std::ranges::output_range<typename T::MonomialType>;
+                    { polynomial.constant() } -> DecaySameAs<typename T::ValueType>;
                 };
 
             template<typename... Ts>
@@ -200,8 +223,8 @@ namespace ospf
                 && MonomialTypeOf<typename T::MonomialType, V, SV, cat>
                 && requires (const T& polynomial)
                 {
-                    { T::monomials() } -> std::ranges::output_range<typename T::MonomialType>;
-                    { T::constant() } -> DecaySameAs<typename T::ValueType>;
+                    { polynomial.monomials() } -> std::ranges::output_range<typename T::MonomialType>;
+                    { polynomial.constant() } -> DecaySameAs<typename T::ValueType>;
                 };
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
@@ -224,6 +247,20 @@ namespace ospf
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             concept AllPolynomialTypeOf = is_all_polynomial_type_of<V, SV, cat, Ts...>;
+
+            // operators between polynomial and polynomial
+
+            // operators between polynomial and monomial
+
+            // operators between monomial and polynomial
+
+            // operators between polynomial and value
+            
+            // operators between value and polynomial
+
+            // operators between polynomial and symbol
+
+            // operators between symbol and polynomial
 
             // operators between monomial and monomial
 

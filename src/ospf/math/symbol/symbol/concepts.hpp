@@ -1,5 +1,6 @@
 #pragma once1
 
+#include <ospf/string/hasher.hpp>
 #include <ospf/math/symbol/expression.hpp>
 #include <boost/locale.hpp>
 
@@ -86,7 +87,7 @@ namespace ospf
             };
 
             template<typename T>
-            concept SymbolType = requires (const T& symbol, const StringHashMap<std::string_view, f64>& values)
+            concept SymbolType = requires (const T& symbol)
             {
                 { symbol.name() } -> StringViewType;
                 { symbol.display_name() } -> StringViewType;
