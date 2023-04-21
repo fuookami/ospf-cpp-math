@@ -19,6 +19,30 @@ namespace ospf
                 // operators between symbol and value
 
                 // operators between symbol and symbol
+
+                // operators between polynomial and polynomial
+
+                // operators between polynomial and monomial
+
+                // operators between monomial and polynomial
+
+                // operators between polynomial and value
+
+                // operators between value and polynomial
+
+                // operators between polynomial and symbol
+
+                // operators between symbol and polynomial
+
+                // operators between monomial and monomial
+
+                // operators between monomial and value
+
+                // operators between value and monomial
+
+                // operators between monomial and symbol
+
+                // operators between symbol and monomial
             };
         };
     };

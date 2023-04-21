@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ospf/math/algebra/operator/arithmetic/pow.hpp>
+#include <ospf/math/algebra/operator/arithmetic/reciprocal.hpp>
 #include <ospf/math/symbol/monomial/concepts.hpp>
 #include <ospf/memory/reference.hpp>
 #include <span>
@@ -274,7 +275,7 @@ namespace ospf
                         });
                 }
 
-            OSPF_CRTP_PERMISSION :
+            OSPF_CRTP_PERMISSION:
                 inline constexpr RetType<ValueType> get_value_by(const std::function<Result<ValueType>(const std::string_view)>& values) const noexcept
                 {
                     auto ret = ArithmeticTrait<ValueType>::zero();
@@ -291,7 +292,7 @@ namespace ospf
                                     }
                                     else if (std::convertible_to<SymbolValueType, ValueType>)
                                     {
-                                        return static_cast<SymbolValueType>(values(sym->name()));
+                                        return static_cast<ValueType>(values(sym->name()));
                                     }
                                     else
                                     {
@@ -320,7 +321,76 @@ namespace ospf
             {
                 // operators between value and symbol
 
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator*(Lhs&& lhs, const Rhs& rhs) noexcept
+                {
+                    using RetType = StandardMonomial<OriginType<Lhs>, f64, OriginType<Rhs>>;
+                    return RetType{ std::forward<Lhs>(lhs), rhs };
+                }
+
+                template<Invariant Lhs, ExpressionSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator*(Lhs&& lhs, const Rhs& rhs) noexcept
+                {
+                    using ValueType = OriginType<decltype(lhs * std::declval<typename Rhs::ValueType>())>;
+                    using RetType = StandardMonomial<ValueType, typename Rhs::SymbolValueType, PureSymbol, OriginType<Rhs>>;
+                    if constexpr (DecaySameAs<Lhs, ValueType>)
+                    {
+                        return RetType{ std::forward<Lhs>(lhs), rhs };
+                    }
+                    else
+                    {
+                        return RetType{ static_cast<ValueType>(lhs), rhs };
+                    }
+                }
+
                 // operators between symbol and value
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator*(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using RetType = StandardMonomial<OriginType<Rhs>, f64, OriginType<Lhs>>;
+                    return RetType{ std::forward<Rhs>(rhs), lhs };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator/(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using RetType = StandardMonomial<OriginType<Rhs>, f64, OriginType<Lhs>>;
+                    return RetType{ reciprocal(std::forward<Rhs>(rhs)), lhs };
+                }
+
+                template<ExpressionSymbolType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator*(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using ValueType = OriginType<decltype(std::declval<typename Lhs::ValueType>() * rhs)>;
+                    using RetType = StandardMonomial<ValueType, typename Lhs::SymbolValueType, PureSymbol, OriginType<Lhs>>;
+                    if constexpr (DecaySameAs<Rhs, ValueType>)
+                    {
+                        return RetType{ std::forward<Rhs>(rhs), lhs };
+                    }
+                    else
+                    {
+                        return RetType{ static_cast<ValueType>(rhs), lhs };
+                    }
+                }
+
+                template<ExpressionSymbolType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator/(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using ValueType = OriginType<decltype(std::declval<typename Lhs::ValueType>() / rhs)>;
+                    using RetType = StandardMonomial<ValueType, typename Lhs::SymbolValueType, PureSymbol, OriginType<Lhs>>;
+                    if constexpr (DecaySameAs<Rhs, ValueType>)
+                    {
+                        return RetType{ reciprocal(std::forward<Rhs>(rhs)), lhs };
+                    }
+                    else
+                    {
+                        return RetType{ static_cast<ValueType>(reciprocal(std::forward<Rhs>(rhs))), lhs };
+                    }
+                }
 
                 // operators between symbol and symbol
 

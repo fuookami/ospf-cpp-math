@@ -38,7 +38,7 @@ namespace ospf
                     requires (Rhs::category == ExpressionCategory::Linear)
                 inline constexpr decltype(auto) operator+(Lhs&& lhs, const Rhs& rhs) noexcept
                 {
-                    using ValueType = OriginType<Lhs>;
+                    using ValueType = OriginType<decltype(lhs + std::declval<typename Rhs::ValueType>())>;
                     using RetType = LinearPolynomial<ValueType, f64, PureSymbol, OriginType<Rhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ rhs } }, std::forward<Lhs>(lhs) };
@@ -48,7 +48,7 @@ namespace ospf
                     requires (Rhs::category == ExpressionCategory::Linear)
                 inline constexpr decltype(auto) operator-(Lhs&& lhs, const Rhs& rhs) noexcept
                 {
-                    using ValueType = OriginType<Lhs>;
+                    using ValueType = OriginType<decltype(lhs - std::declval<typename Rhs::ValueType>())>;
                     using RetType = LinearPolynomial<ValueType, f64, PureSymbol, OriginType<Rhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ -ArithmeticTrait<ValueType>::one(), rhs } }, std::forward<Lhs>(lhs) };
@@ -77,7 +77,7 @@ namespace ospf
                 template<ExpressionSymbolType Lhs, Invariant Rhs>
                 inline constexpr decltype(auto) operator+(const Lhs& lhs, Rhs&& rhs) noexcept
                 {
-                    using ValueType = OriginType<Rhs>;
+                    using ValueType = OriginType<decltype(std::declval<typename Lhs::ValueType>() + rhs)>;
                     using RetType = LinearPolynomial<ValueType, f64, PureSymbol, OriginType<Lhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ lhs } }, std::forward<Rhs>(rhs) };
@@ -86,7 +86,7 @@ namespace ospf
                 template<ExpressionSymbolType Lhs, Invariant Rhs>
                 inline constexpr decltype(auto) operator-(const Lhs& lhs, Rhs&& rhs) noexcept
                 {
-                    using ValueType = OriginType<Rhs>;
+                    using ValueType = OriginType<decltype(std::declval<typename Lhs::ValueType>() - rhs)>;
                     using RetType = LinearPolynomial<ValueType, f64, PureSymbol, OriginType<Lhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ lhs } }, -std::forward<Rhs>(rhs) };
@@ -115,7 +115,7 @@ namespace ospf
                 template<PureSymbolType Lhs, ExpressionSymbolType Rhs>
                 inline constexpr decltype(auto) operator+(Lhs&& lhs, Rhs&& rhs) noexcept
                 {
-                    using RetType = LinearPolynomial<f64, f64, OriginType<Lhs>, OriginType<Rhs>>;
+                    using RetType = LinearPolynomial<typename Rhs::ValueType, typename Rhs::SymbolValueType, OriginType<Lhs>, OriginType<Rhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ lhs }, MonomialType{ rhs } } };
                 }
@@ -123,15 +123,15 @@ namespace ospf
                 template<PureSymbolType Lhs, ExpressionSymbolType Rhs>
                 inline constexpr decltype(auto) operator-(Lhs&& lhs, Rhs&& rhs) noexcept
                 {
-                    using RetType = LinearPolynomial<f64, f64, OriginType<Lhs>, OriginType<Rhs>>;
+                    using RetType = LinearPolynomial<typename Rhs::ValueType, typename Rhs::SymbolValueType, OriginType<Lhs>, OriginType<Rhs>>;
                     using MonomialType = typename RetType::MonomialType;
-                    return RetType{ { MonomialType{ lhs }, MonomialType{ -1.0_f64, rhs } } };
+                    return RetType{ { MonomialType{ lhs }, MonomialType{ -ArithmeticTrait<typename Rhs::ValueType>::one(), rhs}}};
                 }
 
                 template<ExpressionSymbolType Lhs, PureSymbolType Rhs>
                 inline constexpr decltype(auto) operator+(Lhs&& lhs, Rhs&& rhs) noexcept
                 {
-                    using RetType = LinearPolynomial<f64, f64, OriginType<Rhs>, OriginType<Lhs>>;
+                    using RetType = LinearPolynomial<typename Lhs::ValueType, typename Lhs::SymbolValueType, OriginType<Rhs>, OriginType<Lhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ lhs }, MonomialType{ rhs } } };
                 }
@@ -139,16 +139,16 @@ namespace ospf
                 template<ExpressionSymbolType Lhs, PureSymbolType Rhs>
                 inline constexpr decltype(auto) operator-(Lhs&& lhs, Rhs&& rhs) noexcept
                 {
-                    using RetType = LinearPolynomial<f64, f64, OriginType<Rhs>, OriginType<Lhs>>;
+                    using RetType = LinearPolynomial<typename Lhs::ValueType, typename Lhs::SymbolValueType, OriginType<Rhs>, OriginType<Lhs>>;
                     using MonomialType = typename RetType::MonomialType;
-                    return RetType{ { MonomialType{ lhs }, MonomialType{ -1.0_f64, rhs } } };
+                    return RetType{ { MonomialType{ lhs }, MonomialType{ -ArithmeticTrait<typename Lhs::ValueType>::one(), rhs } } };
                 }
 
                 template<ExpressionSymbolType Lhs, ExpressionSymbolType Rhs>
                     requires DecaySameAs<Lhs, Rhs>
                 inline constexpr decltype(auto) operator+(Lhs&& lhs, Rhs&& rhs) noexcept
                 {
-                    using RetType = LinearPolynomial<f64, f64, PureSymbol, OriginType<Lhs>>;
+                    using RetType = LinearPolynomial<typename Lhs::ValueType, typename Lhs::SymbolValueType, PureSymbol, OriginType<Lhs>>;
                     using MonomialType = typename RetType::MonomialType;
                     return RetType{ { MonomialType{ lhs }, MonomialType{ rhs } } };
                 }
@@ -157,10 +157,34 @@ namespace ospf
                     requires DecaySameAs<Lhs, Rhs>
                 inline constexpr decltype(auto) operator-(Lhs&& lhs, Rhs&& rhs) noexcept
                 {
-                    using RetType = LinearPolynomial<f64, f64, PureSymbol, OriginType<Lhs>>;
+                    using RetType = LinearPolynomial<typename Lhs::ValueType, typename Lhs::SymbolValueType, PureSymbol, OriginType<Lhs>>;
                     using MonomialType = typename RetType::MonomialType;
-                    return RetType{ { MonomialType{ lhs }, MonomialType{ -1.0_f64, rhs } } };
+                    return RetType{ { MonomialType{ lhs }, MonomialType{ -ArithmeticTrait<typename Lhs::ValueType>::one(), rhs } } };
                 }
+
+                // operators between polynomial and polynomial
+
+                // operators between polynomial and monomial
+
+                // operators between monomial and polynomial
+
+                // operators between polynomial and value
+
+                // operators between value and polynomial
+
+                // operators between polynomial and symbol
+
+                // operators between symbol and polynomial
+
+                // operators between monomial and monomial
+
+                // operators between monomial and value
+
+                // operators between value and monomial
+
+                // operators between monomial and symbol
+
+                // operators between symbol and monomial
             };
         };
     };

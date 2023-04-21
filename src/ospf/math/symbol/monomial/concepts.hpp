@@ -21,6 +21,8 @@ namespace ospf
                 using ValueType = OriginType<T>;
                 using SymbolValueType = OriginType<ST>;
                 using CellType = OriginType<Cell>;
+                using PureSymbolType = typename CellType::PureSymbolType;
+                using ExprSymbolType = typename CellType::ExprSymbolType;
 
             public:
                 constexpr Monomial(CellType cell)

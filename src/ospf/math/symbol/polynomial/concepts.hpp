@@ -247,30 +247,6 @@ namespace ospf
 
             template<typename V, typename SV, ExpressionCategory cat, typename... Ts>
             concept AllPolynomialTypeOf = is_all_polynomial_type_of<V, SV, cat, Ts...>;
-
-            // operators between polynomial and polynomial
-
-            // operators between polynomial and monomial
-
-            // operators between monomial and polynomial
-
-            // operators between polynomial and value
-            
-            // operators between value and polynomial
-
-            // operators between polynomial and symbol
-
-            // operators between symbol and polynomial
-
-            // operators between monomial and monomial
-
-            // operators between monomial and value
-
-            // operators between value and monomial
-
-            // operators between monomial and symbol
-
-            // operators between symbol and monomial
         };
     };
 };

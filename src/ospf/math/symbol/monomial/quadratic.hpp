@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ospf/exception.hpp>
+#include <ospf/math/algebra/operator/arithmetic/reciprocal.hpp>
 #include <ospf/math/symbol/monomial/concepts.hpp>
 #include <ospf/memory/reference.hpp>
 
@@ -325,7 +326,7 @@ namespace ospf
                                         }
                                         else if (std::convertible_to<SymbolValueType, ValueType>)
                                         {
-                                            return static_cast<SymbolValueType>(values(sym->name()));
+                                            return static_cast<ValueType>(values(sym->name()));
                                         }
                                         else
                                         {
@@ -359,7 +360,76 @@ namespace ospf
             {
                 // operators between value and symbol
 
+                template<Invariant Lhs, PureSymbolType Rhs>
+                inline constexpr decltype(auto) operator*(Lhs&& lhs, const Rhs& rhs) noexcept
+                {
+                    using RetType = QuadraticMonomial<OriginType<Lhs>, f64, OriginType<Rhs>>;
+                    return RetType{ std::forward<Lhs>(lhs), rhs };
+                }
+
+                template<Invariant Lhs, ExpressionSymbolType Rhs>
+                    requires (Rhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator*(Lhs&& lhs, const Rhs& rhs) noexcept
+                {
+                    using ValueType = OriginType<decltype(lhs * std::declval<typename Rhs::ValueType>())>;
+                    using RetType = QuadraticMonomial<ValueType, typename Rhs::SymbolValueType, PureSymbol, OriginType<Rhs>>;
+                    if constexpr (DecaySameAs<Lhs, ValueType>)
+                    {
+                        return RetType{ std::forward<Lhs>(lhs), rhs };
+                    }
+                    else
+                    {
+                        return RetType{ static_cast<ValueType>(lhs), rhs };
+                    }
+                }
+
                 // operators between symbol and value
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator*(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using RetType = QuadraticMonomial<OriginType<Rhs>, f64, OriginType<Lhs>>;
+                    return RetType{ std::forward<Rhs>(rhs), lhs };
+                }
+
+                template<PureSymbolType Lhs, Invariant Rhs>
+                inline constexpr decltype(auto) operator/(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using RetType = QuadraticMonomial<OriginType<Rhs>, f64, OriginType<Lhs>>;
+                    return RetType{ reciprocal(std::forward<Rhs>(rhs)), lhs };
+                }
+
+                template<ExpressionSymbolType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator*(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using ValueType = OriginType<decltype(std::declval<typename Lhs::ValueType>() * rhs)>;
+                    using RetType = QuadraticMonomial<ValueType, typename Lhs::SymbolValueType, PureSymbol, OriginType<Lhs>>;
+                    if constexpr (DecaySameAs<Rhs, ValueType>)
+                    {
+                        return RetType{ std::forward<Rhs>(rhs), lhs };
+                    }
+                    else
+                    {
+                        return RetType{ static_cast<ValueType>(rhs), lhs };
+                    }
+                }
+
+                template<ExpressionSymbolType Lhs, Invariant Rhs>
+                    requires (Lhs::category == ExpressionCategory::Linear)
+                inline constexpr decltype(auto) operator/(const Lhs& lhs, Rhs&& rhs) noexcept
+                {
+                    using ValueType = OriginType<decltype(std::declval<typename Lhs::ValueType>() / rhs)>;
+                    using RetType = QuadraticMonomial<ValueType, typename Lhs::SymbolValueType, PureSymbol, OriginType<Lhs>>;
+                    if constexpr (DecaySameAs<Rhs, ValueType>)
+                    {
+                        return RetType{ reciprocal(std::forward<Rhs>(rhs)), lhs };
+                    }
+                    else
+                    {
+                        return RetType{ static_cast<ValueType>(reciprocal(std::forward<Rhs>(rhs))), lhs };
+                    }
+                }
 
                 // operators between symbol and symbol
 
